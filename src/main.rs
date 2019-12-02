@@ -1,8 +1,9 @@
+mod day;
 mod day_one;
 
 fn main() {
-  let days = vec![day_one::DayOne];
-  for day in &days {
-    day.solve();
+  let days: [day::Day; 1] = [day_one::DayOne::new()];
+  for d in &days {
+    println!("{}", d.solve());
   }
 }

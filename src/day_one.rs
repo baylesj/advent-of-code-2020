@@ -1,12 +1,15 @@
-mod day;
-
 mod day_one {
-struct DayOne {
-}
+pub struct DayOne {}
 
+use crate::day::Day;
 impl Day for DayOne {
-  fn solve() {
+  fn new(Self) -> DayOne {
+    DayOne{}
+  }
 
+  fn solve(Self) -> String {
+    "foo".to_string()
   }
 }
+
 }
