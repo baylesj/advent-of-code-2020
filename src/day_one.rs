@@ -2,7 +2,7 @@ use std::fs::File;
 use std::io::prelude::*;
 use std::io::BufReader;
 
-const INPUT_FILENAME: &str = "./src/day_one_input.txt";
+const INPUT_FILENAME: &str = "input/day_one_input.txt";
 
 type Mass = u32;
 type Fuel = u32;
