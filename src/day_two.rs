@@ -40,15 +40,49 @@ fn fixup_program(program: &mut Vec<i32>) {
     program[2] = 2;
 }
 
-pub fn solve() -> String {
-    let fc: String = fs::read_to_string(INPUT_FILENAME).expect("invalid filename");
-    let mut program: Vec<i32> = fc.split(',').map(|x| x.parse::<i32>().unwrap()).collect();
-    fixup_program(&mut program);
+fn set_program_inputs(program: &mut Vec<i32>, noun: i32, verb: i32) {
+    program[1] = noun;
+    program[2] = verb;
+}
 
+fn load_program() -> Vec<i32> {
+    let fc: String = fs::read_to_string(INPUT_FILENAME).expect("invalid filename");
+    fc.split(',').map(|x| x.parse::<i32>().unwrap()).collect()
+}
+
+fn run_program(program: &mut Vec<i32>) {
     let mut index: usize = 0;
-    while perform_operation(index, &mut program) {
+    while perform_operation(index, program) {
         index += 4;
     }
+}
 
-    program[0].to_string()
+fn part_one() -> i32 {
+    let mut program = load_program();
+    fixup_program(&mut program);
+    run_program(&mut program);
+
+    program[0]
+}
+
+fn part_two() -> i32 {
+    const DESIRED_OUTPUT: i32 = 19690720;
+    let original_program = load_program();
+
+    for noun in 0..=99 {
+        for verb in 0..=99 {
+            let mut program: Vec<i32> = original_program.to_vec();
+            set_program_inputs(&mut program, noun, verb);
+            run_program(&mut program);
+            if program[0] == DESIRED_OUTPUT {
+                return 100 * program[1] + program[2];
+            }
+        }
+    }
+
+    -1
+}
+
+pub fn solve() -> String {
+    format!("part one: {}, part two: {}", part_one(), part_two())
 }
