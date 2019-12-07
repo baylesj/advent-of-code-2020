@@ -1,6 +1,11 @@
 use std::cmp;
+use std::fs;
 use std::ops::Sub;
+use std::str::FromStr;
 
+const INPUT_FILENAME: &str = "input/day_three.txt";
+
+// TODO: move Point, Bounds to geometry mod.
 #[derive(Debug, Default)]
 struct Point {
     x: i32,
@@ -55,27 +60,73 @@ impl Update for Bounds {
         }
     }
 }
-struct Instructions {
-    first_wire: Vec<String>,
-    second_wire: Vec<String>,
+
+enum Instruction {
+    Left(i32),
+    Up(i32),
+    Right(i32),
+    Down(i32),
 }
 
-fn calc_manhattan_distance(a: Point, b: Point) -> i32 {
-    ((a.x - b.x) + (a.y - b.y)).abs()
-}
+impl FromStr for Instruction {
+    type Err = &'static str;
 
-fn update_location(location: &mut Point, instruction: &str) {
-    let magnitude: i32 = instruction[1..].parse().unwrap();
-    match instruction[..0].chars().next().unwrap() {
-        'U' => location.y += magnitude,
-        'D' => location.y -= magnitude,
-        'L' => location.x -= magnitude,
-        'R' => location.x += magnitude,
-        _ => panic!("Unknown instruction"),
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let magnitude: i32 = s[1..].parse::<i32>().expect("Invalid magnitude");
+        match s.chars().nth(0).expect("Invalid instruction") {
+            'L' => Ok(Instruction::Left(magnitude)),
+            'U' => Ok(Instruction::Up(magnitude)),
+            'R' => Ok(Instruction::Right(magnitude)),
+            'D' => Ok(Instruction::Down(magnitude)),
+            _ => Err("Invalid direction code"),
+        }
     }
 }
 
-fn calc_bounds(wire_instructions: &Vec<String>) -> Bounds {
+struct Instructions {
+    first_wire: Vec<Instruction>,
+    second_wire: Vec<Instruction>,
+}
+
+impl FromStr for Instructions {
+    type Err = &'static str;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let mut lines = s.lines();
+
+        let first_instructions = lines
+            .next()
+            .expect("invalid line")
+            .split(",")
+            .map(|x| Instruction::from_str(x).expect("parse error"))
+            .collect();
+        let second_instructions = lines
+            .next()
+            .expect("invalid line")
+            .split(",")
+            .map(|x| Instruction::from_str(x).expect("parse error"))
+            .collect();
+        Ok(Instructions {
+            first_wire: first_instructions,
+            second_wire: second_instructions,
+        })
+    }
+}
+
+// fn calc_manhattan_distance(a: Point, b: Point) -> i32 {
+//     ((a.x - b.x) + (a.y - b.y)).abs()
+// }
+
+fn update_location(location: &mut Point, instruction: &Instruction) {
+    match instruction {
+        Instruction::Left(x) => location.x -= x,
+        Instruction::Up(y) => location.y += y,
+        Instruction::Right(x) => location.x += x,
+        Instruction::Down(y) => location.y -= y,
+    }
+}
+
+fn calc_bounds(wire_instructions: &Vec<Instruction>) -> Bounds {
     let mut bounds = Bounds::default();
 
     let mut current_location = Point::default();
@@ -87,15 +138,23 @@ fn calc_bounds(wire_instructions: &Vec<String>) -> Bounds {
     bounds
 }
 
-fn calc_grid_size(instructions: Instructions) -> Point {
+fn calc_grid_size(instructions: &Instructions) -> Point {
     let mut first_bounds = calc_bounds(&instructions.first_wire);
-    let second_bounds = calc_bounds(&instructions.first_wire);
+    let second_bounds = calc_bounds(&instructions.second_wire);
 
     first_bounds.update_limits(&second_bounds.lower_left);
     first_bounds.update_limits(&second_bounds.upper_right);
     return first_bounds.dimensions();
 }
 
+// TODO: refactor file ops into separate mod?
+fn load_all_instructions() -> Result<Instructions, &'static str> {
+    let lines = fs::read_to_string(INPUT_FILENAME).expect("invalid file");
+    Instructions::from_str(&lines)
+}
+
 pub fn solve() -> String {
-    format!("{}", calc_grid_size())
+    let instructions = load_all_instructions().expect("invalid instructions");
+
+    format!("size: {:?}", calc_grid_size(&instructions))
 }
