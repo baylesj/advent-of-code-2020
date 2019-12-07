@@ -1,6 +1,6 @@
 use std::fs;
 
-const INPUT_FILENAME: &str = "input/day_two_input.txt";
+const INPUT_FILENAME: &str = "input/day_two.txt";
 
 fn operation_code_one(index: usize, program: &mut Vec<i32>) {
     let a_i: usize = program[index + 1] as usize;
