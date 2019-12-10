@@ -132,13 +132,13 @@ impl IntersectionList for geo::LineString<f64> {
                         (coord.x - b.start.x as i64).abs() + (coord.y - b.start.y as i64).abs(), /*- 2*/
                     ) as usize;
 
-                    println!(
-                        "x: {}, y: {}, stepsA: {}, stepsB: {}",
-                        coord.x,
-                        coord.y,
-                        a_len + a_line_frag_len,
-                        b_len + b_line_frag_len
-                    );
+                    // println!(
+                    //     "x: {}, y: {}, stepsA: {}, stepsB: {}",
+                    //     coord.x,
+                    //     coord.y,
+                    //     a_len + a_line_frag_len,
+                    //     b_len + b_line_frag_len
+                    // );
                     if coord.x_y() != (0, 0) {
                         intersections.push(IntersectionInfo {
                             location: coord,
