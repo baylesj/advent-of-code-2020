@@ -1,65 +1,12 @@
-use std::cmp;
+#[path = "geometry.rs"]
+mod geometry;
+
+use geometry::Dimensions;
+use geometry::Update;
 use std::fs;
-use std::ops::Sub;
 use std::str::FromStr;
 
 const INPUT_FILENAME: &str = "input/day_three.txt";
-
-// TODO: move Point, Bounds to geometry mod.
-#[derive(Debug, Default)]
-struct Point {
-    x: i32,
-    y: i32,
-}
-
-impl Sub for Point {
-    type Output = Point;
-
-    fn sub(self, other: Point) -> Point {
-        Point {
-            x: self.x - other.x,
-            y: self.y - other.y,
-        }
-    }
-}
-
-#[derive(Debug, Default)]
-struct Bounds {
-    upper_right: Point,
-    lower_left: Point,
-}
-
-trait Dimensions {
-    fn dimensions(self) -> Point;
-}
-
-impl Dimensions for Bounds {
-    fn dimensions(self) -> Point {
-        Point {
-            x: self.upper_right.x - self.lower_left.x,
-            y: self.upper_right.y - self.lower_left.y,
-        }
-    }
-}
-
-trait Update {
-    fn update_limits(&mut self, location: &Point);
-}
-
-impl Update for Bounds {
-    fn update_limits(&mut self, location: &Point) {
-        if location.x < 0 {
-            self.lower_left.x = cmp::min(self.lower_left.x, location.x);
-        } else {
-            self.upper_right.x = cmp::max(self.lower_left.x, location.x);
-        }
-        if location.y < 0 {
-            self.lower_left.y = cmp::min(self.lower_left.y, location.y);
-        } else {
-            self.upper_right.y = cmp::max(self.lower_left.y, location.y);
-        }
-    }
-}
 
 enum Instruction {
     Left(i32),
@@ -113,11 +60,11 @@ impl FromStr for Instructions {
     }
 }
 
-// fn calc_manhattan_distance(a: Point, b: Point) -> i32 {
+// fn calc_manhattan_distance(a: geometry::Point, b: geometry::Point) -> i32 {
 //     ((a.x - b.x) + (a.y - b.y)).abs()
 // }
 
-fn update_location(location: &mut Point, instruction: &Instruction) {
+fn update_location(location: &mut geometry::Point, instruction: &Instruction) {
     match instruction {
         Instruction::Left(x) => location.x -= x,
         Instruction::Up(y) => location.y += y,
@@ -126,10 +73,10 @@ fn update_location(location: &mut Point, instruction: &Instruction) {
     }
 }
 
-fn calc_bounds(wire_instructions: &Vec<Instruction>) -> Bounds {
-    let mut bounds = Bounds::default();
+fn calc_bounds(wire_instructions: &Vec<Instruction>) -> geometry::Bounds {
+    let mut bounds = geometry::Bounds::default();
 
-    let mut current_location = Point::default();
+    let mut current_location = geometry::Point::default();
     for instruction in wire_instructions {
         update_location(&mut current_location, instruction);
         bounds.update_limits(&current_location);
@@ -138,7 +85,7 @@ fn calc_bounds(wire_instructions: &Vec<Instruction>) -> Bounds {
     bounds
 }
 
-fn calc_grid_size(instructions: &Instructions) -> Point {
+fn calc_grid_size(instructions: &Instructions) -> geometry::Point {
     let mut first_bounds = calc_bounds(&instructions.first_wire);
     let second_bounds = calc_bounds(&instructions.second_wire);
 
@@ -153,6 +100,29 @@ fn load_all_instructions() -> Result<Instructions, &'static str> {
     Instructions::from_str(&lines)
 }
 
+/*
+  Some facts:
+    1. Vertical lines can only intersect with horizontal lines. Not strictly
+       true, but a good limiting assumption to start with.
+
+    2. Thus we can store our line instructions as a pair of points: source
+    point and terminal point.
+
+    Two lines intersect if there is some point where x = x', y = y'
+    (0, 0) R75 (75, 0)
+    (30, 30) D60 (30, -30)
+
+    Horizontal line: y=0, 0 -> 75
+    Vertical line: x'=30, y'-30 -> 30
+
+    intersect if x' in x0 -> x1 and y in y'0 ->y'1
+    at x = 30, y = 0 they are the same.
+
+    Simple solution:
+    for each line in trail one, put in a map by x, y
+    for each line in y 2, check and see if it intersects any pair in line 1.
+
+*/
 pub fn solve() -> String {
     let instructions = load_all_instructions().expect("invalid instructions");
 
