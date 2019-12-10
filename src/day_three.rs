@@ -1,8 +1,4 @@
-#[path = "geometry.rs"]
-mod geometry;
-
-use geometry::Dimensions;
-use geometry::Update;
+use geo;
 use std::fs;
 use std::str::FromStr;
 
@@ -30,101 +26,115 @@ impl FromStr for Instruction {
     }
 }
 
-struct Instructions {
-    first_wire: Vec<Instruction>,
-    second_wire: Vec<Instruction>,
+#[derive(Debug)]
+struct WireSegments {
+    first_wire: geo::LineString<f64>,
+    second_wire: geo::LineString<f64>,
 }
 
-impl FromStr for Instructions {
+fn process_instruction(
+    begin: geo::Coordinate<f64>,
+    instruction: &Instruction,
+) -> geo::Coordinate<f64> {
+    let mut end: geo::Coordinate<f64> = begin;
+    match instruction {
+        Instruction::Left(x) => end.x -= *x as f64,
+        Instruction::Up(y) => end.y += *y as f64,
+        Instruction::Right(x) => end.x += *x as f64,
+        Instruction::Down(y) => end.y -= *y as f64,
+    }
+    end
+}
+
+fn parse_wire(lines: &mut std::str::Lines) -> geo::LineString<f64> {
+    let instructions: Vec<Instruction> = lines
+        .next()
+        .expect("invalid line")
+        .split(",")
+        .map(|x| Instruction::from_str(x).expect("parse error"))
+        .collect();
+
+    // TODO: set size in advance
+    // TODO: aggregate mapper?
+    let mut points: Vec<geo::Coordinate<f64>> = vec![];
+    let mut current_location = geo::Coordinate::<f64> { x: 0.0, y: 0.0 };
+    for inst in instructions {
+        points.push(current_location);
+        current_location = process_instruction(current_location, &inst);
+    }
+    geo::LineString(points)
+}
+
+impl FromStr for WireSegments {
     type Err = &'static str;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let mut lines = s.lines();
-
-        let first_instructions = lines
-            .next()
-            .expect("invalid line")
-            .split(",")
-            .map(|x| Instruction::from_str(x).expect("parse error"))
-            .collect();
-        let second_instructions = lines
-            .next()
-            .expect("invalid line")
-            .split(",")
-            .map(|x| Instruction::from_str(x).expect("parse error"))
-            .collect();
-        Ok(Instructions {
-            first_wire: first_instructions,
-            second_wire: second_instructions,
+        Ok(WireSegments {
+            first_wire: parse_wire(&mut lines),
+            second_wire: parse_wire(&mut lines),
         })
     }
 }
 
-// fn calc_manhattan_distance(a: geometry::Point, b: geometry::Point) -> i32 {
-//     ((a.x - b.x) + (a.y - b.y)).abs()
-// }
-
-fn update_location(location: &mut geometry::Point, instruction: &Instruction) {
-    match instruction {
-        Instruction::Left(x) => location.x -= x,
-        Instruction::Up(y) => location.y += y,
-        Instruction::Right(x) => location.x += x,
-        Instruction::Down(y) => location.y -= y,
-    }
+pub trait IntersectionList {
+    fn intersections(self: Self, other: &Self) -> Vec<geo::Coordinate<f64>>;
 }
 
-fn calc_bounds(wire_instructions: &Vec<Instruction>) -> geometry::Bounds {
-    let mut bounds = geometry::Bounds::default();
-
-    let mut current_location = geometry::Point::default();
-    for instruction in wire_instructions {
-        update_location(&mut current_location, instruction);
-        bounds.update_limits(&current_location);
+// TODO: clean this up.
+impl IntersectionList for geo::LineString<f64> {
+    fn intersections(self: Self, other: &Self) -> Vec<geo::Coordinate<f64>> {
+        let mut intersections = Vec::new();
+        if self.0.is_empty() || other.0.is_empty() {
+            return intersections;
+        }
+        for a in self.lines() {
+            for b in other.lines() {
+                let u_b = b.dy() * a.dx() - b.dx() * a.dy();
+                if u_b == 0.0 {
+                    continue;
+                }
+                // Slope intercept forms of the lines
+                let ua_t = b.dx() * (a.start.y - b.start.y) - b.dy() * (a.start.x - b.start.x);
+                let ub_t = a.dx() * (a.start.y - b.start.y) - a.dy() * (a.start.x - b.start.x);
+                let u_a = ua_t / u_b;
+                let u_b = ub_t / u_b;
+                if (0.0 <= u_a) && (u_a <= 1.0) && (0.0 <= u_b) && (u_b <= 1.0) {
+                    intersections.push(geo::Coordinate {
+                        x: a.start.x + u_a * (a.end.x - a.start.x),
+                        y: a.start.y + u_a * (a.end.y - a.start.y),
+                    });
+                }
+            }
+        }
+        intersections
     }
-
-    bounds
-}
-
-fn calc_grid_size(instructions: &Instructions) -> geometry::Point {
-    let mut first_bounds = calc_bounds(&instructions.first_wire);
-    let second_bounds = calc_bounds(&instructions.second_wire);
-
-    first_bounds.update_limits(&second_bounds.lower_left);
-    first_bounds.update_limits(&second_bounds.upper_right);
-    return first_bounds.dimensions();
 }
 
 // TODO: refactor file ops into separate mod?
-fn load_all_instructions() -> Result<Instructions, &'static str> {
+fn load_all_instructions() -> Result<WireSegments, &'static str> {
     let lines = fs::read_to_string(INPUT_FILENAME).expect("invalid file");
-    Instructions::from_str(&lines)
+    WireSegments::from_str(&lines)
 }
 
-/*
-  Some facts:
-    1. Vertical lines can only intersect with horizontal lines. Not strictly
-       true, but a good limiting assumption to start with.
-
-    2. Thus we can store our line instructions as a pair of points: source
-    point and terminal point.
-
-    Two lines intersect if there is some point where x = x', y = y'
-    (0, 0) R75 (75, 0)
-    (30, 30) D60 (30, -30)
-
-    Horizontal line: y=0, 0 -> 75
-    Vertical line: x'=30, y'-30 -> 30
-
-    intersect if x' in x0 -> x1 and y in y'0 ->y'1
-    at x = 30, y = 0 they are the same.
-
-    Simple solution:
-    for each line in trail one, put in a map by x, y
-    for each line in y 2, check and see if it intersects any pair in line 1.
-
-*/
+use geo::algorithm::intersects::Intersects;
 pub fn solve() -> String {
     let instructions = load_all_instructions().expect("invalid instructions");
 
-    format!("size: {:?}", calc_grid_size(&instructions))
+    let intersects: bool = instructions
+        .first_wire
+        .intersects(&instructions.second_wire);
+    let intersections = instructions
+        .first_wire
+        .intersections(&instructions.second_wire);
+
+    format!(
+        "intersects: {}, min distance: {}",
+        intersects,
+        intersections
+            .iter()
+            .map(|c| (c.x.abs() + c.y.abs()) as i64)
+            .min()
+            .expect("Failed to find intersection!")
+    )
 }
