@@ -1,48 +1,89 @@
 use std::fs;
+use text_io::read;
 
-const INPUT_FILENAME: &str = "input/day_two.txt";
+const INPUT_FILENAME: &str = "input/day_five.txt";
 
-fn operation_code_one(index: usize, program: &mut Vec<i32>) {
-    let a_i: usize = program[index + 1] as usize;
-    let b_i: usize = program[index + 2] as usize;
-    let r_i: usize = program[index + 3] as usize;
-
-    program[r_i] = program[a_i] + program[b_i];
+#[derive(PartialEq, Clone, Copy)]
+enum ParameterMode {
+    Immediate,
+    Position,
 }
 
-// TODO: create generic and pass operator?
-fn operation_code_two(index: usize, program: &mut Vec<i32>) {
-    let a_i: usize = program[index + 1] as usize;
-    let b_i: usize = program[index + 2] as usize;
-    let r_i: usize = program[index + 3] as usize;
-
-    program[r_i] = program[a_i] * program[b_i];
-}
-
-fn perform_operation(index: usize, program: &mut Vec<i32>) -> bool {
-    match program[index] {
-        1 => {
-            operation_code_one(index, program);
-            true
-        }
-        2 => {
-            operation_code_two(index, program);
-            true
-        }
-        // 99 is HALT.
-        99 => false,
-        _ => panic!("unknown op code received!"),
+// NOTE: ONLY for read only params.
+fn access_parameter(index: usize, program: &Vec<i32>, mode: ParameterMode) -> i32 {
+    if mode == ParameterMode::Immediate {
+        program[index]
+    } else {
+        program[program[index] as usize]
     }
 }
 
-fn fixup_program(program: &mut Vec<i32>) {
-    program[1] = 12;
-    program[2] = 2;
+fn operation_code_one(index: usize, program: &mut Vec<i32>, modes: &Vec<ParameterMode>) {
+    let a: i32 = access_parameter(index + 1, program, modes[0]);
+    let b: i32 = access_parameter(index + 2, program, modes[1]);
+    let r_i: usize = program[index + 3] as usize;
+    program[r_i] = a + b;
 }
 
-fn set_program_inputs(program: &mut Vec<i32>, noun: i32, verb: i32) {
-    program[1] = noun;
-    program[2] = verb;
+// TODO: create generic and pass operator?
+fn operation_code_two(index: usize, program: &mut Vec<i32>, modes: &Vec<ParameterMode>) {
+    let a: i32 = access_parameter(index + 1, program, modes[0]);
+    let b: i32 = access_parameter(index + 2, program, modes[1]);
+    let r_i: usize = program[index + 3] as usize;
+    program[r_i] = a * b;
+}
+
+fn operation_code_three(index: usize, program: &mut Vec<i32>) {
+    let r_i: usize = program[index + 1] as usize;
+
+    println!("Enter system ID:");
+    let i: i32 = read!();
+    program[r_i] = i;
+}
+
+fn operation_code_four(index: usize, program: &mut Vec<i32>, modes: &Vec<ParameterMode>) {
+    let a: i32 = access_parameter(index + 1, program, modes[0]);
+    println!("Output: {}", a);
+}
+
+fn dig(op: i32, place: u32) -> i32 {
+    let t = i32::pow(10, place);
+    ((op / t) % 10) * t
+}
+
+fn dig_mode(op: i32, place: u32) -> ParameterMode {
+    if dig(op, place) > 0 {
+        return ParameterMode::Immediate;
+    }
+    ParameterMode::Position
+}
+
+fn perform_operation(index: usize, program: &mut Vec<i32>) -> Option<usize> {
+    let op = program[index];
+    let op_code: i32 = dig(op, 1) + dig(op, 0);
+    let modes: Vec<ParameterMode> = vec![dig_mode(op, 2), dig_mode(op, 3), dig_mode(op, 4)];
+
+    match op_code {
+        1 => {
+            operation_code_one(index, program, &modes);
+            Some(4)
+        }
+        2 => {
+            operation_code_two(index, program, &modes);
+            Some(4)
+        }
+        3 => {
+            operation_code_three(index, program);
+            Some(2)
+        }
+        4 => {
+            operation_code_four(index, program, &modes);
+            Some(2)
+        }
+        // 99 is HALT.
+        99 => None,
+        _ => panic!("unknown OP code: {}", op_code),
+    }
 }
 
 fn load_program() -> Vec<i32> {
@@ -52,37 +93,18 @@ fn load_program() -> Vec<i32> {
 
 fn run_program(program: &mut Vec<i32>) {
     let mut index: usize = 0;
-    while perform_operation(index, program) {
-        index += 4;
+
+    while let Some(adv) = perform_operation(index, program) {
+        index += adv
     }
 }
 
-fn part_one() -> i32 {
+fn part_one() {
     let mut program = load_program();
-    fixup_program(&mut program);
     run_program(&mut program);
-
-    program[0]
-}
-
-fn part_two() -> i32 {
-    const DESIRED_OUTPUT: i32 = 19690720;
-    let original_program = load_program();
-
-    for noun in 0..=99 {
-        for verb in 0..=99 {
-            let mut program: Vec<i32> = original_program.to_vec();
-            set_program_inputs(&mut program, noun, verb);
-            run_program(&mut program);
-            if program[0] == DESIRED_OUTPUT {
-                return 100 * program[1] + program[2];
-            }
-        }
-    }
-
-    -1
 }
 
 pub fn solve() -> String {
-    format!("part one: {}, part two: {}", part_one(), part_two())
+    part_one();
+    String::from("Check stdout.")
 }

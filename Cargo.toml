@@ -9,3 +9,4 @@ edition = "2018"
 [dependencies]
 geo = "0.12.2"
 line_intersection = "0.4.0"
+text_io = "0.1.7"
