@@ -39,7 +39,7 @@ fn parse_input<'a>() -> HashMap<String, Node> {
     map
 }
 
-pub fn solve() -> String {
+fn part_one() -> i32 {
     let map = parse_input();
     const ROOT_NODE_NAME: &str = "COM";
     let mut current_level: Vec<&Node> = vec![map.get(&ROOT_NODE_NAME.to_string()).unwrap()];
@@ -57,5 +57,38 @@ pub fn solve() -> String {
         current_level = next_level;
     }
 
-    current_num_orbits.to_string()
+    current_num_orbits
+}
+
+fn part_two() -> i32 {
+    let map = parse_input();
+    const SANTA_NODE_NAME: &str = "SAN";
+    let santas_node = map.get(&SANTA_NODE_NAME.to_string());
+    let mut santas_parents = HashMap::new();
+
+    const YOUR_NODE_NAME: &str = "YOU";
+    let your_node = map.get(&YOUR_NODE_NAME.to_string());
+
+    let mut sa = santas_node.unwrap().parent.as_ref();
+    let mut depth: i32 = 0;
+    while let Some(a) = sa {
+        santas_parents.insert(a, depth);
+        depth += 1;
+        sa = map[&a.to_string()].parent.as_ref();
+    }
+
+    let mut ya = your_node.unwrap().parent.as_ref();
+    let mut your_depth: i32 = 0;
+    while let Some(a) = ya {
+        if santas_parents.contains_key(&a) {
+            return santas_parents[&a] + your_depth;
+        }
+        your_depth += 1;
+        ya = map[&a.to_string()].parent.as_ref();
+    }
+    -1
+}
+
+pub fn solve() -> String {
+    format!("part one: {}, part two: {}", part_one(), part_two())
 }
