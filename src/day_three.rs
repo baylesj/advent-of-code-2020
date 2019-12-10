@@ -3,6 +3,10 @@ use std::fs;
 use std::str::FromStr;
 
 const INPUT_FILENAME: &str = "input/day_three.txt";
+// TODO: doesn't work on day_three_sample.txt. Looking at the implementation
+// implies there's an offset issue from the original advent source?
+//const INPUT_FILENAME: &str = "input/day_three_sample.txt";
+//const INPUT_FILENAME: &str = "input/day_three_sample_two.txt";
 
 enum Instruction {
     Left(i32),
@@ -77,42 +81,79 @@ impl FromStr for WireSegments {
     }
 }
 
+#[derive(Debug)]
+pub struct IntersectionInfo {
+    location: geo::Coordinate<i64>,
+    steps: usize,
+}
+
 pub trait IntersectionList {
-    fn intersections(self: &Self, other: &Self) -> Vec<geo::Coordinate<f64>>;
+    fn intersections(self: &Self, other: &Self) -> Vec<IntersectionInfo>;
 }
 
 // TODO: clean this up.
 impl IntersectionList for geo::LineString<f64> {
-    fn intersections(self: &Self, other: &Self) -> Vec<geo::Coordinate<f64>> {
+    fn intersections(self: &Self, other: &Self) -> Vec<IntersectionInfo> {
         let mut intersections = Vec::new();
         if self.0.is_empty() || other.0.is_empty() {
             return intersections;
         }
+
+        let mut a_len: usize = 0;
         for a in self.lines() {
+            let mut b_len: usize = 0;
             for b in other.lines() {
                 let u_b = b.dy() * a.dx() - b.dx() * a.dy();
                 if u_b == 0.0 {
+                    // -1 to not double count the ends of segments
+                    b_len += b.length();
                     continue;
                 }
-                // Slope intercept forms of the lines
+
                 let ua_t = b.dx() * (a.start.y - b.start.y) - b.dy() * (a.start.x - b.start.x);
                 let ub_t = a.dx() * (a.start.y - b.start.y) - a.dy() * (a.start.x - b.start.x);
                 let u_a = ua_t / u_b;
                 let u_b = ub_t / u_b;
                 if (0.0 <= u_a) && (u_a <= 1.0) && (0.0 <= u_b) && (u_b <= 1.0) {
-                    intersections.push(geo::Coordinate {
-                        x: a.start.x + u_a * (a.end.x - a.start.x),
-                        y: a.start.y + u_a * (a.end.y - a.start.y),
-                    });
+                    let coord = geo::Coordinate {
+                        x: (a.start.x + u_a * (a.end.x - a.start.x)) as i64,
+                        y: (a.start.y + u_a * (a.end.y - a.start.y)) as i64,
+                    };
+
+                    // TODO: refactor into trait. Note the -2 offset, which
+                    // ensures that we don't include the beginning of the line (similar to others)
+                    // as well as not counting the intersection point itself.
+                    let a_line_frag_len = std::cmp::max(
+                        0,
+                        (coord.x - a.start.x as i64).abs() + (coord.y - a.start.y as i64).abs(), /*- 2*/
+                    ) as usize;
+                    let b_line_frag_len = std::cmp::max(
+                        0,
+                        (coord.x - b.start.x as i64).abs() + (coord.y - b.start.y as i64).abs(), /*- 2*/
+                    ) as usize;
+
+                    println!(
+                        "x: {}, y: {}, stepsA: {}, stepsB: {}",
+                        coord.x,
+                        coord.y,
+                        a_len + a_line_frag_len,
+                        b_len + b_line_frag_len
+                    );
+                    if coord.x_y() != (0, 0) {
+                        intersections.push(IntersectionInfo {
+                            location: coord,
+                            steps: a_len + b_len + a_line_frag_len + b_line_frag_len,
+                        });
+                    }
                 }
+                // -1 to not double count the ends of segments
+                b_len += b.length();
             }
+            // -1 to not double count the ends of segments
+            a_len += a.length();
         }
         intersections
     }
-}
-
-pub trait IntersectionStepList {
-    fn intersections_steps(self: &Self, other: &Self) -> Vec<usize>;
 }
 
 pub trait Length {
@@ -122,40 +163,6 @@ pub trait Length {
 impl Length for geo::Line<f64> {
     fn length(self: &Self) -> usize {
         ((self.end.x - self.start.x).abs() + (self.end.y - self.start.y).abs()) as usize
-    }
-}
-
-// TODO: combine common code
-impl IntersectionStepList for geo::LineString<f64> {
-    fn intersections_steps(self: &Self, other: &Self) -> Vec<usize> {
-        let mut intersections = Vec::new();
-        if self.0.is_empty() || other.0.is_empty() {
-            return intersections;
-        }
-
-        let mut a_len: usize = 0;
-        for a in self.lines() {
-            a_len += a.length() - 1;
-            let mut b_len: usize = 0;
-            for b in other.lines() {
-                b_len += b.length() - 1;
-                let u_b = b.dy() * a.dx() - b.dx() * a.dy();
-                if u_b == 0.0 {
-                    continue;
-                }
-                // Slope intercept forms of the lines
-                let ua_t = b.dx() * (a.start.y - b.start.y) - b.dy() * (a.start.x - b.start.x);
-                let ub_t = a.dx() * (a.start.y - b.start.y) - a.dy() * (a.start.x - b.start.x);
-                let u_a = ua_t / u_b;
-                let u_b = ub_t / u_b;
-                if (0.0 <= u_a) && (u_a <= 1.0) && (0.0 <= u_b) && (u_b <= 1.0) {
-                    // steps are defined by the total number of squares each
-                    // wire has to pass to get to this location.
-                    intersections.push(a_len + b_len);
-                }
-            }
-        }
-        intersections
     }
 }
 
@@ -175,20 +182,19 @@ pub fn solve() -> String {
     let intersections = instructions
         .first_wire
         .intersections(&instructions.second_wire);
-    let intersections_steps = instructions
-        .first_wire
-        .intersections_steps(&instructions.second_wire);
 
     format!(
+        //"intersects: {}, min distance: {}, expected 159, min steps: {}, expected 610",
         "intersects: {}, min distance: {}, min steps: {}",
         intersects,
         intersections
             .iter()
-            .map(|c| (c.x.abs() + c.y.abs()) as i64)
+            .map(|i| (i.location.x.abs() + i.location.y.abs()) as i64)
             .min()
             .expect("failed to find intersection"),
-        intersections_steps
+        intersections
             .iter()
+            .map(|i| i.steps)
             .min()
             .expect("failed to find intersection")
     )
