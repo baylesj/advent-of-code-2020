@@ -18,7 +18,7 @@ fn access_parameter(index: usize, program: &Vec<i32>, mode: ParameterMode) -> i3
     }
 }
 
-fn operation_code_one(index: usize, program: &mut Vec<i32>, modes: &Vec<ParameterMode>) {
+fn operation_add(index: usize, program: &mut Vec<i32>, modes: &Vec<ParameterMode>) {
     let a: i32 = access_parameter(index + 1, program, modes[0]);
     let b: i32 = access_parameter(index + 2, program, modes[1]);
     let r_i: usize = program[index + 3] as usize;
@@ -26,24 +26,72 @@ fn operation_code_one(index: usize, program: &mut Vec<i32>, modes: &Vec<Paramete
 }
 
 // TODO: create generic and pass operator?
-fn operation_code_two(index: usize, program: &mut Vec<i32>, modes: &Vec<ParameterMode>) {
+fn operation_multiply(index: usize, program: &mut Vec<i32>, modes: &Vec<ParameterMode>) {
     let a: i32 = access_parameter(index + 1, program, modes[0]);
     let b: i32 = access_parameter(index + 2, program, modes[1]);
     let r_i: usize = program[index + 3] as usize;
     program[r_i] = a * b;
 }
 
-fn operation_code_three(index: usize, program: &mut Vec<i32>) {
+fn operation_input(index: usize, program: &mut Vec<i32>) {
     let r_i: usize = program[index + 1] as usize;
 
-    println!("Enter system ID:");
+    println!("SYSTEM INPUT REQUESTED:");
     let i: i32 = read!();
     program[r_i] = i;
 }
 
-fn operation_code_four(index: usize, program: &mut Vec<i32>, modes: &Vec<ParameterMode>) {
+fn operation_output(index: usize, program: &mut Vec<i32>, modes: &Vec<ParameterMode>) {
     let a: i32 = access_parameter(index + 1, program, modes[0]);
-    println!("Output: {}", a);
+    println!("SYSTEM OUTPUT PROVIDED: {}", a);
+}
+
+fn operation_jump_if_true(
+    index: usize,
+    program: &mut Vec<i32>,
+    modes: &Vec<ParameterMode>,
+) -> usize {
+    let a: i32 = access_parameter(index + 1, program, modes[0]);
+    let b: i32 = access_parameter(index + 2, program, modes[1]);
+    if a != 0 {
+        return b as usize;
+    }
+    index + 3
+}
+
+fn operation_jump_if_false(
+    index: usize,
+    program: &mut Vec<i32>,
+    modes: &Vec<ParameterMode>,
+) -> usize {
+    let a: i32 = access_parameter(index + 1, program, modes[0]);
+    let b: i32 = access_parameter(index + 2, program, modes[1]);
+    if a == 0 {
+        return b as usize;
+    }
+    index + 3
+}
+
+fn operation_less_than(index: usize, program: &mut Vec<i32>, modes: &Vec<ParameterMode>) {
+    let a: i32 = access_parameter(index + 1, program, modes[0]);
+    let b: i32 = access_parameter(index + 2, program, modes[1]);
+    let r_i: usize = program[index + 3] as usize;
+    if a < b {
+        program[r_i] = 1;
+    } else {
+        program[r_i] = 0;
+    }
+}
+
+fn operation_equals(index: usize, program: &mut Vec<i32>, modes: &Vec<ParameterMode>) {
+    let a: i32 = access_parameter(index + 1, program, modes[0]);
+    let b: i32 = access_parameter(index + 2, program, modes[1]);
+    let r_i: usize = program[index + 3] as usize;
+    if a == b {
+        program[r_i] = 1;
+    } else {
+        program[r_i] = 0;
+    }
 }
 
 fn dig(op: i32, place: u32) -> i32 {
@@ -63,22 +111,33 @@ fn perform_operation(index: usize, program: &mut Vec<i32>) -> Option<usize> {
     let op_code: i32 = dig(op, 1) + dig(op, 0);
     let modes: Vec<ParameterMode> = vec![dig_mode(op, 2), dig_mode(op, 3), dig_mode(op, 4)];
 
+    // TODO: separate algo from data here.
     match op_code {
         1 => {
-            operation_code_one(index, program, &modes);
-            Some(4)
+            operation_add(index, program, &modes);
+            Some(index + 4)
         }
         2 => {
-            operation_code_two(index, program, &modes);
-            Some(4)
+            operation_multiply(index, program, &modes);
+            Some(index + 4)
         }
         3 => {
-            operation_code_three(index, program);
-            Some(2)
+            operation_input(index, program);
+            Some(index + 2)
         }
         4 => {
-            operation_code_four(index, program, &modes);
-            Some(2)
+            operation_output(index, program, &modes);
+            Some(index + 2)
+        }
+        5 => Some(operation_jump_if_true(index, program, &modes)),
+        6 => Some(operation_jump_if_false(index, program, &modes)),
+        7 => {
+            operation_less_than(index, program, &modes);
+            Some(index + 4)
+        }
+        8 => {
+            operation_equals(index, program, &modes);
+            Some(index + 4)
         }
         // 99 is HALT.
         99 => None,
@@ -94,8 +153,8 @@ fn load_program() -> Vec<i32> {
 fn run_program(program: &mut Vec<i32>) {
     let mut index: usize = 0;
 
-    while let Some(adv) = perform_operation(index, program) {
-        index += adv
+    while let Some(new_index) = perform_operation(index, program) {
+        index = new_index;
     }
 }
 
