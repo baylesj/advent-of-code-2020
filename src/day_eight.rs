@@ -81,7 +81,11 @@ fn part_two(image: &Image) {
         println!(
             "{}",
             line.iter()
-                .map(|c| if *c as char == PIXEL_BLACK { '.' } else { '#' })
+                .map(|c| if *c as char == PIXEL_BLACK {
+                    '⬛'
+                } else {
+                    '⬜'
+                })
                 .collect::<String>()
         );
     }
