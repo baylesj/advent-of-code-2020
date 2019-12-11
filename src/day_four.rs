@@ -50,7 +50,7 @@ fn meets_criteria_strict(password: Password) -> bool {
     has_one_repeating || (duplicate_count == 1)
 }
 
-pub fn solve() -> String {
+pub fn solve() {
     const PASSWORD_RANGE: Range<Password> = (138307..654505);
 
     let mut password_count: i64 = 0;
@@ -65,8 +65,8 @@ pub fn solve() -> String {
         }
     }
 
-    format!(
-        "part one: {} passwords, part two: {}",
+    println!(
+        "Day four, part one: {} passwords, part two: {} passwords",
         password_count, strict_password_count
     )
 }

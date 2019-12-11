@@ -28,7 +28,7 @@ fn get_fuel_for_module_step(mass: Mass) -> Fuel {
     }
 }
 
-pub fn solve() -> String {
+pub fn solve() {
     let file = File::open(INPUT_FILENAME).expect("Invalid filename");
     let reader = BufReader::new(file);
 
@@ -43,5 +43,8 @@ pub fn solve() -> String {
         part_two_sum += get_fuel_for_module(module_mass);
     }
 
-    format!("part one: {}, part two: {}", part_one_sum, part_two_sum)
+    println!(
+        "Day one, part one: {}, part two: {}",
+        part_one_sum, part_two_sum
+    )
 }
