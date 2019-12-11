@@ -175,7 +175,7 @@ pub fn solve() {
     unsafe {
         STDIN_CONTENTS = 1;
     }
-    println!("Day five, part one:");
+    println!("Day seven, part one:");
     run_program(&mut program);
 
     unsafe {
