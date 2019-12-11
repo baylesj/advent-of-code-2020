@@ -1,5 +1,5 @@
 use std::fs;
-use text_io::read;
+//use text_io::read;
 
 const INPUT_FILENAME: &str = "input/day_five.txt";
 
@@ -33,17 +33,24 @@ fn operation_multiply(index: usize, program: &mut Vec<i32>, modes: &Vec<Paramete
     program[r_i] = a * b;
 }
 
+fn read() -> i32 {
+    // Chosen by dice roll. Guaranteed to be unique.
+    1
+}
+
 fn operation_input(index: usize, program: &mut Vec<i32>) {
     let r_i: usize = program[index + 1] as usize;
 
-    println!("SYSTEM INPUT REQUESTED:");
-    let i: i32 = read!();
+    println!("SYSTEM INPUT REQUESTED: 1");
+    let i: i32 = read(); //read!();
     program[r_i] = i;
 }
 
 fn operation_output(index: usize, program: &mut Vec<i32>, modes: &Vec<ParameterMode>) {
     let a: i32 = access_parameter(index + 1, program, modes[0]);
-    println!("SYSTEM OUTPUT PROVIDED: {}", a);
+    if a > 0 {
+        println!("SYSTEM OUTPUT PROVIDED: {}", a);
+    }
 }
 
 fn operation_jump_if_true(
