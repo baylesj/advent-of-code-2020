@@ -1,3 +1,6 @@
+use queues::IsQueue;
+use queues::Queue;
+use std::clone::Clone;
 use std::fs;
 
 pub type ProgramBuffer = Vec<i32>;
@@ -16,12 +19,23 @@ impl Default for ProgramState {
     }
 }
 
-#[derive(Default, Clone, Debug)]
+#[derive(Default, Debug)]
 pub struct Program {
     pub buffer: ProgramBuffer,
     pub state: ProgramState,
-    pub io: Vec<i32>,
+    pub io: Queue<i32>,
     ptr: usize,
+}
+
+impl Clone for Program {
+    fn clone(&self) -> Program {
+        Program {
+            buffer: self.buffer.clone(),
+            state: ProgramState::Initialized,
+            io: Queue::new(),
+            ptr: 0,
+        }
+    }
 }
 
 #[derive(PartialEq, Clone, Copy, Debug)]
@@ -57,7 +71,7 @@ fn operation_multiply(program: &mut Program, modes: &Vec<ParameterMode>) {
 }
 
 fn operation_input(program: &mut Program) {
-    let value: i32 = program.io.pop().expect("requested input on empty stack");
+    let value: i32 = program.io.remove().expect("requested input on empty stack");
     let r_i: usize = program.buffer[program.ptr + 1] as usize;
     program.buffer[r_i] = value;
     program.ptr += 2;
@@ -65,7 +79,7 @@ fn operation_input(program: &mut Program) {
 
 fn operation_output(program: &mut Program, modes: &Vec<ParameterMode>) {
     let value: i32 = access_parameter(program.ptr + 1, program, modes[0]);
-    program.io.push(value);
+    program.io.add(value).ok();
     program.state = ProgramState::Paused;
     program.ptr += 2;
 }
