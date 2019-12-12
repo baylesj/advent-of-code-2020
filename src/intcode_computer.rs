@@ -3,8 +3,9 @@ use std::fs;
 
 pub type ProgramBuffer = Vec<i32>;
 
-#[derive(PartialEq, Clone, Copy)]
+#[derive(PartialEq, Clone, Copy, Debug)]
 pub enum ProgramState {
+    Initialized,
     Running,
     Paused,
     Stopped,
@@ -12,11 +13,11 @@ pub enum ProgramState {
 
 impl Default for ProgramState {
     fn default() -> ProgramState {
-        ProgramState::Running
+        ProgramState::Initialized
     }
 }
 
-#[derive(Default, Clone)]
+#[derive(Default, Clone, Debug)]
 pub struct Program {
     pub buffer: ProgramBuffer,
     pub state: ProgramState,
@@ -24,7 +25,7 @@ pub struct Program {
     ptr: usize,
 }
 
-#[derive(PartialEq, Clone, Copy)]
+#[derive(PartialEq, Clone, Copy, Debug)]
 enum ParameterMode {
     Immediate,
     Position,
@@ -164,7 +165,7 @@ impl Runnable for Program {
     }
 }
 
-// TODO: trait useful for other clases?
+// TODO: trait useful for other classes?
 pub trait LoadableFromFile {
     fn load(filename: &str) -> Self;
 }
