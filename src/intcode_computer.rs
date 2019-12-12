@@ -3,7 +3,7 @@ use queues::Queue;
 use std::clone::Clone;
 use std::fs;
 
-pub type ProgramBuffer = Vec<i32>;
+pub type ProgramBuffer = Vec<i64>;
 
 #[derive(PartialEq, Clone, Copy, Debug)]
 pub enum ProgramState {
@@ -23,7 +23,7 @@ impl Default for ProgramState {
 pub struct Program {
     pub buffer: ProgramBuffer,
     pub state: ProgramState,
-    pub io: Queue<i32>,
+    pub io: Queue<i64>,
     ptr: usize,
 }
 
@@ -45,7 +45,7 @@ enum ParameterMode {
 }
 
 // NOTE: ONLY for read only params.
-fn access_parameter(index: usize, program: &Program, mode: ParameterMode) -> i32 {
+fn access_parameter(index: usize, program: &Program, mode: ParameterMode) -> i64 {
     if mode == ParameterMode::Immediate {
         program.buffer[index]
     } else {
@@ -54,8 +54,8 @@ fn access_parameter(index: usize, program: &Program, mode: ParameterMode) -> i32
 }
 
 fn operation_add(program: &mut Program, modes: &Vec<ParameterMode>) {
-    let a: i32 = access_parameter(program.ptr + 1, program, modes[0]);
-    let b: i32 = access_parameter(program.ptr + 2, program, modes[1]);
+    let a: i64 = access_parameter(program.ptr + 1, program, modes[0]);
+    let b: i64 = access_parameter(program.ptr + 2, program, modes[1]);
     let r_i: usize = program.buffer[program.ptr + 3] as usize;
     program.buffer[r_i] = a + b;
     program.ptr += 4;
@@ -63,30 +63,30 @@ fn operation_add(program: &mut Program, modes: &Vec<ParameterMode>) {
 
 // TODO: create generic and pass operator?
 fn operation_multiply(program: &mut Program, modes: &Vec<ParameterMode>) {
-    let a: i32 = access_parameter(program.ptr + 1, program, modes[0]);
-    let b: i32 = access_parameter(program.ptr + 2, program, modes[1]);
+    let a: i64 = access_parameter(program.ptr + 1, program, modes[0]);
+    let b: i64 = access_parameter(program.ptr + 2, program, modes[1]);
     let r_i: usize = program.buffer[program.ptr + 3] as usize;
     program.buffer[r_i] = a * b;
     program.ptr += 4;
 }
 
 fn operation_input(program: &mut Program) {
-    let value: i32 = program.io.remove().expect("requested input on empty stack");
+    let value: i64 = program.io.remove().expect("requested input on empty stack");
     let r_i: usize = program.buffer[program.ptr + 1] as usize;
     program.buffer[r_i] = value;
     program.ptr += 2;
 }
 
 fn operation_output(program: &mut Program, modes: &Vec<ParameterMode>) {
-    let value: i32 = access_parameter(program.ptr + 1, program, modes[0]);
+    let value: i64 = access_parameter(program.ptr + 1, program, modes[0]);
     program.io.add(value).ok();
     program.state = ProgramState::Paused;
     program.ptr += 2;
 }
 
 fn operation_jump_if_true(program: &mut Program, modes: &Vec<ParameterMode>) {
-    let a: i32 = access_parameter(program.ptr + 1, program, modes[0]);
-    let b: i32 = access_parameter(program.ptr + 2, program, modes[1]);
+    let a: i64 = access_parameter(program.ptr + 1, program, modes[0]);
+    let b: i64 = access_parameter(program.ptr + 2, program, modes[1]);
     if a != 0 {
         program.ptr = b as usize;
     } else {
@@ -95,8 +95,8 @@ fn operation_jump_if_true(program: &mut Program, modes: &Vec<ParameterMode>) {
 }
 
 fn operation_jump_if_false(program: &mut Program, modes: &Vec<ParameterMode>) {
-    let a: i32 = access_parameter(program.ptr + 1, program, modes[0]);
-    let b: i32 = access_parameter(program.ptr + 2, program, modes[1]);
+    let a: i64 = access_parameter(program.ptr + 1, program, modes[0]);
+    let b: i64 = access_parameter(program.ptr + 2, program, modes[1]);
     if a == 0 {
         program.ptr = b as usize;
     } else {
@@ -105,8 +105,8 @@ fn operation_jump_if_false(program: &mut Program, modes: &Vec<ParameterMode>) {
 }
 
 fn operation_less_than(program: &mut Program, modes: &Vec<ParameterMode>) {
-    let a: i32 = access_parameter(program.ptr + 1, program, modes[0]);
-    let b: i32 = access_parameter(program.ptr + 2, program, modes[1]);
+    let a: i64 = access_parameter(program.ptr + 1, program, modes[0]);
+    let b: i64 = access_parameter(program.ptr + 2, program, modes[1]);
     let r_i: usize = program.buffer[program.ptr + 3] as usize;
     if a < b {
         program.buffer[r_i] = 1;
@@ -117,8 +117,8 @@ fn operation_less_than(program: &mut Program, modes: &Vec<ParameterMode>) {
 }
 
 fn operation_equals(program: &mut Program, modes: &Vec<ParameterMode>) {
-    let a: i32 = access_parameter(program.ptr + 1, program, modes[0]);
-    let b: i32 = access_parameter(program.ptr + 2, program, modes[1]);
+    let a: i64 = access_parameter(program.ptr + 1, program, modes[0]);
+    let b: i64 = access_parameter(program.ptr + 2, program, modes[1]);
     let r_i: usize = program.buffer[program.ptr + 3] as usize;
     if a == b {
         program.buffer[r_i] = 1;
@@ -132,12 +132,12 @@ fn operation_halt(program: &mut Program) {
     program.state = ProgramState::Stopped;
 }
 
-fn dig(op: i32, place: u32) -> i32 {
-    let t = i32::pow(10, place);
+fn dig(op: i64, place: u32) -> i64 {
+    let t = i64::pow(10, place);
     ((op / t) % 10) * t
 }
 
-fn dig_mode(op: i32, place: u32) -> ParameterMode {
+fn dig_mode(op: i64, place: u32) -> ParameterMode {
     if dig(op, place) > 0 {
         return ParameterMode::Immediate;
     }
@@ -146,7 +146,7 @@ fn dig_mode(op: i32, place: u32) -> ParameterMode {
 
 fn perform_operation(program: &mut Program) {
     let op = program.buffer[program.ptr];
-    let op_code: i32 = dig(op, 1) + dig(op, 0);
+    let op_code: i64 = dig(op, 1) + dig(op, 0);
     let modes: Vec<ParameterMode> = vec![dig_mode(op, 2), dig_mode(op, 3), dig_mode(op, 4)];
 
     match op_code {
@@ -186,7 +186,7 @@ impl LoadableFromFile for Program {
         let fc: String = fs::read_to_string(filename).expect("invalid filename");
 
         let mut program = Program::default();
-        program.buffer = fc.split(',').map(|x| x.parse::<i32>().unwrap()).collect();
+        program.buffer = fc.split(',').map(|x| x.parse::<i64>().unwrap()).collect();
         program
     }
 }
