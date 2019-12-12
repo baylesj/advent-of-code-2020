@@ -1,8 +1,11 @@
+use permutator::Permutation;
 use std::fs;
-//use text_io::read;
 
-const INPUT_FILENAME: &str = "input/day_five.txt";
-static mut STDIN_CONTENTS: i32 = 0;
+const INPUT_FILENAME: &str = "input/day_seven.txt";
+
+// TODO: redirect to fakes?
+static mut STDIN_CONTENTS: Vec<i32> = Vec::new();
+static mut STDOUT_CONTENTS: i32 = 0;
 
 #[derive(PartialEq, Clone, Copy)]
 enum ParameterMode {
@@ -38,14 +41,14 @@ fn operation_multiply(index: usize, program: &mut Program, modes: &Vec<Parameter
 
 fn read() -> i32 {
     // TODO: refactor to remove unsafe.
-    unsafe { STDIN_CONTENTS }
+    unsafe { STDIN_CONTENTS.pop().expect("stack empty") }
 }
 
 fn operation_input(index: usize, program: &mut Program) {
     let r_i: usize = program[index + 1] as usize;
 
-    println!("\tSYSTEM INPUT REQUESTED: 1");
-    let i: i32 = read(); //read!();
+    let i: i32 = read();
+    println!("\tSYSTEM INPUT REQUESTED: {}", i);
     program[r_i] = i;
 }
 
@@ -53,6 +56,9 @@ fn operation_output(index: usize, program: &mut Program, modes: &Vec<ParameterMo
     let a: i32 = access_parameter(index + 1, program, modes[0]);
     if a > 0 {
         println!("\tSYSTEM OUTPUT PROVIDED: {}", a);
+        unsafe {
+            STDOUT_CONTENTS = a;
+        }
     }
 }
 
@@ -168,19 +174,24 @@ fn run_program(program: &mut Program) {
     }
 }
 
+fn run_permutation(permutation: &[i32], program: &Program) -> i32 {
+    unsafe {
+        STDOUT_CONTENTS = 0;
+        for i in 0..5 {
+            STDIN_CONTENTS = vec![STDOUT_CONTENTS, permutation[i]];
+            run_program(&mut program.to_vec());
+        }
+        STDOUT_CONTENTS
+    }
+}
+
 pub fn solve() {
-    let mut program: Program = load_program();
-    let mut program_copy: Program = program.to_vec();
+    const PHASES: [i32; 5] = [0, 1, 2, 3, 4];
+    let program: Program = load_program();
+    let mut max_signal: i32 = 0;
+    PHASES.to_vec().permutation().for_each(|p| {
+        max_signal = std::cmp::max(max_signal, run_permutation(&p, &program));
+    });
 
-    unsafe {
-        STDIN_CONTENTS = 1;
-    }
-    println!("Day seven, part one:");
-    run_program(&mut program);
-
-    unsafe {
-        STDIN_CONTENTS = 5;
-    }
-    println!("part two:");
-    run_program(&mut program_copy);
+    println!("Day seven, part 1: {}", max_signal);
 }
