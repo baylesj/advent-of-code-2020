@@ -48,14 +48,12 @@ fn operation_input(index: usize, program: &mut Program) {
     let r_i: usize = program[index + 1] as usize;
 
     let i: i32 = read();
-    println!("\tSYSTEM INPUT REQUESTED: {}", i);
     program[r_i] = i;
 }
 
 fn operation_output(index: usize, program: &mut Program, modes: &Vec<ParameterMode>) {
     let a: i32 = access_parameter(index + 1, program, modes[0]);
     if a > 0 {
-        println!("\tSYSTEM OUTPUT PROVIDED: {}", a);
         unsafe {
             STDOUT_CONTENTS = a;
         }
