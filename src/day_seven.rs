@@ -57,7 +57,7 @@ pub fn part_two(input_filename: &str) -> i32 {
 pub fn solve() {
     println!(
         "Day seven, part 1: {}, part 2: {}",
-        /*part_one(INPUT_FILENAME)*/ 0,
+        part_one(INPUT_FILENAME),
         part_two(INPUT_FILENAME)
     );
 }
