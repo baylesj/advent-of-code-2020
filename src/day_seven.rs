@@ -28,6 +28,7 @@ fn create_program_vector(reference: &Program) -> Vec<Program> {
     programs
 }
 
+// TODO: factor out common permutate function.
 pub fn part_one(input_filename: &str) -> i32 {
     const PHASES: [i32; PROGRAM_COUNT] = [0, 1, 2, 3, 4];
     let program = Program::load(input_filename);
