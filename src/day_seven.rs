@@ -172,24 +172,38 @@ fn run_program(program: &mut Program) {
     }
 }
 
-fn run_permutation(permutation: &[i32], program: &Program) -> i32 {
+fn run_permutation(permutation: &[i32], program: &mut Program) -> i32 {
     unsafe {
         STDOUT_CONTENTS = 0;
         for i in 0..5 {
             STDIN_CONTENTS = vec![STDOUT_CONTENTS, permutation[i]];
-            run_program(&mut program.to_vec());
+            run_program(&mut program);
         }
         STDOUT_CONTENTS
     }
 }
 
-pub fn solve() {
+pub fn part_one() -> i32 {
     const PHASES: [i32; 5] = [0, 1, 2, 3, 4];
     let program: Program = load_program();
     let mut max_signal: i32 = 0;
     PHASES.to_vec().permutation().for_each(|p| {
-        max_signal = std::cmp::max(max_signal, run_permutation(&p, &program));
+        max_signal = std::cmp::max(max_signal, run_permutation(&p, &mut program.to_vec()));
+    });
+    max_signal
+}
+
+pub fn part_two() -> i32 {
+    const PHASES: [i32; 5] = [0, 1, 2, 3, 4];
+    let mut program: Program = load_program();
+    let mut max_signal: i32 = 0;
+    PHASES.to_vec().permutation().for_each(|p| {
+        max_signal = std::cmp::max(max_signal, run_permutation(&p, &mut program));
     });
 
-    println!("Day seven, part 1: {}", max_signal);
+    max_signal
+}
+
+pub fn solve() {
+    println!("Day seven, part 1: {}, part 2: {}", part_one(), part_two());
 }
