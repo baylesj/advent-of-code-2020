@@ -24,6 +24,7 @@ pub struct Program {
     pub buffer: ProgramBuffer,
     pub state: ProgramState,
     pub io: Queue<i64>,
+    relative_base: i64,
     ptr: usize,
 }
 
@@ -33,6 +34,7 @@ impl Clone for Program {
             buffer: self.buffer.clone(),
             state: ProgramState::Initialized,
             io: Queue::new(),
+            relative_base: self.relative_base,
             ptr: 0,
         }
     }
@@ -42,14 +44,17 @@ impl Clone for Program {
 enum ParameterMode {
     Immediate,
     Position,
+    Relative,
 }
 
 // NOTE: ONLY for read only params.
 fn access_parameter(index: usize, program: &Program, mode: ParameterMode) -> i64 {
-    if mode == ParameterMode::Immediate {
-        program.buffer[index]
-    } else {
-        program.buffer[program.buffer[index] as usize]
+    match mode {
+        ParameterMode::Immediate => program.buffer[index],
+        ParameterMode::Position => program.buffer[program.buffer[index] as usize],
+        ParameterMode::Relative => {
+            program.buffer[program.buffer[index] as usize] + program.relative_base
+        }
     }
 }
 
@@ -128,6 +133,12 @@ fn operation_equals(program: &mut Program, modes: &Vec<ParameterMode>) {
     program.ptr += 4;
 }
 
+fn operation_set_relative_base(program: &mut Program, modes: &Vec<ParameterMode>) {
+    let new_base: i64 = access_parameter(program.ptr + 1, program, modes[0]);
+    program.relative_base = new_base;
+    program.ptr += 2;
+}
+
 fn operation_halt(program: &mut Program) {
     program.state = ProgramState::Stopped;
 }
@@ -138,10 +149,12 @@ fn dig(op: i64, place: u32) -> i64 {
 }
 
 fn dig_mode(op: i64, place: u32) -> ParameterMode {
-    if dig(op, place) > 0 {
-        return ParameterMode::Immediate;
+    match dig(op, place) / i64::pow(10, place) {
+        0 => ParameterMode::Position,
+        1 => ParameterMode::Immediate,
+        2 => ParameterMode::Relative,
+        _ => panic!("invalid parameter mode {}", dig(op, place)),
     }
-    ParameterMode::Position
 }
 
 fn perform_operation(program: &mut Program) {
@@ -158,6 +171,7 @@ fn perform_operation(program: &mut Program) {
         6 => operation_jump_if_false(program, &modes),
         7 => operation_less_than(program, &modes),
         8 => operation_equals(program, &modes),
+        9 => operation_set_relative_base(program, &modes),
         99 => operation_halt(program),
         _ => panic!("unknown OP code: {}", op_code),
     }
@@ -181,12 +195,15 @@ pub trait LoadableFromFile {
     fn load(filename: &str) -> Self;
 }
 
+// TODO: move to growable buffer size.
+const PROGRAM_MEMORY_SIZE: usize = 1 * 1024 * 1024;
 impl LoadableFromFile for Program {
     fn load(filename: &str) -> Self {
         let fc: String = fs::read_to_string(filename).expect("invalid filename");
 
         let mut program = Program::default();
         program.buffer = fc.split(',').map(|x| x.parse::<i64>().unwrap()).collect();
+        program.buffer.resize(PROGRAM_MEMORY_SIZE, 0);
         program
     }
 }
