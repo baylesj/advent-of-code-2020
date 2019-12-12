@@ -1,4 +1,3 @@
-use log::debug;
 use std::fs;
 
 pub type ProgramBuffer = Vec<i32>;
@@ -60,7 +59,6 @@ fn operation_multiply(program: &mut Program, modes: &Vec<ParameterMode>) {
 fn operation_input(program: &mut Program) {
     let value: i32 = program.io.pop().expect("requested input on empty stack");
     let r_i: usize = program.buffer[program.ptr + 1] as usize;
-    debug!("operation input: {}", value);
     program.buffer[r_i] = value;
     program.ptr += 2;
 }
@@ -68,7 +66,6 @@ fn operation_input(program: &mut Program) {
 fn operation_output(program: &mut Program, modes: &Vec<ParameterMode>) {
     let value: i32 = access_parameter(program.ptr + 1, program, modes[0]);
     program.io.push(value);
-    debug!("operation output: {}", value);
     program.state = ProgramState::Paused;
     program.ptr += 2;
 }
