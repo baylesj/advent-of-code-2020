@@ -69,7 +69,7 @@ fn access_parameter(index: usize, program: &Program, mode: ParameterMode) -> i64
         ParameterMode::Immediate => program.buffer[index],
         ParameterMode::Position => program.buffer[program.buffer[index] as usize],
         ParameterMode::Relative => {
-            program.buffer[program.buffer[index] as usize] + program.relative_base
+            program.buffer[(program.buffer[index] + program.relative_base) as usize]
         }
     }
 }
@@ -395,5 +395,26 @@ mod tests {
         test_operation(OpCode::Equals, Some(vec![10, 2]), Some(vec![0]), None);
         test_operation(OpCode::Equals, Some(vec![0, 0]), Some(vec![1]), None);
         test_operation(OpCode::Equals, Some(vec![-10, -10]), Some(vec![1]), None);
+    }
+
+    #[test]
+    fn test_set_relative_base() {
+        let mut program = Program::default();
+        program.buffer = vec![
+            OpCode::SetRelativeBase.to_i64().unwrap(), // index 0
+            4, // index 1
+            // Now the relative base is four...
+            2200 + OpCode::Add.to_i64().unwrap(), // index 2
+            3, // value 3 + rel base = points to 7
+            4, // value 4 + rel base = points to 8
+            9, // index 5 -> points direct to 9
+            99, // index 6
+            10, // index 7
+            20, // index 8
+            -1, // index 9
+        ];
+
+        program.run();
+        assert_eq!(program.buffer[9], 30);
     }
 }
