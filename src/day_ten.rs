@@ -50,8 +50,21 @@ pub fn calculate_visible_points(x: usize, y: usize, map: &AsteroidMap) -> i64 {
             let rise: i64 = y as i64 - row as i64;
             let run: i64 = x as i64 - col as i64;
 
+            // UR - 1, LR - 2, LL - 3, UL - 4
+            let quadrant: u8;
+            if rise >= 0 && run >= 0 {
+              quadrant = 1;
+            } else if rise < 0 && run >= 0 {
+              quadrant = 2;
+            } else if rise < 0 && run < 0 {
+              quadrant = 3;
+            } else {
+              quadrant = 4;
+            }
             let slope = Fraction::new(rise.abs() as u64, run.abs() as u64);
-            found_slopes.insert(format!("{}{}{}", rise < 0, run < 0, slope));
+            // TODO: new way doesn't work.
+            found_slopes.insert(format!("{}-{}", quadrant,
+            format!("{:.1$}", slope, 4)));
         }
     }
 
