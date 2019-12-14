@@ -18,8 +18,22 @@ pub fn part_one(input_filename: &str) -> i128 {
     program.io.remove().unwrap()
 }
 
+pub fn part_two(input_filename: &str) -> i128 {
+    let mut program = Program::load(input_filename);
+    program.io.add(2).ok();
+    program.run_until_halted();
+    while program.io.peek().unwrap() == 0 {
+        program.io.remove().ok();
+    }
+    program.io.remove().unwrap()
+}
+
 pub fn solve() {
-    println!("Day nine, part one: {:#?} ", part_one(INPUT_FILENAME));
+    println!(
+        "Day nine, part one: {:#?}, part two {:#?}",
+        part_one(INPUT_FILENAME),
+        part_two(INPUT_FILENAME)
+    );
 }
 
 #[cfg(test)]
@@ -47,5 +61,10 @@ mod tests {
         let mut program = Program::load("input/day_nine_sample_three.txt");
         program.run_until_halted();
         assert_eq!(1125899906842624, program.io.peek().unwrap());
+    }
+
+    #[test]
+    fn test_part_one() {
+        assert_eq!(2406950601, part_one(INPUT_FILENAME));
     }
 }
