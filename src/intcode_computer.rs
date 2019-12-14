@@ -2,6 +2,23 @@ use queues::IsQueue;
 use queues::Queue;
 use std::clone::Clone;
 use std::fs;
+use num_traits::FromPrimitive;
+use enum_primitive_derive::Primitive;
+
+// List of operations supported by this computer.
+#[derive(Primitive, Debug, Clone, Copy, PartialEq)]
+enum OpCode {
+    Add = 1,
+    Multiply = 2,
+    Input = 3,
+    Output = 4,
+    JumpIfTrue = 5,
+    JumpIfFalse = 6,
+    LessThan = 7,
+    Equals = 8,
+    SetRelativeBase = 9,
+    Halt = 99
+}
 
 pub type ProgramBuffer = Vec<i64>;
 
@@ -159,21 +176,20 @@ fn dig_mode(op: i64, place: u32) -> ParameterMode {
 
 fn perform_operation(program: &mut Program) {
     let op = program.buffer[program.ptr];
-    let op_code: i64 = dig(op, 1) + dig(op, 0);
+    let op_code = OpCode::from_i64(dig(op, 1) + dig(op, 0)).expect("invalid opcode");
     let modes: Vec<ParameterMode> = vec![dig_mode(op, 2), dig_mode(op, 3), dig_mode(op, 4)];
 
     match op_code {
-        1 => operation_add(program, &modes),
-        2 => operation_multiply(program, &modes),
-        3 => operation_input(program),
-        4 => operation_output(program, &modes),
-        5 => operation_jump_if_true(program, &modes),
-        6 => operation_jump_if_false(program, &modes),
-        7 => operation_less_than(program, &modes),
-        8 => operation_equals(program, &modes),
-        9 => operation_set_relative_base(program, &modes),
-        99 => operation_halt(program),
-        _ => panic!("unknown OP code: {}", op_code),
+        OpCode::Add => operation_add(program, &modes),
+        OpCode::Multiply => operation_multiply(program, &modes),
+        OpCode::Input => operation_input(program),
+        OpCode::Output => operation_output(program, &modes),
+        OpCode::JumpIfTrue => operation_jump_if_true(program, &modes),
+        OpCode::JumpIfFalse => operation_jump_if_false(program, &modes),
+        OpCode::LessThan => operation_less_than(program, &modes),
+        OpCode::Equals => operation_equals(program, &modes),
+        OpCode::SetRelativeBase => operation_set_relative_base(program, &modes),
+        OpCode::Halt => operation_halt(program),
     }
 }
 
@@ -205,5 +221,70 @@ impl LoadableFromFile for Program {
         program.buffer = fc.split(',').map(|x| x.parse::<i64>().unwrap()).collect();
         program.buffer.resize(PROGRAM_MEMORY_SIZE, 0);
         program
+    }
+}
+
+// Some test assumptions:
+// 1. data is well formed, any errors in input data should cause an assert.
+//    hence, any major errors are "expect" or "assert" and we don't use any
+//    result or option returns.
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use num_traits::ToPrimitive;
+
+    fn test_operation(op_code: OpCode, input: &mut Vec<i64>, outputs: Vec<i64>, io: Option<Queue<i64>>)
+    -> Program {
+        let mut program = Program::default();
+        program.io = io.unwrap_or_default();
+
+        let parameter_start_index: i64 = input.len() as i64 + 2;
+        program.buffer.push(op_code.to_i64().unwrap());
+        for i in 0..input.len() + 1 {
+            program.buffer.push(parameter_start_index + i as i64 + 1);
+        }
+        // Push HALT
+        program.buffer.push(99);
+        program.buffer.append(input);
+
+        for output in &outputs {
+            program.buffer.push(-1 * output);
+        }
+
+        program.run();
+
+        let output_offset = program.buffer.len() - outputs.len();
+        for i in 0..outputs.len() {
+            assert_eq!(program.buffer[i + output_offset], outputs[i]);
+        }
+        program
+    }
+
+    #[test]
+    fn test_operation_add() {
+        test_operation(OpCode::Add, &mut vec![10, 20], vec![30], None);
+        test_operation(OpCode::Add, &mut vec![-1, -2], vec![-3], None);
+        test_operation(OpCode::Add, &mut vec![0, 0], vec![0], None);
+    }
+
+    #[test]
+    fn test_operation_multiply() {
+        test_operation(OpCode::Multiply, &mut vec![10, 20], vec![200], None);
+        test_operation(OpCode::Multiply, &mut vec![-1, -2], vec![2], None);
+        test_operation(OpCode::Multiply, &mut vec![0, 0], vec![0], None);
+    }
+
+    #[test]
+    fn test_operation_input() {
+        let mut io = Queue::new();
+        io.add(1337).ok();
+        test_operation(OpCode::Input, &mut vec![], vec![1337], Some(io));
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_operation_input_empty_stack_asserts() {
+        let io = Queue::new();
+        test_operation(OpCode::Input, &mut vec![], vec![1337], Some(io));
     }
 }
