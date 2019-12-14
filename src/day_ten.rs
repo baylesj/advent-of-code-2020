@@ -1,5 +1,5 @@
 use fraction::Fraction;
-use std::collections::HashSet;
+use std::collections::HashMap;
 use std::fs::File;
 use std::io::{prelude::*, BufReader};
 
@@ -38,9 +38,18 @@ impl LoadableFromFile for AsteroidMap {
     }
 }
 
+#[derive(Debug, Default)]
+pub struct VisiblePoint {
+  pub x: usize,
+  pub y: usize,
+  pub distance: f64
+}
+
+pub type VisiblePoints = HashMap<String, Vec<VisiblePoint>>;
+
 // x equals column, y equals row. Top Left = (0, 0)
-pub fn calculate_visible_points(x: usize, y: usize, map: &AsteroidMap) -> i64 {
-    let mut found_slopes = HashSet::new();
+pub fn calculate_visible_points(x: usize, y: usize, map: &AsteroidMap) -> VisiblePoints {
+    let mut found_slopes: VisiblePoints = HashMap::new();
     for row in 0..map.len() {
         for col in 0..map[0].len() {
             if (x == col && y == row) || !map[row][col] {
@@ -62,30 +71,43 @@ pub fn calculate_visible_points(x: usize, y: usize, map: &AsteroidMap) -> i64 {
               quadrant = 4;
             }
             let slope = Fraction::new(rise.abs() as u64, run.abs() as u64);
-            // TODO: new way doesn't work.
-            found_slopes.insert(format!("{}-{}", quadrant,
-            format!("{:.1$}", slope, 4)));
+            let key = format!("{}-{}", quadrant, format!("{:.1$}", slope, 4));
+            let point = VisiblePoint {
+              x: col, y: row, distance: ((rise*rise + run*run) as f64).sqrt()
+            };
+
+            let points_with_same_slope = found_slopes.entry(key).or_insert(vec![]);
+            points_with_same_slope.push(point);
         }
     }
 
-    found_slopes.len() as i64
+    found_slopes
+}
+
+pub fn get_best_location(input_filename: &str) -> VisiblePoints {
+  let map = AsteroidMap::load(input_filename);
+  let mut max_visible: i64 = 0;
+  let mut max_visible_points = VisiblePoints::default();
+
+  for row in 0..map.len() {
+      for col in 0..map[0].len() {
+          // No asteroid here, so can't place a station here.
+          if !map[row][col] {
+              continue;
+          }
+
+          let visible_points = calculate_visible_points(col, row, &map);
+          if visible_points.len() as i64 > max_visible {
+            max_visible = visible_points.len() as i64;
+            max_visible_points = visible_points;
+          }
+      }
+  }
+  max_visible_points
 }
 
 pub fn part_one(input_filename: &str) -> i64 {
-    let map = AsteroidMap::load(input_filename);
-    let mut max_visible: i64 = 0;
-    for row in 0..map.len() {
-        for col in 0..map[0].len() {
-            // No asteroid here, so can't place a station here.
-            if !map[row][col] {
-                continue;
-            }
-
-            let visible_points = calculate_visible_points(col, row, &map);
-            max_visible = i64::max(max_visible, visible_points);
-        }
-    }
-    max_visible
+  get_best_location(input_filename).len() as i64
 }
 
 pub fn part_two(_input_filename: &str) -> i64 {
@@ -106,9 +128,6 @@ mod tests {
 
     #[test]
     fn test_part_one_sample_one() {
-        let map = AsteroidMap::load("input/day_ten_sample_one.txt");
-        assert_eq!(33, calculate_visible_points(5, 8, &map));
-        // duplicate
         assert_eq!(part_one("input/day_ten_sample_one.txt"), 33);
     }
 
