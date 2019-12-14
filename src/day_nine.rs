@@ -1,8 +1,11 @@
 use queues::IsQueue;
 
+#[path = "loadable.rs"]
+mod loadable;
+use loadable::LoadableFromFile;
+
 #[path = "intcode_computer.rs"]
 mod intcode_computer;
-use intcode_computer::LoadableFromFile;
 use intcode_computer::Program;
 use intcode_computer::Runnable;
 

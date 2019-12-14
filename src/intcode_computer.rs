@@ -5,6 +5,10 @@ use std::clone::Clone;
 use std::convert::TryInto;
 use std::fs;
 
+#[path = "loadable.rs"]
+mod loadable;
+use loadable::LoadableFromFile;
+
 // List of operations supported by this computer.
 #[derive(Primitive, Debug, Clone, Copy, PartialEq)]
 enum OpCode {
@@ -250,11 +254,6 @@ impl Runnable for Program {
             perform_operation(self);
         }
     }
-}
-
-// TODO: trait useful for other classes?
-pub trait LoadableFromFile {
-    fn load(filename: &str) -> Self;
 }
 
 impl LoadableFromFile for Program {
