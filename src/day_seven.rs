@@ -96,12 +96,12 @@ mod tests {
     use super::*;
 
     #[test]
-    fn part_one_sample_one() {
+    fn test_part_one_sample_one() {
         assert_eq!(43210, part_one("input/day_seven_part_one_sample_one.txt"));
     }
 
     #[test]
-    fn part_two_sample_one() {
+    fn test_part_two_sample_one() {
         assert_eq!(
             139629729,
             part_two("input/day_seven_part_two_sample_one.txt")
@@ -109,7 +109,7 @@ mod tests {
     }
 
     #[test]
-    fn part_two_sample_two() {
+    fn test_part_two_sample_two() {
         assert_eq!(18216, part_two("input/day_seven_part_two_sample_two.txt"));
     }
 }

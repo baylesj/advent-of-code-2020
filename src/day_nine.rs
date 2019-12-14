@@ -4,7 +4,6 @@ use queues::IsQueue;
 mod intcode_computer;
 use intcode_computer::LoadableFromFile;
 use intcode_computer::Program;
-//use intcode_computer::ProgramState;
 use intcode_computer::Runnable;
 
 const INPUT_FILENAME: &str = "input/day_nine.txt";

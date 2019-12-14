@@ -194,12 +194,26 @@ fn perform_operation(program: &mut Program) {
 
 pub trait Runnable {
     fn run(self: &mut Self);
+    fn run_until_halted(self: &mut Self);
 }
 
 impl Runnable for Program {
+    // The default run implementation only runs until we hit a pause event,
+    // i.e. we output to the console.
     fn run(self: &mut Self) {
         self.state = ProgramState::Running;
         while self.state == ProgramState::Running {
+            perform_operation(self);
+        }
+    }
+
+    // This implementation runs until HALT operation occurs.
+    fn run_until_halted(self: &mut Self) {
+        self.state = ProgramState::Running;
+        while self.state != ProgramState::Stopped {
+            if self.state != ProgramState::Running {
+                self.state = ProgramState::Running;
+            }
             perform_operation(self);
         }
     }
@@ -267,7 +281,7 @@ mod tests {
         op_code: OpCode,
         input: &Vec<i64>,
         output: &Vec<i64>,
-        io: &Vec<i64>
+        io: &Vec<i64>,
     ) -> Program {
         let mut program = Program::default();
         for i in io {
@@ -280,7 +294,9 @@ mod tests {
             program.buffer.push(parameter_start_index + i as i64);
         }
         for i in 0..output.len() {
-            program.buffer.push(parameter_start_index + input.len() as i64 + i as i64);
+            program
+                .buffer
+                .push(parameter_start_index + input.len() as i64 + i as i64);
         }
         program.buffer.push(OpCode::Halt.to_i64().unwrap());
         program.buffer.append(&mut input.clone());
@@ -307,8 +323,10 @@ mod tests {
         let output = output_opt.unwrap_or_default();
         let io = io_opt.unwrap_or_default();
 
-        vec![test_operation_parameter_mode(op_code, &input, &output, &io),
-        test_operation_immediate_mode(op_code, &input, &output, &io)]
+        vec![
+            test_operation_parameter_mode(op_code, &input, &output, &io),
+            test_operation_immediate_mode(op_code, &input, &output, &io),
+        ]
     }
 
     #[test]
@@ -343,10 +361,12 @@ mod tests {
 
     #[test]
     fn test_operation_output() {
-        test_operation(OpCode::Output, Some(vec![42]), None, None).iter().for_each(|p| {
-            assert_eq!(p.io.size(), 1);
-            assert_eq!(p.io.peek().unwrap(), 42);
-        });
+        test_operation(OpCode::Output, Some(vec![42]), None, None)
+            .iter()
+            .for_each(|p| {
+                assert_eq!(p.io.size(), 1);
+                assert_eq!(p.io.peek().unwrap(), 42);
+            });
     }
 
     #[test]
@@ -354,10 +374,12 @@ mod tests {
         // The jump instructions are a little tricky because we still need to
         // halt. So, this program has an extra output instruction that we should
         // skip if we perform a jump operation.
-        test_operation(OpCode::JumpIfTrue, Some(vec![1, 5, 4, 13]), None, None).iter().for_each(|p| {
-            assert_eq!(p.ptr, 5);
-            assert_eq!(p.io.size(), 0);
-        });
+        test_operation(OpCode::JumpIfTrue, Some(vec![1, 5, 4, 13]), None, None)
+            .iter()
+            .for_each(|p| {
+                assert_eq!(p.ptr, 5);
+                assert_eq!(p.io.size(), 0);
+            });
     }
 
     #[test]
@@ -369,10 +391,12 @@ mod tests {
 
     #[test]
     fn test_operation_jump_if_false() {
-        test_operation(OpCode::JumpIfFalse, Some(vec![0, 5, 4, 13]), None, None).iter().for_each(|p| {
-            assert_eq!(p.ptr, 5);
-            assert_eq!(p.io.size(), 0);
-        });
+        test_operation(OpCode::JumpIfFalse, Some(vec![0, 5, 4, 13]), None, None)
+            .iter()
+            .for_each(|p| {
+                assert_eq!(p.ptr, 5);
+                assert_eq!(p.io.size(), 0);
+            });
     }
 
     #[test]
@@ -402,16 +426,16 @@ mod tests {
         let mut program = Program::default();
         program.buffer = vec![
             OpCode::SetRelativeBase.to_i64().unwrap(), // index 0
-            4, // index 1
+            4,                                         // index 1
             // Now the relative base is four...
             2200 + OpCode::Add.to_i64().unwrap(), // index 2
-            3, // value 3 + rel base = points to 7
-            4, // value 4 + rel base = points to 8
-            9, // index 5 -> points direct to 9
-            99, // index 6
-            10, // index 7
-            20, // index 8
-            -1, // index 9
+            3,                                    // value 3 + rel base = points to 7
+            4,                                    // value 4 + rel base = points to 8
+            9,                                    // index 5 -> points direct to 9
+            99,                                   // index 6
+            10,                                   // index 7
+            20,                                   // index 8
+            -1,                                   // index 9
         ];
 
         program.run();
