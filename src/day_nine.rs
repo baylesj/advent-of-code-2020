@@ -28,28 +28,24 @@ mod tests {
 
     #[test]
     fn part_one_sample_one() {
-        // let expected_program = Program::load("input/day_nine_sample_one.txt");
-        // println!("expected: {:#?}", expected_program.buffer);
-        // let mut actual_program = part_one("input/day_nine_sample_one.txt");
-        // for i in 0..expected_program.buffer.len() {
-        //     assert_eq!(expected_program.buffer[i], actual_program.remove().unwrap());
-        // }
+        let mut program = Program::load("input/day_nine_sample_one.txt");
+        let expected_buffer = program.buffer.clone();
+        program.run_until_halted();
+        assert_eq!(expected_buffer[0], program.io.remove().unwrap());
     }
 
     #[test]
     fn part_one_sample_two() {
-        // a sixteen digit number
-        // assert_eq!(
-        //     139629729,
-        //     part_one("input/day_nine_sample_two.txt")
-        // );
+        let mut program = Program::load("input/day_nine_sample_two.txt");
+        program.run_until_halted();
+        let output = program.io.remove().unwrap();
+        assert!(i128::pow(10, 15) < output && output < i128::pow(10, 16));
     }
 
     #[test]
     fn part_one_sample_three() {
-        assert_eq!(
-            1125899906842624,
-            part_one("input/day_nine_sample_three.txt")
-        );
+        let mut program = Program::load("input/day_nine_sample_three.txt");
+        program.run_until_halted();
+        assert_eq!(1125899906842624, program.io.peek().unwrap());
     }
 }

@@ -2,6 +2,7 @@ use enum_primitive_derive::Primitive;
 use num_traits::FromPrimitive;
 use queues::*;
 use std::clone::Clone;
+use std::convert::TryInto;
 use std::fs;
 
 // List of operations supported by this computer.
@@ -63,20 +64,24 @@ enum ParameterMode {
     Relative,
 }
 
-fn deference_output_index(index: usize, program: &mut Program) -> usize {
-    let output_index: usize = program.buffer[index] as usize;
-    if output_index > program.buffer.len() {
-        let new_size: usize = output_index * 2;
+fn evaluate_output_index(index: usize, program: &mut Program, mode: ParameterMode) -> usize {
+    let mut output_index = program.buffer[index] as i128;
+    if mode == ParameterMode::Relative {
+        output_index += program.relative_base as i128;
+    }
+    if output_index > program.buffer.len() as i128 {
+        let new_size: i128 = output_index * 2;
         println!(
             "INFO: received index {}, resizing to new size: {}",
             output_index, new_size
         );
-        program.buffer.resize(new_size, 0);
+
+        program.buffer.resize(new_size.try_into().unwrap(), 0);
     }
-    output_index
+    output_index.try_into().unwrap()
 }
 
-fn access_parameter(index: usize, program: &mut Program, mode: ParameterMode) -> i128 {
+fn evaluate_index(index: usize, program: &mut Program, mode: ParameterMode) -> usize {
     let actual_index: usize;
     match mode {
         ParameterMode::Immediate => actual_index = index,
@@ -94,13 +99,18 @@ fn access_parameter(index: usize, program: &mut Program, mode: ParameterMode) ->
         );
         program.buffer.resize(new_size, 0);
     }
-    program.buffer[actual_index]
+    actual_index
+}
+
+fn access_parameter(index: usize, program: &mut Program, mode: ParameterMode) -> i128 {
+    let index: usize = evaluate_index(index, program, mode);
+    program.buffer[index]
 }
 
 fn operation_add(program: &mut Program, modes: &Vec<ParameterMode>) {
     let a: i128 = access_parameter(program.ptr + 1, program, modes[0]);
     let b: i128 = access_parameter(program.ptr + 2, program, modes[1]);
-    let r_i: usize = deference_output_index(program.ptr + 3, program);
+    let r_i: usize = evaluate_output_index(program.ptr + 3, program, modes[2]);
     program.buffer[r_i] = a + b;
     program.ptr += 4;
 }
@@ -109,14 +119,14 @@ fn operation_add(program: &mut Program, modes: &Vec<ParameterMode>) {
 fn operation_multiply(program: &mut Program, modes: &Vec<ParameterMode>) {
     let a: i128 = access_parameter(program.ptr + 1, program, modes[0]);
     let b: i128 = access_parameter(program.ptr + 2, program, modes[1]);
-    let r_i: usize = deference_output_index(program.ptr + 3, program);
+    let r_i: usize = evaluate_output_index(program.ptr + 3, program, modes[2]);
     program.buffer[r_i] = a * b;
     program.ptr += 4;
 }
 
-fn operation_input(program: &mut Program) {
+fn operation_input(program: &mut Program, modes: &Vec<ParameterMode>) {
     let value: i128 = program.io.remove().expect("requested input on empty stack");
-    let r_i: usize = deference_output_index(program.ptr + 1, program);
+    let r_i: usize = evaluate_output_index(program.ptr + 1, program, modes[0]);
     program.buffer[r_i] = value;
     program.ptr += 2;
 }
@@ -151,7 +161,7 @@ fn operation_jump_if_false(program: &mut Program, modes: &Vec<ParameterMode>) {
 fn operation_less_than(program: &mut Program, modes: &Vec<ParameterMode>) {
     let a: i128 = access_parameter(program.ptr + 1, program, modes[0]);
     let b: i128 = access_parameter(program.ptr + 2, program, modes[1]);
-    let r_i: usize = deference_output_index(program.ptr + 3, program);
+    let r_i: usize = evaluate_output_index(program.ptr + 3, program, modes[2]);
     if a < b {
         program.buffer[r_i] = 1;
     } else {
@@ -163,7 +173,7 @@ fn operation_less_than(program: &mut Program, modes: &Vec<ParameterMode>) {
 fn operation_equals(program: &mut Program, modes: &Vec<ParameterMode>) {
     let a: i128 = access_parameter(program.ptr + 1, program, modes[0]);
     let b: i128 = access_parameter(program.ptr + 2, program, modes[1]);
-    let r_i: usize = deference_output_index(program.ptr + 3, program);
+    let r_i: usize = evaluate_output_index(program.ptr + 3, program, modes[2]);
     if a == b {
         program.buffer[r_i] = 1;
     } else {
@@ -173,8 +183,8 @@ fn operation_equals(program: &mut Program, modes: &Vec<ParameterMode>) {
 }
 
 fn operation_set_relative_base(program: &mut Program, modes: &Vec<ParameterMode>) {
-    let new_base: i128 = access_parameter(program.ptr + 1, program, modes[0]);
-    program.relative_base = new_base;
+    let offset: i128 = access_parameter(program.ptr + 1, program, modes[0]);
+    program.relative_base += offset;
     program.ptr += 2;
 }
 
@@ -204,7 +214,7 @@ fn perform_operation(program: &mut Program) {
     match op_code {
         OpCode::Add => operation_add(program, &modes),
         OpCode::Multiply => operation_multiply(program, &modes),
-        OpCode::Input => operation_input(program),
+        OpCode::Input => operation_input(program, &modes),
         OpCode::Output => operation_output(program, &modes),
         OpCode::JumpIfTrue => operation_jump_if_true(program, &modes),
         OpCode::JumpIfFalse => operation_jump_if_false(program, &modes),
