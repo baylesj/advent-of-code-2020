@@ -1,81 +1,38 @@
-use std::fs;
+#[path = "intcode_computer.rs"]
+mod intcode_computer;
+use intcode_computer::LoadableFromFile;
+use intcode_computer::Program;
+use intcode_computer::Runnable;
 
 const INPUT_FILENAME: &str = "input/day_two.txt";
 
-fn operation_code_one(index: usize, program: &mut Vec<i32>) {
-    let a_i: usize = program[index + 1] as usize;
-    let b_i: usize = program[index + 2] as usize;
-    let r_i: usize = program[index + 3] as usize;
-
-    program[r_i] = program[a_i] + program[b_i];
+fn set_program_inputs(program: &mut Program, noun: i64, verb: i64) {
+    program.buffer[1] = noun;
+    program.buffer[2] = verb;
 }
 
-// TODO: create generic and pass operator?
-fn operation_code_two(index: usize, program: &mut Vec<i32>) {
-    let a_i: usize = program[index + 1] as usize;
-    let b_i: usize = program[index + 2] as usize;
-    let r_i: usize = program[index + 3] as usize;
-
-    program[r_i] = program[a_i] * program[b_i];
+fn fixup_program(program: &mut Program) {
+    set_program_inputs(program, 12, 2);
 }
 
-fn perform_operation(index: usize, program: &mut Vec<i32>) -> bool {
-    match program[index] {
-        1 => {
-            operation_code_one(index, program);
-            true
-        }
-        2 => {
-            operation_code_two(index, program);
-            true
-        }
-        // 99 is HALT.
-        99 => false,
-        _ => panic!("unknown op code received!"),
-    }
-}
-
-fn fixup_program(program: &mut Vec<i32>) {
-    program[1] = 12;
-    program[2] = 2;
-}
-
-fn set_program_inputs(program: &mut Vec<i32>, noun: i32, verb: i32) {
-    program[1] = noun;
-    program[2] = verb;
-}
-
-fn load_program() -> Vec<i32> {
-    let fc: String = fs::read_to_string(INPUT_FILENAME).expect("invalid filename");
-    fc.split(',').map(|x| x.parse::<i32>().unwrap()).collect()
-}
-
-fn run_program(program: &mut Vec<i32>) {
-    let mut index: usize = 0;
-    while perform_operation(index, program) {
-        index += 4;
-    }
-}
-
-fn part_one() -> i32 {
-    let mut program = load_program();
+pub fn part_one(input_filename: &str) -> i64 {
+    let mut program = Program::load(input_filename);
     fixup_program(&mut program);
-    run_program(&mut program);
-
-    program[0]
+    program.run_until_halted();
+    program.buffer[0]
 }
 
-fn part_two() -> i32 {
-    const DESIRED_OUTPUT: i32 = 19690720;
-    let original_program = load_program();
+pub fn part_two(input_filename: &str) -> i64 {
+    const DESIRED_OUTPUT: i64 = 19690720;
+    let original_program = Program::load(input_filename);
 
     for noun in 0..=99 {
         for verb in 0..=99 {
-            let mut program: Vec<i32> = original_program.to_vec();
+            let mut program = original_program.clone();
             set_program_inputs(&mut program, noun, verb);
-            run_program(&mut program);
-            if program[0] == DESIRED_OUTPUT {
-                return 100 * program[1] + program[2];
+            program.run();
+            if program.buffer[0] == DESIRED_OUTPUT {
+                return 100 * program.buffer[1] + program.buffer[2];
             }
         }
     }
@@ -86,7 +43,22 @@ fn part_two() -> i32 {
 pub fn solve() {
     println!(
         "Day two, part one: {}, part two: {}",
-        part_one(),
-        part_two()
+        part_one(INPUT_FILENAME),
+        part_two(INPUT_FILENAME)
     )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_part_one() {
+        assert_eq!(9581917, part_one(INPUT_FILENAME));
+    }
+
+    #[test]
+    fn test_part_two() {
+        assert_eq!(2505, part_two(INPUT_FILENAME));
+    }
 }

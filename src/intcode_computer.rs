@@ -224,15 +224,12 @@ pub trait LoadableFromFile {
     fn load(filename: &str) -> Self;
 }
 
-// TODO: move to growable buffer size.
-const PROGRAM_MEMORY_SIZE: usize = 1 * 1024 * 1024;
 impl LoadableFromFile for Program {
     fn load(filename: &str) -> Self {
         let fc: String = fs::read_to_string(filename).expect("invalid filename");
 
         let mut program = Program::default();
         program.buffer = fc.split(',').map(|x| x.parse::<i64>().unwrap()).collect();
-        program.buffer.resize(PROGRAM_MEMORY_SIZE, 0);
         program
     }
 }
