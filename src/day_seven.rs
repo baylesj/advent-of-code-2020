@@ -11,8 +11,8 @@ use intcode_computer::Runnable;
 const INPUT_FILENAME: &str = "input/day_seven.txt";
 const PROGRAM_COUNT: usize = 5;
 
-fn run_permutation(input: i64, permutation: &[i64], programs: &mut Vec<Program>) -> i64 {
-    let mut output: i64 = input;
+fn run_permutation(input: i128, permutation: &[i128], programs: &mut Vec<Program>) -> i128 {
+    let mut output: i128 = input;
     for i in 0..PROGRAM_COUNT {
         programs[i].io.add(permutation[i]).ok();
         programs[i].io.add(output).ok();
@@ -31,10 +31,10 @@ fn create_program_vector(reference: &Program) -> Vec<Program> {
 }
 
 // TODO: factor out common permutate function.
-pub fn part_one(input_filename: &str) -> i64 {
-    const PHASES: [i64; PROGRAM_COUNT] = [0, 1, 2, 3, 4];
+pub fn part_one(input_filename: &str) -> i128 {
+    const PHASES: [i128; PROGRAM_COUNT] = [0, 1, 2, 3, 4];
     let program = Program::load(input_filename);
-    let mut max_signal: i64 = 0;
+    let mut max_signal: i128 = 0;
     PHASES.to_vec().permutation().for_each(|p| {
         let mut programs = create_program_vector(&program);
         max_signal = std::cmp::max(max_signal, run_permutation(0, &p, &mut programs));
@@ -57,10 +57,10 @@ fn pipe_io(programs: &mut Vec<Program>, from: usize, to: usize) {
     }
 }
 
-pub fn part_two(input_filename: &str) -> i64 {
-    const PHASES: [i64; PROGRAM_COUNT] = [5, 6, 7, 8, 9];
+pub fn part_two(input_filename: &str) -> i128 {
+    const PHASES: [i128; PROGRAM_COUNT] = [5, 6, 7, 8, 9];
     let program = Program::load(input_filename);
-    let mut max_signal: i64 = 0;
+    let mut max_signal: i128 = 0;
     PHASES.to_vec().permutation().for_each(|p| {
         let mut programs = create_program_vector(&program);
         for i in 0..PROGRAM_COUNT {

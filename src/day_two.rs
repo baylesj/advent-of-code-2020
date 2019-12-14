@@ -6,7 +6,7 @@ use intcode_computer::Runnable;
 
 const INPUT_FILENAME: &str = "input/day_two.txt";
 
-fn set_program_inputs(program: &mut Program, noun: i64, verb: i64) {
+fn set_program_inputs(program: &mut Program, noun: i128, verb: i128) {
     program.buffer[1] = noun;
     program.buffer[2] = verb;
 }
@@ -15,15 +15,15 @@ fn fixup_program(program: &mut Program) {
     set_program_inputs(program, 12, 2);
 }
 
-pub fn part_one(input_filename: &str) -> i64 {
+pub fn part_one(input_filename: &str) -> i128 {
     let mut program = Program::load(input_filename);
     fixup_program(&mut program);
     program.run_until_halted();
     program.buffer[0]
 }
 
-pub fn part_two(input_filename: &str) -> i64 {
-    const DESIRED_OUTPUT: i64 = 19690720;
+pub fn part_two(input_filename: &str) -> i128 {
+    const DESIRED_OUTPUT: i128 = 19690720;
     let original_program = Program::load(input_filename);
 
     for noun in 0..=99 {

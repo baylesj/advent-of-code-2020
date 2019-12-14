@@ -7,7 +7,7 @@ use queues::IsQueue;
 
 const INPUT_FILENAME: &str = "input/day_five.txt";
 
-pub fn part_one(input_filename: &str) -> i64 {
+pub fn part_one(input_filename: &str) -> i128 {
     let mut program: Program = Program::load(input_filename);
     program.io.add(1).ok();
     program.run_until_halted();
@@ -19,7 +19,7 @@ pub fn part_one(input_filename: &str) -> i64 {
     program.io.peek().unwrap()
 }
 
-pub fn part_two(input_filename: &str) -> i64 {
+pub fn part_two(input_filename: &str) -> i128 {
     let mut program: Program = Program::load(input_filename);
     program.io.add(5).ok();
     program.run_until_halted();
