@@ -354,8 +354,8 @@ mod tests {
         // The jump instructions are a little tricky because we still need to
         // halt. So, this program has an extra output instruction that we should
         // skip if we perform a jump operation.
-        test_operation(OpCode::JumpIfTrue, Some(vec![1, 6, 4, 13]), None, None).iter().for_each(|p| {
-            assert_eq!(p.ptr, 6);
+        test_operation(OpCode::JumpIfTrue, Some(vec![1, 5, 4, 13]), None, None).iter().for_each(|p| {
+            assert_eq!(p.ptr, 5);
             assert_eq!(p.io.size(), 0);
         });
     }
@@ -364,13 +364,13 @@ mod tests {
     #[should_panic]
     fn test_operation_jump_if_true_false_case() {
         // Ensure that our strategy works by testing again with false.
-        test_operation(OpCode::JumpIfTrue, Some(vec![0, 6, -1]), None, None);
+        test_operation(OpCode::JumpIfTrue, Some(vec![0, 5, -1]), None, None);
     }
 
     #[test]
     fn test_operation_jump_if_false() {
-        test_operation(OpCode::JumpIfFalse, Some(vec![0, 6, 4, 13]), None, None).iter().for_each(|p| {
-            assert_eq!(p.ptr, 6);
+        test_operation(OpCode::JumpIfFalse, Some(vec![0, 5, 4, 13]), None, None).iter().for_each(|p| {
+            assert_eq!(p.ptr, 5);
             assert_eq!(p.io.size(), 0);
         });
     }
@@ -379,7 +379,7 @@ mod tests {
     #[should_panic]
     fn test_operation_jump_if_false_true_case() {
         // Ensure that our strategy works by testing again with false.
-        test_operation(OpCode::JumpIfFalse, Some(vec![1, 6, -1]), None, None);
+        test_operation(OpCode::JumpIfFalse, Some(vec![1, 5, -1]), None, None);
     }
 
     #[test]
