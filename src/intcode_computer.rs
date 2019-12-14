@@ -5,9 +5,10 @@ use std::clone::Clone;
 use std::convert::TryInto;
 use std::fs;
 
+pub use self::loadable::LoadableFromFile;
+
 #[path = "loadable.rs"]
 mod loadable;
-use loadable::LoadableFromFile;
 
 // List of operations supported by this computer.
 #[derive(Primitive, Debug, Clone, Copy, PartialEq)]

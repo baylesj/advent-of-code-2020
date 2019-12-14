@@ -1,13 +1,8 @@
 use queues::IsQueue;
 
-#[path = "loadable.rs"]
-mod loadable;
-use loadable::LoadableFromFile;
-
+pub use self::intcode_computer::{LoadableFromFile, Program, Runnable};
 #[path = "intcode_computer.rs"]
 mod intcode_computer;
-use intcode_computer::Program;
-use intcode_computer::Runnable;
 
 const INPUT_FILENAME: &str = "input/day_nine.txt";
 

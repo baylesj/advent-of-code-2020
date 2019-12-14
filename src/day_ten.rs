@@ -1,7 +1,7 @@
-use fraction::{GenericFraction, Sign};
+use fraction::Fraction;
 use std::collections::HashSet;
 use std::fs::File;
-use std::io::{self, prelude::*, BufReader};
+use std::io::{prelude::*, BufReader};
 
 #[path = "loadable.rs"]
 mod loadable;
@@ -43,22 +43,15 @@ pub fn calculate_visible_points(x: usize, y: usize, map: &AsteroidMap) -> i64 {
     let mut found_slopes = HashSet::new();
     for row in 0..map.len() {
         for col in 0..map[0].len() {
-            if (x == col && y == row) || !map[y][x] {
+            if (x == col && y == row) || !map[row][col] {
                 continue;
             }
 
             let rise: i64 = y as i64 - row as i64;
             let run: i64 = x as i64 - col as i64;
-            // TODO: sign here is dumb...
-            let sign: Sign;
-            if (rise < 0) == (run < 0) {
-                sign = Sign::Plus;
-            } else {
-                sign = Sign::Minus;
-            }
 
-            let slope = GenericFraction::<u64>::new_generic(sign, rise.abs(), run.abs()).unwrap();
-            found_slopes.insert(slope.to_string());
+            let slope = Fraction::new(rise.abs() as u64, run.abs() as u64);
+            found_slopes.insert(format!("{}{}{}", rise < 0, run < 0, slope));
         }
     }
 
@@ -70,13 +63,19 @@ pub fn part_one(input_filename: &str) -> i64 {
     let mut max_visible: i64 = 0;
     for row in 0..map.len() {
         for col in 0..map[0].len() {
-            max_visible = i64::max(max_visible, calculate_visible_points(col, row, &map));
+            // No asteroid here, so can't place a station here.
+            if !map[row][col] {
+                continue;
+            }
+
+            let visible_points = calculate_visible_points(col, row, &map);
+            max_visible = i64::max(max_visible, visible_points);
         }
     }
     max_visible
 }
 
-pub fn part_two(input_filename: &str) -> i64 {
+pub fn part_two(_input_filename: &str) -> i64 {
     128
 }
 
@@ -90,8 +89,33 @@ pub fn solve() {
 
 #[cfg(test)]
 mod tests {
-    //use super::*;
+    use super::*;
 
     #[test]
-    fn test_foo() {}
+    fn test_part_one_sample_one() {
+        let map = AsteroidMap::load("input/day_ten_sample_one.txt");
+        assert_eq!(33, calculate_visible_points(5, 8, &map));
+        // duplicate
+        assert_eq!(part_one("input/day_ten_sample_one.txt"), 33);
+    }
+
+    #[test]
+    fn test_part_one_sample_two() {
+        assert_eq!(part_one("input/day_ten_sample_two.txt"), 35);
+    }
+
+    #[test]
+    fn test_part_one_sample_three() {
+        assert_eq!(part_one("input/day_ten_sample_three.txt"), 41);
+    }
+
+    #[test]
+    fn test_part_one_sample_four() {
+        assert_eq!(part_one("input/day_ten_sample_four.txt"), 210);
+    }
+
+    #[test]
+    fn test_part_one() {
+      assert_eq!(part_one(INPUT_FILENAME), 278);
+    }
 }

@@ -1,4 +1,7 @@
-use advent_of_code::*;
+use advent_of_code::{
+    day_eight, day_five, day_four, day_nine, day_one, day_seven, day_six, day_ten, day_three,
+    day_two,
+};
 
 // TODO: clean this up, overly procedural.
 fn main() {
