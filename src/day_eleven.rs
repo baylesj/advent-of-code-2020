@@ -80,6 +80,9 @@ impl Advance for Point {
 #[derive(Default, Debug)]
 struct PainterState {
     white_tiles: HashSet<Point>,
+    // Important note from prompt: painting a tile black
+    // does count as painting, not "erasing."
+    black_tiles: HashSet<Point>,
     current_location: Point,
     current_direction: Direction,
 
@@ -95,9 +98,9 @@ impl Update for PainterState {
     fn update(self: &mut Self) {
         self.current_location.advance(self.current_direction);
         self.min_point.x = i32::min(self.min_point.x, self.current_location.x);
-        self.min_point.y = i32::min(self.min_point.x, self.current_location.y);
+        self.min_point.y = i32::min(self.min_point.y, self.current_location.y);
         self.max_point.x = i32::max(self.max_point.x, self.current_location.x);
-        self.max_point.y = i32::max(self.max_point.x, self.current_location.y);
+        self.max_point.y = i32::max(self.max_point.y, self.current_location.y);
     }
 }
 
@@ -119,10 +122,10 @@ fn print(state: &PainterState) {
     let mut line: Vec<char> =
         Vec::with_capacity((state.max_point.x + 1 - state.min_point.x) as usize);
     let mut point = Point::default();
-    for x in state.min_point.x..state.max_point.x + 1 {
-        point.x = x;
-        for y in state.min_point.y..state.max_point.y + 1 {
-            point.y = y;
+    for y in state.min_point.y..state.max_point.y + 1 {
+        point.y = y;
+        for x in state.min_point.x..state.max_point.x + 1 {
+            point.x = x;
             line.push(if state.white_tiles.contains(&point) {
                 '⬜'
             } else {
@@ -141,14 +144,16 @@ fn paint(program: &mut Program, initial_color: TileColor) -> i64 {
     program.run();
     program.run();
     while program.state != ProgramState::Stopped {
-        let should_turn_right: bool = program.io.remove().expect("missing output") == 1;
         let tile_color = TileColor::try_from(program.io.remove().expect("missing output"));
+        let should_turn_right: bool = program.io.remove().expect("missing output") == 1;
         match tile_color.expect("invalid tile color") {
             TileColor::Black => {
                 state.white_tiles.remove(&state.current_location);
+                state.black_tiles.insert(state.current_location);
             }
             TileColor::White => {
                 state.white_tiles.insert(state.current_location);
+                state.black_tiles.remove(&state.current_location);
             }
         }
 
@@ -164,7 +169,7 @@ fn paint(program: &mut Program, initial_color: TileColor) -> i64 {
     }
 
     print(&state);
-    state.white_tiles.len() as i64
+    (state.white_tiles.len() + state.black_tiles.len()) as i64
 }
 
 pub fn part_one(program: &mut Program) -> i64 {
