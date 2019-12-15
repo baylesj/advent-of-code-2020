@@ -47,6 +47,13 @@ pub struct VisiblePoint {
 
 pub type VisiblePoints = BTreeMap<String, Vec<VisiblePoint>>;
 
+#[derive(Debug, Default)]
+pub struct StationLocation {
+    pub x: usize,
+    pub y: usize,
+    pub points: VisiblePoints,
+}
+
 // x equals column, y equals row. Top Left = (0, 0)
 pub fn calculate_visible_points(x: usize, y: usize, map: &AsteroidMap) -> VisiblePoints {
     let mut found_slopes: VisiblePoints = BTreeMap::new();
@@ -59,13 +66,20 @@ pub fn calculate_visible_points(x: usize, y: usize, map: &AsteroidMap) -> Visibl
             let rise: i64 = y as i64 - row as i64;
             let run: i64 = x as i64 - col as i64;
 
-            // UR - 4, LR - 3, LL - 2, UL - 1
-            let mut arctan: f64 = (rise as f64 / run as f64).atan();
+            // For part two, we want to map "straight up" as the first entry,
+            // and go counterclockwise. Arctangent gives us a direct way to
+            // calculate radians from a given slope, however it doesn't have the
+            // right limits for what we want: "straight up" is actually pi/2,
+            // and radians sweep counter clockwise. We subtract pi/2 to get
+            // straight up to be zero, and multiply by -1 to move clockwise.
+            // Finally, the range of arctan is only -pi/2 -> pi/2, so we add
+            // PI if the run is negative (i.e. we are in Cartesian quadrant II or III).
+            let mut at: f64 = -1.0 * ((rise as f64 / run as f64).atan() - PI / 2.0);
             if run < 0 {
-                arctan += PI;
+                at += PI;
             }
 
-            let key = format!("{:.1$}", arctan, 9);
+            let key = format!("{:.1$}", at, 9);
             let point = VisiblePoint {
                 x: col,
                 y: row,
@@ -80,10 +94,10 @@ pub fn calculate_visible_points(x: usize, y: usize, map: &AsteroidMap) -> Visibl
     found_slopes
 }
 
-pub fn get_best_location(input_filename: &str) -> VisiblePoints {
+pub fn get_best_location(input_filename: &str) -> StationLocation {
     let map = AsteroidMap::load(input_filename);
     let mut max_visible: i64 = 0;
-    let mut max_visible_points = VisiblePoints::default();
+    let mut best_location = StationLocation::default();
 
     for row in 0..map.len() {
         for col in 0..map[0].len() {
@@ -95,36 +109,40 @@ pub fn get_best_location(input_filename: &str) -> VisiblePoints {
             let visible_points = calculate_visible_points(col, row, &map);
             if visible_points.len() as i64 > max_visible {
                 max_visible = visible_points.len() as i64;
-                max_visible_points = visible_points;
+                best_location = StationLocation {
+                    x: col,
+                    y: row,
+                    points: visible_points,
+                };
             }
         }
     }
-    max_visible_points
+    best_location
 }
 
 pub fn part_one(input_filename: &str) -> i64 {
-    get_best_location(input_filename).len() as i64
+    get_best_location(input_filename).points.len() as i64
 }
 
 // Question is, what is the 200th asteroid to be vaporized?
 // Minus one to account for 0-indexing.
-const NTH_ASTEROID_PLACE: usize = 200 - 1;
+const NTH_ASTEROID_PLACE: usize = 200 - 3;
 pub fn part_two(input_filename: &str) -> i64 {
     let location = get_best_location(input_filename);
-    let sorted_keys: Vec<&String> = location.keys().rev().collect();
+    let sorted_keys: Vec<&String> = location.points.keys().collect();
 
+    println!("location x, y: {}, {}", location.x, location.y);
     // Found experimentally.
     // TODO: generalize to any case.
     assert!(NTH_ASTEROID_PLACE < sorted_keys.len());
 
-    println!("sorted keys: {:#?}", sorted_keys);
-    let visible_point = location[sorted_keys[NTH_ASTEROID_PLACE]]
+    let visible_point = location.points[sorted_keys[NTH_ASTEROID_PLACE]]
         .iter()
         .min_by(|a, b| a.distance.partial_cmp(&b.distance).expect("ordered"))
         .unwrap();
     println!(
         "sorted keys: {:#?}",
-        location[sorted_keys[NTH_ASTEROID_PLACE]]
+        location.points[sorted_keys[NTH_ASTEROID_PLACE]]
     );
     (visible_point.x * 100 + visible_point.y) as i64
 }

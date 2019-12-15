@@ -1,0 +1,2196 @@
+Day one, part one: 3267890, part two: 4898972
+Day two, part one: 9581917, part two: 2505
+Day three, intersects: true, min distance: 248, min steps: 28580
+Day four, part one: 1855 passwords, part two: 1253 passwords
+Day five, part one: 13978427, part two: 11189491
+Day six, part one: 295834, part two: 361
+Day seven, part 1: 422858, part 2: 14897241
+Day eight, part one: 2684, part two: 
+⬜⬛⬛⬛⬜⬛⬜⬜⬛⬛⬜⬜⬜⬛⬛⬜⬛⬛⬛⬜⬜⬜⬜⬜⬛
+⬜⬛⬛⬛⬜⬜⬛⬛⬜⬛⬜⬛⬛⬜⬛⬜⬛⬛⬛⬜⬛⬛⬛⬜⬛
+⬛⬜⬛⬜⬛⬜⬛⬛⬛⬛⬜⬛⬛⬜⬛⬛⬜⬛⬜⬛⬛⬛⬜⬛⬛
+⬛⬛⬜⬛⬛⬜⬛⬜⬜⬛⬜⬜⬜⬛⬛⬛⬛⬜⬛⬛⬛⬜⬛⬛⬛
+⬛⬛⬜⬛⬛⬜⬛⬛⬜⬛⬜⬛⬜⬛⬛⬛⬛⬜⬛⬛⬜⬛⬛⬛⬛
+⬛⬛⬜⬛⬛⬛⬜⬜⬜⬛⬜⬛⬛⬜⬛⬛⬛⬜⬛⬛⬜⬜⬜⬜⬛
+INFO: received index 1000, resizing to new size: 2000
+INFO: received index 1000, resizing to new size: 2000
+Day nine, part one: 2406950601, part two 83239
+location: {
+    "0.000000000": [
+        VisiblePoint {
+            x: 23,
+            y: 3,
+            distance: 16.0,
+        },
+        VisiblePoint {
+            x: 23,
+            y: 17,
+            distance: 2.0,
+        },
+    ],
+    "0.083141232": [
+        VisiblePoint {
+            x: 22,
+            y: 7,
+            distance: 12.041594578792296,
+        },
+    ],
+    "0.104876939": [
+        VisiblePoint {
+            x: 21,
+            y: 0,
+            distance: 19.1049731745428,
+        },
+    ],
+    "0.110657221": [
+        VisiblePoint {
+            x: 21,
+            y: 1,
+            distance: 18.110770276274835,
+        },
+        VisiblePoint {
+            x: 22,
+            y: 10,
+            distance: 9.055385138137417,
+        },
+    ],
+    "0.174672199": [
+        VisiblePoint {
+            x: 20,
+            y: 2,
+            distance: 17.26267650163207,
+        },
+    ],
+    "0.218668946": [
+        VisiblePoint {
+            x: 21,
+            y: 10,
+            distance: 9.219544457292887,
+        },
+    ],
+    "0.231090667": [
+        VisiblePoint {
+            x: 19,
+            y: 2,
+            distance: 17.46424919657298,
+        },
+    ],
+    "0.257323715": [
+        VisiblePoint {
+            x: 18,
+            y: 0,
+            distance: 19.6468827043885,
+        },
+    ],
+    "0.321750554": [
+        VisiblePoint {
+            x: 19,
+            y: 7,
+            distance: 12.649110640673518,
+        },
+        VisiblePoint {
+            x: 20,
+            y: 10,
+            distance: 9.486832980505138,
+        },
+    ],
+    "0.343023940": [
+        VisiblePoint {
+            x: 18,
+            y: 5,
+            distance: 14.866068747318506,
+        },
+    ],
+    "0.367173834": [
+        VisiblePoint {
+            x: 18,
+            y: 6,
+            distance: 13.92838827718412,
+        },
+    ],
+    "0.380506377": [
+        VisiblePoint {
+            x: 19,
+            y: 9,
+            distance: 10.770329614269007,
+        },
+    ],
+    "0.390607044": [
+        VisiblePoint {
+            x: 16,
+            y: 2,
+            distance: 18.384776310850235,
+        },
+    ],
+    "0.404891786": [
+        VisiblePoint {
+            x: 17,
+            y: 5,
+            distance: 15.231546211727817,
+        },
+    ],
+    "0.418224330": [
+        VisiblePoint {
+            x: 19,
+            y: 10,
+            distance: 9.848857801796104,
+        },
+    ],
+    "0.436627160": [
+        VisiblePoint {
+            x: 16,
+            y: 4,
+            distance: 16.55294535724685,
+        },
+    ],
+    "0.463647609": [
+        VisiblePoint {
+            x: 19,
+            y: 11,
+            distance: 8.94427190999916,
+        },
+    ],
+    "0.507098504": [
+        VisiblePoint {
+            x: 18,
+            y: 10,
+            distance: 10.295630140987,
+        },
+    ],
+    "0.519146114": [
+        VisiblePoint {
+            x: 15,
+            y: 5,
+            distance: 16.1245154965971,
+        },
+    ],
+    "0.524795772": [
+        VisiblePoint {
+            x: 12,
+            y: 0,
+            distance: 21.95449840010015,
+        },
+    ],
+    "0.531724067": [
+        VisiblePoint {
+            x: 13,
+            y: 2,
+            distance: 19.72308292331602,
+        },
+    ],
+    "0.566729218": [
+        VisiblePoint {
+            x: 16,
+            y: 8,
+            distance: 13.038404810405298,
+        },
+    ],
+    "0.588002604": [
+        VisiblePoint {
+            x: 19,
+            y: 13,
+            distance: 7.211102550927978,
+        },
+    ],
+    "0.610725964": [
+        VisiblePoint {
+            x: 16,
+            y: 9,
+            distance: 12.206555615733702,
+        },
+    ],
+    "0.625485040": [
+        VisiblePoint {
+            x: 10,
+            y: 1,
+            distance: 22.20360331117452,
+        },
+    ],
+    "0.643501109": [
+        VisiblePoint {
+            x: 11,
+            y: 3,
+            distance: 20.0,
+        },
+        VisiblePoint {
+            x: 20,
+            y: 15,
+            distance: 5.0,
+        },
+    ],
+    "0.652846631": [
+        VisiblePoint {
+            x: 10,
+            y: 2,
+            distance: 21.400934559032695,
+        },
+    ],
+    "0.655695626": [
+        VisiblePoint {
+            x: 13,
+            y: 6,
+            distance: 16.401219466856727,
+        },
+    ],
+    "0.668289419": [
+        VisiblePoint {
+            x: 8,
+            y: 0,
+            distance: 24.20743687382041,
+        },
+    ],
+    "0.694738276": [
+        VisiblePoint {
+            x: 13,
+            y: 7,
+            distance: 15.620499351813308,
+        },
+    ],
+    "0.722979353": [
+        VisiblePoint {
+            x: 8,
+            y: 2,
+            distance: 22.67156809750927,
+        },
+    ],
+    "0.726642341": [
+        VisiblePoint {
+            x: 15,
+            y: 10,
+            distance: 12.041594578792296,
+        },
+    ],
+    "0.785398163": [
+        VisiblePoint {
+            x: 8,
+            y: 4,
+            distance: 21.213203435596427,
+        },
+        VisiblePoint {
+            x: 9,
+            y: 5,
+            distance: 19.79898987322333,
+        },
+        VisiblePoint {
+            x: 11,
+            y: 7,
+            distance: 16.97056274847714,
+        },
+        VisiblePoint {
+            x: 14,
+            y: 10,
+            distance: 12.727922061357855,
+        },
+        VisiblePoint {
+            x: 17,
+            y: 13,
+            distance: 8.48528137423857,
+        },
+    ],
+    "0.851966327": [
+        VisiblePoint {
+            x: 15,
+            y: 12,
+            distance: 10.63014581273465,
+        },
+    ],
+    "0.856705628": [
+        VisiblePoint {
+            x: 8,
+            y: 6,
+            distance: 19.849433241279208,
+        },
+    ],
+    "0.858438729": [
+        VisiblePoint {
+            x: 1,
+            y: 0,
+            distance: 29.068883707497267,
+        },
+    ],
+    "0.862170055": [
+        VisiblePoint {
+            x: 2,
+            y: 1,
+            distance: 27.65863337187866,
+        },
+        VisiblePoint {
+            x: 16,
+            y: 13,
+            distance: 9.219544457292887,
+        },
+    ],
+    "0.876058051": [
+        VisiblePoint {
+            x: 17,
+            y: 14,
+            distance: 7.810249675906654,
+        },
+    ],
+    "0.888479772": [
+        VisiblePoint {
+            x: 7,
+            y: 6,
+            distance: 20.615528128088304,
+        },
+    ],
+    "0.909753158": [
+        VisiblePoint {
+            x: 5,
+            y: 5,
+            distance: 22.80350850198276,
+        },
+    ],
+    "0.912907722": [
+        VisiblePoint {
+            x: 1,
+            y: 2,
+            distance: 27.80287754891569,
+        },
+    ],
+    "0.915100701": [
+        VisiblePoint {
+            x: 10,
+            y: 9,
+            distance: 16.401219466856727,
+        },
+    ],
+    "0.919719605": [
+        VisiblePoint {
+            x: 2,
+            y: 3,
+            distance: 26.40075756488817,
+        },
+    ],
+    "0.927295218": [
+        VisiblePoint {
+            x: 15,
+            y: 13,
+            distance: 10.0,
+        },
+    ],
+    "0.934288111": [
+        VisiblePoint {
+            x: 0,
+            y: 2,
+            distance: 28.600699292150182,
+        },
+    ],
+    "0.938047492": [
+        VisiblePoint {
+            x: 8,
+            y: 8,
+            distance: 18.601075237738275,
+        },
+    ],
+    "0.950546841": [
+        VisiblePoint {
+            x: 2,
+            y: 4,
+            distance: 25.80697580112788,
+        },
+    ],
+    "0.968508981": [
+        VisiblePoint {
+            x: 7,
+            y: 8,
+            distance: 19.4164878389476,
+        },
+    ],
+    "0.970746113": [
+        VisiblePoint {
+            x: 4,
+            y: 6,
+            distance: 23.021728866442675,
+        },
+    ],
+    "0.972377433": [
+        VisiblePoint {
+            x: 1,
+            y: 4,
+            distance: 26.627053911388696,
+        },
+    ],
+    "0.982793723": [
+        VisiblePoint {
+            x: 17,
+            y: 15,
+            distance: 7.211102550927978,
+        },
+    ],
+    "0.996491497": [
+        VisiblePoint {
+            x: 6,
+            y: 8,
+            distance: 20.248456731316587,
+        },
+    ],
+    "1.004067109": [
+        VisiblePoint {
+            x: 1,
+            y: 5,
+            distance: 26.076809620810597,
+        },
+    ],
+    "1.007480065": [
+        VisiblePoint {
+            x: 4,
+            y: 7,
+            distance: 22.47220505424423,
+        },
+    ],
+    "1.012197011": [
+        VisiblePoint {
+            x: 7,
+            y: 9,
+            distance: 18.867962264113206,
+        },
+    ],
+    "1.030376827": [
+        VisiblePoint {
+            x: 13,
+            y: 13,
+            distance: 11.661903789690601,
+        },
+    ],
+    "1.042721878": [
+        VisiblePoint {
+            x: 11,
+            y: 12,
+            distance: 13.892443989449804,
+        },
+    ],
+    "1.051650213": [
+        VisiblePoint {
+            x: 9,
+            y: 11,
+            distance: 16.1245154965971,
+        },
+    ],
+    "1.056345014": [
+        VisiblePoint {
+            x: 0,
+            y: 6,
+            distance: 26.419689627245813,
+        },
+    ],
+    "1.058406866": [
+        VisiblePoint {
+            x: 7,
+            y: 10,
+            distance: 18.35755975068582,
+        },
+    ],
+    "1.083897095": [
+        VisiblePoint {
+            x: 6,
+            y: 10,
+            distance: 19.235384061671343,
+        },
+    ],
+    "1.107148718": [
+        VisiblePoint {
+            x: 17,
+            y: 16,
+            distance: 6.708203932499369,
+        },
+    ],
+    "1.144168834": [
+        VisiblePoint {
+            x: 12,
+            y: 14,
+            distance: 12.083045973594572,
+        },
+    ],
+    "1.152571997": [
+        VisiblePoint {
+            x: 5,
+            y: 11,
+            distance: 19.697715603592208,
+        },
+        VisiblePoint {
+            x: 14,
+            y: 15,
+            distance: 9.848857801796104,
+        },
+    ],
+    "1.160668986": [
+        VisiblePoint {
+            x: 0,
+            y: 9,
+            distance: 25.079872407968907,
+        },
+    ],
+    "1.165904541": [
+        VisiblePoint {
+            x: 2,
+            y: 10,
+            distance: 22.847319317591726,
+        },
+    ],
+    "1.176005207": [
+        VisiblePoint {
+            x: 11,
+            y: 14,
+            distance: 13.0,
+        },
+    ],
+    "1.182477609": [
+        VisiblePoint {
+            x: 1,
+            y: 10,
+            distance: 23.769728648009426,
+        },
+    ],
+    "1.190289950": [
+        VisiblePoint {
+            x: 13,
+            y: 15,
+            distance: 10.770329614269007,
+        },
+    ],
+    "1.199905038": [
+        VisiblePoint {
+            x: 5,
+            y: 12,
+            distance: 19.313207915827967,
+        },
+    ],
+    "1.217805939": [
+        VisiblePoint {
+            x: 4,
+            y: 12,
+            distance: 20.248456731316587,
+        },
+    ],
+    "1.227772386": [
+        VisiblePoint {
+            x: 9,
+            y: 14,
+            distance: 14.866068747318506,
+        },
+    ],
+    "1.264917455": [
+        VisiblePoint {
+            x: 4,
+            y: 13,
+            distance: 19.924858845171276,
+        },
+    ],
+    "1.267911458": [
+        VisiblePoint {
+            x: 7,
+            y: 14,
+            distance: 16.76305461424021,
+        },
+    ],
+    "1.292496668": [
+        VisiblePoint {
+            x: 16,
+            y: 17,
+            distance: 7.280109889280518,
+        },
+    ],
+    "1.310193935": [
+        VisiblePoint {
+            x: 8,
+            y: 15,
+            distance: 15.524174696260024,
+        },
+    ],
+    "1.313472612": [
+        VisiblePoint {
+            x: 4,
+            y: 14,
+            distance: 19.6468827043885,
+        },
+    ],
+    "1.325817664": [
+        VisiblePoint {
+            x: 7,
+            y: 15,
+            distance: 16.492422502470642,
+        },
+    ],
+    "1.339705660": [
+        VisiblePoint {
+            x: 6,
+            y: 15,
+            distance: 17.46424919657298,
+        },
+    ],
+    "1.352127381": [
+        VisiblePoint {
+            x: 14,
+            y: 17,
+            distance: 9.219544457292887,
+        },
+    ],
+    "1.385448377": [
+        VisiblePoint {
+            x: 7,
+            y: 16,
+            distance: 16.278820596099706,
+        },
+    ],
+    "1.390942827": [
+        VisiblePoint {
+            x: 1,
+            y: 15,
+            distance: 22.360679774997898,
+        },
+    ],
+    "1.398605512": [
+        VisiblePoint {
+            x: 0,
+            y: 15,
+            distance: 23.345235059857504,
+        },
+    ],
+    "1.405647649": [
+        VisiblePoint {
+            x: 5,
+            y: 16,
+            distance: 18.24828759089466,
+        },
+    ],
+    "1.428899272": [
+        VisiblePoint {
+            x: 9,
+            y: 17,
+            distance: 14.142135623730951,
+        },
+    ],
+    "1.446441332": [
+        VisiblePoint {
+            x: 15,
+            y: 18,
+            distance: 8.06225774829855,
+        },
+    ],
+    "1.460139106": [
+        VisiblePoint {
+            x: 14,
+            y: 18,
+            distance: 9.055385138137417,
+        },
+    ],
+    "1.471127674": [
+        VisiblePoint {
+            x: 3,
+            y: 17,
+            distance: 20.09975124224178,
+        },
+    ],
+    "1.475844620": [
+        VisiblePoint {
+            x: 2,
+            y: 17,
+            distance: 21.095023109728988,
+        },
+    ],
+    "1.480136440": [
+        VisiblePoint {
+            x: 1,
+            y: 17,
+            distance: 22.090722034374522,
+        },
+    ],
+    "1.499488862": [
+        VisiblePoint {
+            x: 9,
+            y: 18,
+            distance: 14.035668847618199,
+        },
+    ],
+    "1.504228163": [
+        VisiblePoint {
+            x: 8,
+            y: 18,
+            distance: 15.033296378372908,
+        },
+    ],
+    "1.518213265": [
+        VisiblePoint {
+            x: 4,
+            y: 18,
+            distance: 19.026297590440446,
+        },
+    ],
+    "1.520837931": [
+        VisiblePoint {
+            x: 3,
+            y: 18,
+            distance: 20.024984394500787,
+        },
+    ],
+    "1.570796327": [
+        VisiblePoint {
+            x: 5,
+            y: 19,
+            distance: 18.0,
+        },
+        VisiblePoint {
+            x: 10,
+            y: 19,
+            distance: 13.0,
+        },
+        VisiblePoint {
+            x: 11,
+            y: 19,
+            distance: 12.0,
+        },
+        VisiblePoint {
+            x: 16,
+            y: 19,
+            distance: 7.0,
+        },
+        VisiblePoint {
+            x: 19,
+            y: 19,
+            distance: 4.0,
+        },
+        VisiblePoint {
+            x: 21,
+            y: 19,
+            distance: 2.0,
+        },
+    ],
+    "1.614247222": [
+        VisiblePoint {
+            x: 0,
+            y: 20,
+            distance: 23.021728866442675,
+        },
+    ],
+    "1.623379388": [
+        VisiblePoint {
+            x: 4,
+            y: 20,
+            distance: 19.026297590440446,
+        },
+    ],
+    "1.629552150": [
+        VisiblePoint {
+            x: 6,
+            y: 20,
+            distance: 17.029386365926403,
+        },
+    ],
+    "1.637364491": [
+        VisiblePoint {
+            x: 8,
+            y: 20,
+            distance: 15.033296378372908,
+        },
+    ],
+    "1.647568218": [
+        VisiblePoint {
+            x: 10,
+            y: 20,
+            distance: 13.038404810405298,
+        },
+    ],
+    "1.670464979": [
+        VisiblePoint {
+            x: 13,
+            y: 20,
+            distance: 10.04987562112089,
+        },
+    ],
+    "1.681453548": [
+        VisiblePoint {
+            x: 14,
+            y: 20,
+            distance: 9.055385138137417,
+        },
+    ],
+    "1.687905071": [
+        VisiblePoint {
+            x: 6,
+            y: 21,
+            distance: 17.11724276862369,
+        },
+    ],
+    "1.712693381": [
+        VisiblePoint {
+            x: 16,
+            y: 20,
+            distance: 7.0710678118654755,
+        },
+    ],
+    "1.723445655": [
+        VisiblePoint {
+            x: 10,
+            y: 21,
+            distance: 13.152946437965905,
+        },
+    ],
+    "1.778292553": [
+        VisiblePoint {
+            x: 4,
+            y: 23,
+            distance: 19.4164878389476,
+        },
+    ],
+    "1.789465273": [
+        VisiblePoint {
+            x: 14,
+            y: 21,
+            distance: 9.219544457292887,
+        },
+    ],
+    "1.794272928": [
+        VisiblePoint {
+            x: 1,
+            y: 24,
+            distance: 22.561028345356956,
+        },
+    ],
+    "1.797595175": [
+        VisiblePoint {
+            x: 10,
+            y: 22,
+            distance: 13.341664064126334,
+        },
+    ],
+    "1.804539508": [
+        VisiblePoint {
+            x: 2,
+            y: 24,
+            distance: 21.587033144922902,
+        },
+    ],
+    "1.815774990": [
+        VisiblePoint {
+            x: 3,
+            y: 24,
+            distance: 20.615528128088304,
+        },
+    ],
+    "1.825978717": [
+        VisiblePoint {
+            x: 0,
+            y: 25,
+            distance: 23.769728648009426,
+        },
+    ],
+    "1.828120042": [
+        VisiblePoint {
+            x: 4,
+            y: 24,
+            distance: 19.6468827043885,
+        },
+    ],
+    "1.841743177": [
+        VisiblePoint {
+            x: 5,
+            y: 24,
+            distance: 18.681541692269406,
+        },
+    ],
+    "1.849095986": [
+        VisiblePoint {
+            x: 16,
+            y: 21,
+            distance: 7.280109889280518,
+        },
+        VisiblePoint {
+            x: 9,
+            y: 23,
+            distance: 14.560219778561036,
+        },
+    ],
+    "1.892546881": [
+        VisiblePoint {
+            x: 20,
+            y: 20,
+            distance: 3.1622776601683795,
+        },
+        VisiblePoint {
+            x: 8,
+            y: 24,
+            distance: 15.811388300841896,
+        },
+        VisiblePoint {
+            x: 5,
+            y: 25,
+            distance: 18.973665961010276,
+        },
+    ],
+    "1.907471146": [
+        VisiblePoint {
+            x: 3,
+            y: 26,
+            distance: 21.18962010041709,
+        },
+    ],
+    "1.913820267": [
+        VisiblePoint {
+            x: 9,
+            y: 24,
+            distance: 14.866068747318506,
+        },
+    ],
+    "1.923786715": [
+        VisiblePoint {
+            x: 4,
+            y: 26,
+            distance: 20.248456731316587,
+        },
+    ],
+    "1.929566997": [
+        VisiblePoint {
+            x: 7,
+            y: 25,
+            distance: 17.08800749063506,
+        },
+    ],
+    "1.934775283": [
+        VisiblePoint {
+            x: 2,
+            y: 27,
+            distance: 22.47220505424423,
+        },
+    ],
+    "1.937970161": [
+        VisiblePoint {
+            x: 10,
+            y: 24,
+            distance: 13.92838827718412,
+        },
+    ],
+    "1.941687616": [
+        VisiblePoint {
+            x: 5,
+            y: 26,
+            distance: 19.313207915827967,
+        },
+    ],
+    "1.951302704": [
+        VisiblePoint {
+            x: 3,
+            y: 27,
+            distance: 21.540659228538015,
+        },
+    ],
+    "1.961403370": [
+        VisiblePoint {
+            x: 6,
+            y: 26,
+            distance: 18.384776310850235,
+        },
+    ],
+    "1.965587446": [
+        VisiblePoint {
+            x: 11,
+            y: 24,
+            distance: 13.0,
+        },
+    ],
+    "1.989020656": [
+        VisiblePoint {
+            x: 14,
+            y: 23,
+            distance: 9.848857801796104,
+        },
+    ],
+    "1.997423820": [
+        VisiblePoint {
+            x: 1,
+            y: 29,
+            distance: 24.166091947189145,
+        },
+    ],
+    "2.003204102": [
+        VisiblePoint {
+            x: 10,
+            y: 25,
+            distance: 14.317821063276353,
+        },
+    ],
+    "2.013170550": [
+        VisiblePoint {
+            x: 4,
+            y: 28,
+            distance: 21.02379604162864,
+        },
+    ],
+    "2.051683607": [
+        VisiblePoint {
+            x: 0,
+            y: 31,
+            distance: 25.942243542145693,
+        },
+    ],
+    "2.053309622": [
+        VisiblePoint {
+            x: 2,
+            y: 30,
+            distance: 23.706539182259394,
+        },
+    ],
+    "2.057695559": [
+        VisiblePoint {
+            x: 6,
+            y: 28,
+            distance: 19.235384061671343,
+        },
+    ],
+    "2.060753653": [
+        VisiblePoint {
+            x: 8,
+            y: 27,
+            distance: 17.0,
+        },
+    ],
+    "2.083185787": [
+        VisiblePoint {
+            x: 7,
+            y: 28,
+            distance: 18.35755975068582,
+        },
+    ],
+    "2.098870775": [
+        VisiblePoint {
+            x: 11,
+            y: 26,
+            distance: 13.892443989449804,
+        },
+    ],
+    "2.111215827": [
+        VisiblePoint {
+            x: 13,
+            y: 25,
+            distance: 11.661903789690601,
+        },
+        VisiblePoint {
+            x: 8,
+            y: 28,
+            distance: 17.4928556845359,
+        },
+    ],
+    "2.122451309": [
+        VisiblePoint {
+            x: 10,
+            y: 27,
+            distance: 15.264337522473747,
+        },
+    ],
+    "2.125103823": [
+        VisiblePoint {
+            x: 2,
+            y: 32,
+            distance: 24.698178070456937,
+        },
+    ],
+    "2.129395642": [
+        VisiblePoint {
+            x: 7,
+            y: 29,
+            distance: 18.867962264113206,
+        },
+    ],
+    "2.142133807": [
+        VisiblePoint {
+            x: 9,
+            y: 28,
+            distance: 16.64331697709324,
+        },
+    ],
+    "2.147171547": [
+        VisiblePoint {
+            x: 3,
+            y: 32,
+            distance: 23.853720883753127,
+        },
+    ],
+    "2.148698264": [
+        VisiblePoint {
+            x: 0,
+            y: 34,
+            distance: 27.459060435491963,
+        },
+    ],
+    "2.158798930": [
+        VisiblePoint {
+            x: 11,
+            y: 27,
+            distance: 14.422205101855956,
+        },
+    ],
+    "2.185459279": [
+        VisiblePoint {
+            x: 6,
+            y: 31,
+            distance: 20.808652046684813,
+        },
+    ],
+    "2.199592613": [
+        VisiblePoint {
+            x: 12,
+            y: 27,
+            distance: 13.601470508735444,
+        },
+    ],
+    "2.214297436": [
+        VisiblePoint {
+            x: 7,
+            y: 31,
+            distance: 20.0,
+        },
+        VisiblePoint {
+            x: 3,
+            y: 34,
+            distance: 25.0,
+        },
+    ],
+    "2.223642958": [
+        VisiblePoint {
+            x: 6,
+            y: 32,
+            distance: 21.400934559032695,
+        },
+    ],
+    "2.231839496": [
+        VisiblePoint {
+            x: 14,
+            y: 26,
+            distance: 11.40175425099138,
+        },
+    ],
+    "2.245537269": [
+        VisiblePoint {
+            x: 18,
+            y: 23,
+            distance: 6.4031242374328485,
+        },
+        VisiblePoint {
+            x: 8,
+            y: 31,
+            distance: 19.209372712298546,
+        },
+    ],
+    "2.273053258": [
+        VisiblePoint {
+            x: 10,
+            y: 30,
+            distance: 17.029386365926403,
+        },
+    ],
+    "2.279422599": [
+        VisiblePoint {
+            x: 9,
+            y: 31,
+            distance: 18.439088914585774,
+        },
+    ],
+    "2.297438667": [
+        VisiblePoint {
+            x: 14,
+            y: 27,
+            distance: 12.041594578792296,
+        },
+    ],
+    "2.303611429": [
+        VisiblePoint {
+            x: 13,
+            y: 28,
+            distance: 13.45362404707371,
+        },
+    ],
+    "2.308611387": [
+        VisiblePoint {
+            x: 12,
+            y: 29,
+            distance: 14.866068747318506,
+        },
+    ],
+    "2.319174374": [
+        VisiblePoint {
+            x: 9,
+            y: 32,
+            distance: 19.1049731745428,
+        },
+    ],
+    "2.356194490": [
+        VisiblePoint {
+            x: 15,
+            y: 27,
+            distance: 11.313708498984761,
+        },
+        VisiblePoint {
+            x: 11,
+            y: 31,
+            distance: 16.97056274847714,
+        },
+        VisiblePoint {
+            x: 9,
+            y: 33,
+            distance: 19.79898987322333,
+        },
+    ],
+    "2.390663591": [
+        VisiblePoint {
+            x: 9,
+            y: 34,
+            distance: 20.518284528683193,
+        },
+    ],
+    "2.446854377": [
+        VisiblePoint {
+            x: 18,
+            y: 25,
+            distance: 7.810249675906654,
+        },
+    ],
+    "2.455863143": [
+        VisiblePoint {
+            x: 14,
+            y: 30,
+            distance: 14.212670403551895,
+        },
+    ],
+    "2.498091545": [
+        VisiblePoint {
+            x: 17,
+            y: 27,
+            distance: 10.0,
+        },
+    ],
+    "2.553590050": [
+        VisiblePoint {
+            x: 19,
+            y: 25,
+            distance: 7.211102550927978,
+        },
+    ],
+    "2.589937671": [
+        VisiblePoint {
+            x: 15,
+            y: 32,
+            distance: 15.264337522473747,
+        },
+    ],
+    "2.601173153": [
+        VisiblePoint {
+            x: 20,
+            y: 24,
+            distance: 5.830951894845301,
+        },
+        VisiblePoint {
+            x: 14,
+            y: 34,
+            distance: 17.4928556845359,
+        },
+    ],
+    "2.629203193": [
+        VisiblePoint {
+            x: 14,
+            y: 35,
+            distance: 18.35755975068582,
+        },
+    ],
+    "2.677945045": [
+        VisiblePoint {
+            x: 22,
+            y: 21,
+            distance: 2.23606797749979,
+        },
+        VisiblePoint {
+            x: 21,
+            y: 23,
+            distance: 4.47213595499958,
+        },
+        VisiblePoint {
+            x: 19,
+            y: 27,
+            distance: 8.94427190999916,
+        },
+    ],
+    "2.709184878": [
+        VisiblePoint {
+            x: 17,
+            y: 32,
+            distance: 14.317821063276353,
+        },
+    ],
+    "2.729182212": [
+        VisiblePoint {
+            x: 16,
+            y: 35,
+            distance: 17.46424919657298,
+        },
+    ],
+    "2.761086276": [
+        VisiblePoint {
+            x: 19,
+            y: 29,
+            distance: 10.770329614269007,
+        },
+    ],
+    "2.782821983": [
+        VisiblePoint {
+            x: 20,
+            y: 27,
+            distance: 8.54400374531753,
+        },
+    ],
+    "2.819842099": [
+        VisiblePoint {
+            x: 20,
+            y: 28,
+            distance: 9.486832980505138,
+        },
+    ],
+    "2.863292995": [
+        VisiblePoint {
+            x: 21,
+            y: 26,
+            distance: 7.280109889280518,
+        },
+    ],
+    "2.880990262": [
+        VisiblePoint {
+            x: 19,
+            y: 34,
+            distance: 15.524174696260024,
+        },
+    ],
+    "2.922923708": [
+        VisiblePoint {
+            x: 21,
+            y: 28,
+            distance: 9.219544457292887,
+        },
+    ],
+    "2.930499320": [
+        VisiblePoint {
+            x: 20,
+            y: 33,
+            distance: 14.317821063276353,
+        },
+    ],
+    "2.999695599": [
+        VisiblePoint {
+            x: 21,
+            y: 33,
+            distance: 14.142135623730951,
+        },
+    ],
+    "3.009041121": [
+        VisiblePoint {
+            x: 21,
+            y: 34,
+            distance: 15.132745950421556,
+        },
+    ],
+    "3.017237659": [
+        VisiblePoint {
+            x: 22,
+            y: 27,
+            distance: 8.06225774829855,
+        },
+    ],
+    "3.030935432": [
+        VisiblePoint {
+            x: 22,
+            y: 28,
+            distance: 9.055385138137417,
+        },
+    ],
+    "3.041924001": [
+        VisiblePoint {
+            x: 22,
+            y: 29,
+            distance: 10.04987562112089,
+        },
+    ],
+    "3.058451422": [
+        VisiblePoint {
+            x: 22,
+            y: 31,
+            distance: 12.041594578792296,
+        },
+    ],
+    "3.141592654": [
+        VisiblePoint {
+            x: 23,
+            y: 20,
+            distance: 1.0,
+        },
+        VisiblePoint {
+            x: 23,
+            y: 26,
+            distance: 7.0,
+        },
+        VisiblePoint {
+            x: 23,
+            y: 30,
+            distance: 11.0,
+        },
+        VisiblePoint {
+            x: 23,
+            y: 33,
+            distance: 14.0,
+        },
+    ],
+    "3.224733885": [
+        VisiblePoint {
+            x: 24,
+            y: 31,
+            distance: 12.041594578792296,
+        },
+    ],
+    "3.283489708": [
+        VisiblePoint {
+            x: 25,
+            y: 33,
+            distance: 14.142135623730951,
+        },
+    ],
+    "3.321446153": [
+        VisiblePoint {
+            x: 25,
+            y: 30,
+            distance: 11.180339887498949,
+        },
+    ],
+    "3.338988213": [
+        VisiblePoint {
+            x: 25,
+            y: 29,
+            distance: 10.198039027185569,
+        },
+    ],
+    "3.352685987": [
+        VisiblePoint {
+            x: 26,
+            y: 33,
+            distance: 14.317821063276353,
+        },
+    ],
+    "3.407844703": [
+        VisiblePoint {
+            x: 26,
+            y: 30,
+            distance: 11.40175425099138,
+        },
+    ],
+    "3.440091585": [
+        VisiblePoint {
+            x: 27,
+            y: 32,
+            distance: 13.601470508735444,
+        },
+    ],
+    "3.444477522": [
+        VisiblePoint {
+            x: 28,
+            y: 35,
+            distance: 16.76305461424021,
+        },
+    ],
+    "3.500363324": [
+        VisiblePoint {
+            x: 29,
+            y: 35,
+            distance: 17.08800749063506,
+        },
+    ],
+    "3.522099031": [
+        VisiblePoint {
+            x: 27,
+            y: 29,
+            distance: 10.770329614269007,
+        },
+        VisiblePoint {
+            x: 29,
+            y: 34,
+            distance: 16.15549442140351,
+        },
+    ],
+    "3.578219813": [
+        VisiblePoint {
+            x: 30,
+            y: 34,
+            distance: 16.55294535724685,
+        },
+    ],
+    "3.605240263": [
+        VisiblePoint {
+            x: 24,
+            y: 21,
+            distance: 2.23606797749979,
+        },
+        VisiblePoint {
+            x: 26,
+            y: 25,
+            distance: 6.708203932499369,
+        },
+        VisiblePoint {
+            x: 31,
+            y: 35,
+            distance: 17.88854381999832,
+        },
+    ],
+    "3.631549980": [
+        VisiblePoint {
+            x: 31,
+            y: 34,
+            distance: 17.0,
+        },
+    ],
+    "3.635534023": [
+        VisiblePoint {
+            x: 30,
+            y: 32,
+            distance: 14.7648230602334,
+        },
+    ],
+    "3.648691158": [
+        VisiblePoint {
+            x: 28,
+            y: 28,
+            distance: 10.295630140987,
+        },
+    ],
+    "3.660738768": [
+        VisiblePoint {
+            x: 27,
+            y: 26,
+            distance: 8.06225774829855,
+        },
+    ],
+    "3.682012154": [
+        VisiblePoint {
+            x: 32,
+            y: 34,
+            distance: 17.4928556845359,
+        },
+    ],
+    "3.700191969": [
+        VisiblePoint {
+            x: 28,
+            y: 27,
+            distance: 9.433981132056603,
+        },
+        VisiblePoint {
+            x: 33,
+            y: 35,
+            distance: 18.867962264113206,
+        },
+    ],
+    "3.708321871": [
+        VisiblePoint {
+            x: 30,
+            y: 30,
+            distance: 13.038404810405298,
+        },
+    ],
+    "3.729595257": [
+        VisiblePoint {
+            x: 29,
+            y: 28,
+            distance: 10.816653826391969,
+        },
+    ],
+    "3.747137317": [
+        VisiblePoint {
+            x: 32,
+            y: 32,
+            distance: 15.811388300841896,
+        },
+    ],
+    "3.752318618": [
+        VisiblePoint {
+            x: 30,
+            y: 29,
+            distance: 12.206555615733702,
+        },
+    ],
+    "3.761842140": [
+        VisiblePoint {
+            x: 28,
+            y: 26,
+            distance: 8.602325267042627,
+        },
+    ],
+    "3.785093762": [
+        VisiblePoint {
+            x: 26,
+            y: 23,
+            distance: 5.0,
+        },
+        VisiblePoint {
+            x: 32,
+            y: 31,
+            distance: 15.0,
+        },
+    ],
+    "3.807561891": [
+        VisiblePoint {
+            x: 34,
+            y: 33,
+            distance: 17.804493814764857,
+        },
+    ],
+    "3.816333596": [
+        VisiblePoint {
+            x: 35,
+            y: 34,
+            distance: 19.209372712298546,
+        },
+    ],
+    "3.843849585": [
+        VisiblePoint {
+            x: 34,
+            y: 32,
+            distance: 17.029386365926403,
+        },
+    ],
+    "3.850218926": [
+        VisiblePoint {
+            x: 35,
+            y: 33,
+            distance: 18.439088914585774,
+        },
+    ],
+    "3.887012130": [
+        VisiblePoint {
+            x: 35,
+            y: 32,
+            distance: 17.69180601295413,
+        },
+    ],
+    "4.003762708": [
+        VisiblePoint {
+            x: 30,
+            y: 25,
+            distance: 9.219544457292887,
+        },
+    ],
+    "4.124386377": [
+        VisiblePoint {
+            x: 35,
+            y: 27,
+            distance: 14.422205101855956,
+        },
+    ],
+    "4.145659763": [
+        VisiblePoint {
+            x: 34,
+            y: 26,
+            distance: 13.038404810405298,
+        },
+    ],
+    "4.248741371": [
+        VisiblePoint {
+            x: 29,
+            y: 22,
+            distance: 6.708203932499369,
+        },
+    ],
+    "4.294164651": [
+        VisiblePoint {
+            x: 32,
+            y: 23,
+            distance: 9.848857801796104,
+        },
+    ],
+    "4.353618310": [
+        VisiblePoint {
+            x: 31,
+            y: 22,
+            distance: 8.54400374531753,
+        },
+    ],
+    "4.390638426": [
+        VisiblePoint {
+            x: 26,
+            y: 20,
+            distance: 3.1622776601683795,
+        },
+    ],
+    "4.420932186": [
+        VisiblePoint {
+            x: 33,
+            y: 22,
+            distance: 10.44030650891055,
+        },
+    ],
+    "4.434089321": [
+        VisiblePoint {
+            x: 30,
+            y: 21,
+            distance: 7.280109889280518,
+        },
+    ],
+    "4.446136931": [
+        VisiblePoint {
+            x: 34,
+            y: 22,
+            distance: 11.40175425099138,
+        },
+    ],
+    "4.493720035": [
+        VisiblePoint {
+            x: 32,
+            y: 21,
+            distance: 9.219544457292887,
+        },
+    ],
+    "4.514993421": [
+        VisiblePoint {
+            x: 33,
+            y: 21,
+            distance: 10.198039027185569,
+        },
+    ],
+    "4.532535481": [
+        VisiblePoint {
+            x: 34,
+            y: 21,
+            distance: 11.180339887498949,
+        },
+    ],
+    "4.547240303": [
+        VisiblePoint {
+            x: 29,
+            y: 20,
+            distance: 6.082762530298219,
+        },
+        VisiblePoint {
+            x: 35,
+            y: 21,
+            distance: 12.165525060596439,
+        },
+    ],
+    "4.712388980": [
+        VisiblePoint {
+            x: 27,
+            y: 19,
+            distance: 4.0,
+        },
+        VisiblePoint {
+            x: 28,
+            y: 19,
+            distance: 5.0,
+        },
+        VisiblePoint {
+            x: 30,
+            y: 19,
+            distance: 7.0,
+        },
+        VisiblePoint {
+            x: 34,
+            y: 19,
+            distance: 11.0,
+        },
+    ],
+    "4.877537658": [
+        VisiblePoint {
+            x: 29,
+            y: 18,
+            distance: 6.082762530298219,
+        },
+    ],
+    "4.957367644": [
+        VisiblePoint {
+            x: 35,
+            y: 16,
+            distance: 12.36931687685298,
+        },
+        VisiblePoint {
+            x: 31,
+            y: 17,
+            distance: 8.246211251235321,
+        },
+    ],
+    "4.990688639": [
+        VisiblePoint {
+            x: 30,
+            y: 17,
+            distance: 7.280109889280518,
+        },
+    ],
+    "5.092895357": [
+        VisiblePoint {
+            x: 28,
+            y: 17,
+            distance: 5.385164807134504,
+        },
+    ],
+    "5.107180100": [
+        VisiblePoint {
+            x: 35,
+            y: 14,
+            distance: 13.0,
+        },
+    ],
+    "5.117280767": [
+        VisiblePoint {
+            x: 30,
+            y: 16,
+            distance: 7.615773105863909,
+        },
+    ],
+    "5.176036589": [
+        VisiblePoint {
+            x: 35,
+            y: 13,
+            distance: 13.416407864998739,
+        },
+        VisiblePoint {
+            x: 33,
+            y: 14,
+            distance: 11.180339887498949,
+        },
+        VisiblePoint {
+            x: 27,
+            y: 17,
+            distance: 4.47213595499958,
+        },
+        VisiblePoint {
+            x: 25,
+            y: 18,
+            distance: 2.23606797749979,
+        },
+    ],
+    "5.240463429": [
+        VisiblePoint {
+            x: 35,
+            y: 12,
+            distance: 13.892443989449804,
+        },
+    ],
+    "5.300391584": [
+        VisiblePoint {
+            x: 32,
+            y: 13,
+            distance: 10.816653826391969,
+        },
+        VisiblePoint {
+            x: 29,
+            y: 15,
+            distance: 7.211102550927978,
+        },
+    ],
+    "5.387129923": [
+        VisiblePoint {
+            x: 33,
+            y: 11,
+            distance: 12.806248474865697,
+        },
+    ],
+    "5.407127257": [
+        VisiblePoint {
+            x: 35,
+            y: 9,
+            distance: 15.620499351813308,
+        },
+    ],
+    "5.450204041": [
+        VisiblePoint {
+            x: 34,
+            y: 9,
+            distance: 14.866068747318506,
+        },
+    ],
+    "5.497787144": [
+        VisiblePoint {
+            x: 33,
+            y: 9,
+            distance: 14.142135623730951,
+        },
+        VisiblePoint {
+            x: 30,
+            y: 12,
+            distance: 9.899494936611665,
+        },
+    ],
+    "5.550370205": [
+        VisiblePoint {
+            x: 32,
+            y: 9,
+            distance: 13.45362404707371,
+        },
+    ],
+    "5.556542966": [
+        VisiblePoint {
+            x: 31,
+            y: 10,
+            distance: 12.041594578792296,
+        },
+    ],
+    "5.574559035": [
+        VisiblePoint {
+            x: 35,
+            y: 5,
+            distance: 18.439088914585774,
+        },
+    ],
+    "5.588447031": [
+        VisiblePoint {
+            x: 33,
+            y: 7,
+            distance: 15.620499351813308,
+        },
+        VisiblePoint {
+            x: 28,
+            y: 13,
+            distance: 7.810249675906654,
+        },
+    ],
+    "5.597455796": [
+        VisiblePoint {
+            x: 32,
+            y: 8,
+            distance: 14.212670403551895,
+        },
+    ],
+    "5.608444365": [
+        VisiblePoint {
+            x: 27,
+            y: 14,
+            distance: 6.4031242374328485,
+        },
+    ],
+    "5.622142138": [
+        VisiblePoint {
+            x: 30,
+            y: 10,
+            distance: 11.40175425099138,
+        },
+    ],
+    "5.695182704": [
+        VisiblePoint {
+            x: 25,
+            y: 16,
+            distance: 3.605551275463989,
+        },
+    ],
+    "5.716456090": [
+        VisiblePoint {
+            x: 30,
+            y: 8,
+            distance: 13.038404810405298,
+        },
+    ],
+    "5.719869046": [
+        VisiblePoint {
+            x: 35,
+            y: 0,
+            distance: 22.47220505424423,
+        },
+    ],
+    "5.724585992": [
+        VisiblePoint {
+            x: 28,
+            y: 11,
+            distance: 9.433981132056603,
+        },
+    ],
+    "5.742765807": [
+        VisiblePoint {
+            x: 29,
+            y: 9,
+            distance: 11.661903789690601,
+        },
+    ],
+    "5.764039193": [
+        VisiblePoint {
+            x: 27,
+            y: 12,
+            distance: 8.06225774829855,
+        },
+    ],
+    "5.770795847": [
+        VisiblePoint {
+            x: 32,
+            y: 3,
+            distance: 18.35755975068582,
+        },
+    ],
+    "5.783838585": [
+        VisiblePoint {
+            x: 29,
+            y: 8,
+            distance: 12.529964086141668,
+        },
+    ],
+    "5.819537698": [
+        VisiblePoint {
+            x: 31,
+            y: 3,
+            distance: 17.88854381999832,
+        },
+        VisiblePoint {
+            x: 30,
+            y: 5,
+            distance: 15.652475842498529,
+        },
+    ],
+    "5.840811084": [
+        VisiblePoint {
+            x: 32,
+            y: 0,
+            distance: 21.02379604162864,
+        },
+    ],
+    "5.843342724": [
+        VisiblePoint {
+            x: 31,
+            y: 2,
+            distance: 18.788294228055936,
+        },
+    ],
+    "5.846558147": [
+        VisiblePoint {
+            x: 30,
+            y: 4,
+            distance: 16.55294535724685,
+        },
+    ],
+    "5.878293521": [
+        VisiblePoint {
+            x: 26,
+            y: 12,
+            distance: 7.615773105863909,
+        },
+    ],
+    "5.884662862": [
+        VisiblePoint {
+            x: 31,
+            y: 0,
+            distance: 20.615528128088304,
+        },
+    ],
+    "5.892578263": [
+        VisiblePoint {
+            x: 30,
+            y: 2,
+            distance: 18.384776310850235,
+        },
+    ],
+    "5.934414304": [
+        VisiblePoint {
+            x: 27,
+            y: 8,
+            distance: 11.704699910719626,
+        },
+    ],
+    "5.943892693": [
+        VisiblePoint {
+            x: 29,
+            y: 2,
+            distance: 18.027756377319946,
+        },
+    ],
+    "5.961434753": [
+        VisiblePoint {
+            x: 28,
+            y: 4,
+            distance: 15.811388300841896,
+        },
+    ],
+    "5.991728513": [
+        VisiblePoint {
+            x: 26,
+            y: 9,
+            distance: 10.44030650891055,
+        },
+    ],
+    "6.012238457": [
+        VisiblePoint {
+            x: 28,
+            y: 1,
+            distance: 18.681541692269406,
+        },
+    ],
+    "6.025861592": [
+        VisiblePoint {
+            x: 28,
+            y: 0,
+            distance: 19.6468827043885,
+        },
+    ],
+    "6.038206644": [
+        VisiblePoint {
+            x: 26,
+            y: 7,
+            distance: 12.36931687685298,
+        },
+    ],
+    "6.052094640": [
+        VisiblePoint {
+            x: 27,
+            y: 2,
+            distance: 17.46424919657298,
+        },
+    ],
+    "6.064516361": [
+        VisiblePoint {
+            x: 27,
+            y: 1,
+            distance: 18.439088914585774,
+        },
+    ],
+    "6.072091974": [
+        VisiblePoint {
+            x: 26,
+            y: 5,
+            distance: 14.317821063276353,
+        },
+    ],
+    "6.108513108": [
+        VisiblePoint {
+            x: 26,
+            y: 2,
+            distance: 17.26267650163207,
+        },
+    ],
+    "6.130535979": [
+        VisiblePoint {
+            x: 25,
+            y: 6,
+            distance: 13.152946437965905,
+        },
+    ],
+    "6.141288253": [
+        VisiblePoint {
+            x: 24,
+            y: 12,
+            distance: 7.0710678118654755,
+        },
+    ],
+    "6.150633775": [
+        VisiblePoint {
+            x: 25,
+            y: 4,
+            distance: 15.132745950421556,
+        },
+    ],
+    "6.172528086": [
+        VisiblePoint {
+            x: 25,
+            y: 1,
+            distance: 18.110770276274835,
+        },
+    ],
+    "6.224429484": [
+        VisiblePoint {
+            x: 24,
+            y: 2,
+            distance: 17.029386365926403,
+        },
+    ],
+    "6.227686802": [
+        VisiblePoint {
+            x: 24,
+            y: 1,
+            distance: 18.027756377319946,
+        },
+    ],
+}
+Day ten, part one: 278, part two: 2827
