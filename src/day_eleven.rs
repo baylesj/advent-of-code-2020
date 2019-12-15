@@ -25,6 +25,12 @@ enum Direction {
     Down,
 }
 
+impl Default for Direction {
+    fn default() -> Self {
+        return Direction::Up;
+    }
+}
+
 trait RelativeTurn {
     fn to_left(self: &Self) -> Direction;
     fn to_right(self: &Self) -> Direction;
@@ -71,30 +77,67 @@ impl Advance for Point {
     }
 }
 
-fn print(min_point: &Point, max_point: &Point, tiles: &HashSet<Point>) {
-    let mut line: Vec<char> = Vec::with_capacity((max_point.x + 1 - min_point.x) as usize);
+#[derive(Default, Debug)]
+struct PainterState {
+    white_tiles: HashSet<Point>,
+    current_location: Point,
+    current_direction: Direction,
+
+    min_point: Point,
+    max_point: Point,
+}
+
+trait Update {
+    fn update(self: &mut Self);
+}
+
+impl Update for PainterState {
+    fn update(self: &mut Self) {
+        self.current_location.advance(self.current_direction);
+        self.min_point.x = i32::min(self.min_point.x, self.current_location.x);
+        self.min_point.y = i32::min(self.min_point.x, self.current_location.y);
+        self.max_point.x = i32::max(self.max_point.x, self.current_location.x);
+        self.max_point.y = i32::max(self.max_point.x, self.current_location.y);
+    }
+}
+
+trait CurrentColor {
+    fn current_color(self: &Self) -> TileColor;
+}
+
+impl CurrentColor for PainterState {
+    fn current_color(self: &Self) -> TileColor {
+        if self.white_tiles.contains(&self.current_location) {
+            TileColor::White
+        } else {
+            TileColor::Black
+        }
+    }
+}
+
+fn print(state: &PainterState) {
+    let mut line: Vec<char> =
+        Vec::with_capacity((state.max_point.x + 1 - state.min_point.x) as usize);
     let mut point = Point::default();
-    for x in min_point.x..max_point.x + 1 {
+    for x in state.min_point.x..state.max_point.x + 1 {
         point.x = x;
-        for y in min_point.y..max_point.y + 1 {
+        for y in state.min_point.y..state.max_point.y + 1 {
             point.y = y;
-            line.push(if tiles.contains(&point) { '⬜' } else { '⬛' });
+            line.push(if state.white_tiles.contains(&point) {
+                '⬜'
+            } else {
+                '⬛'
+            });
         }
         println!("{}", String::from_iter(&line));
         line.truncate(0);
     }
 }
 
-pub fn part_one(input_filename: &str) -> i64 {
-    let mut program = Program::load(input_filename);
+fn paint(program: &mut Program, initial_color: TileColor) -> i64 {
+    let mut state = PainterState::default();
     // All tiles start out black
-    let mut white_tiles = HashSet::new();
-    let mut current_location = Point::default();
-    let mut current_direction = Direction::Up;
-
-    let mut min_point = Point::default();
-    let mut max_point = Point::default();
-    program.io.add(TileColor::Black.into()).ok();
+    program.io.add(initial_color.into()).ok();
     program.run();
     program.run();
     while program.state != ProgramState::Stopped {
@@ -102,39 +145,43 @@ pub fn part_one(input_filename: &str) -> i64 {
         let tile_color = TileColor::try_from(program.io.remove().expect("missing output"));
         match tile_color.expect("invalid tile color") {
             TileColor::Black => {
-                white_tiles.remove(&current_location);
+                state.white_tiles.remove(&state.current_location);
             }
             TileColor::White => {
-                white_tiles.insert(current_location);
+                state.white_tiles.insert(state.current_location);
             }
         }
 
         match should_turn_right {
-            true => current_direction = current_direction.to_right(),
-            false => current_direction = current_direction.to_left(),
+            true => state.current_direction = state.current_direction.to_right(),
+            false => state.current_direction = state.current_direction.to_left(),
         }
 
-        current_location.advance(current_direction);
-        if white_tiles.contains(&current_location) {
-            program.io.add(TileColor::White.into()).ok();
-        } else {
-            program.io.add(TileColor::Black.into()).ok();
-        }
-
-        min_point.x = i32::min(min_point.x, current_location.x);
-        min_point.y = i32::min(min_point.x, current_location.y);
-        max_point.x = i32::max(max_point.x, current_location.x);
-        max_point.y = i32::max(max_point.x, current_location.y);
+        state.update();
+        program.io.add(state.current_color().into()).ok();
         program.run();
         program.run();
     }
 
-    print(&min_point, &max_point, &white_tiles);
-    white_tiles.len() as i64
+    print(&state);
+    state.white_tiles.len() as i64
+}
+
+pub fn part_one(program: &mut Program) -> i64 {
+    paint(program, TileColor::Black)
+}
+
+pub fn part_two(program: &mut Program) -> i64 {
+    paint(program, TileColor::White)
 }
 
 pub fn solve() {
-    println!("Day eleven, part one: {}", part_one(INPUT_FILENAME));
+    // TODO: fix cloning
+    let mut program = Program::load(INPUT_FILENAME);
+    println!("Day eleven, part one:");
+    println!("total of {} white tiles", part_one(&mut program.clone()));
+    println!("part two:");
+    println!("total of {} white tiles", part_two(&mut program));
 }
 
 #[cfg(test)]
@@ -168,6 +215,7 @@ mod tests {
 
     #[test]
     fn test_part_one() {
-        assert_eq!(732, part_one(INPUT_FILENAME));
+        let mut program = Program::load(INPUT_FILENAME);
+        assert_eq!(732, part_one(&mut program));
     }
 }
