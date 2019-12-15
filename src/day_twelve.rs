@@ -6,6 +6,7 @@ use std::iter::Sum;
 mod loadable;
 use loadable::LoadableFromFile;
 use std::ops::Add;
+use std::fmt::{Display, Formatter, Result};
 
 const INPUT_FILENAME: &'static str = "input/day_twelve.txt";
 
@@ -33,9 +34,27 @@ pub struct Moon {
     pub velocity: Point3D,
 }
 
+impl Display for Moon {
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        write!(f, "pos=<x={}, y={}, z={}>, vel=<x={}, y={}, z={}>",
+      self.position.x, self.position.y, self.position.z,
+    self.velocity.x, self.velocity.y, self.velocity.z)
+    }
+}
+
 #[derive(Debug, Default, Clone)]
 pub struct OrbitalSystem {
     pub moons: Vec<Moon>,
+}
+
+impl Display for OrbitalSystem {
+  fn fmt(&self, f: &mut Formatter) -> Result {
+      write!(f, "Moons:\n").ok();
+      for moon in &self.moons {
+        write!(f, "{}\n", moon).ok();
+      }
+      Ok(())
+  }
 }
 
 impl LoadableFromFile for OrbitalSystem {
@@ -69,40 +88,38 @@ impl LoadableFromFile for OrbitalSystem {
 
 trait TakeSteps {
     fn take_steps(self: &mut Self, step_count: i64);
-    fn step(self: &mut Self);
+    fn take_step(self: &mut Self);
 }
 
 impl TakeSteps for OrbitalSystem {
     fn take_steps(self: &mut Self, step_count: i64) {
         for _ in 0..step_count {
-            self.step();
+            self.take_step();
         }
     }
 
-    fn step(self: &mut Self) {
+    fn take_step(self: &mut Self) {
+        fn adj(l: i64, r: i64) -> i64 {
+            if l < r {
+                1
+            } else if l > r {
+                -1
+            } else {
+                0
+            }
+        }
+
         for i in 0..self.moons.len() {
             for j in i..self.moons.len() {
-                let x_adj: i64 = if self.moons[i].position.x < self.moons[j].position.x {
-                    1
-                } else {
-                    -1
-                };
-                let y_adj: i64 = if self.moons[i].position.y < self.moons[j].position.y {
-                    1
-                } else {
-                    -1
-                };
-                let z_adj: i64 = if self.moons[i].position.z < self.moons[j].position.z {
-                    1
-                } else {
-                    -1
-                };
-                self.moons[i].position.x += x_adj;
-                self.moons[i].position.y += y_adj;
-                self.moons[i].position.z += z_adj;
-                self.moons[j].position.x -= x_adj;
-                self.moons[j].position.y -= y_adj;
-                self.moons[j].position.z -= z_adj;
+                let x_adj: i64 = adj(self.moons[i].position.x, self.moons[j].position.x);
+                let y_adj: i64 = adj(self.moons[i].position.y, self.moons[j].position.y);
+                let z_adj: i64 = adj(self.moons[i].position.z, self.moons[j].position.z);
+                self.moons[i].velocity.x += x_adj;
+                self.moons[i].velocity.y += y_adj;
+                self.moons[i].velocity.z += z_adj;
+                self.moons[j].velocity.x -= x_adj;
+                self.moons[j].velocity.y -= y_adj;
+                self.moons[j].velocity.z -= z_adj;
             }
         }
 
@@ -124,7 +141,7 @@ impl SumTotalEnergy for Point3D {
 
 impl SumTotalEnergy for Moon {
     fn sum_total_energy(self: &Self) -> i64 {
-        self.position.sum_total_energy() + self.velocity.sum_total_energy()
+        self.position.sum_total_energy() * self.velocity.sum_total_energy()
     }
 }
 
@@ -180,9 +197,9 @@ mod tests {
             position: point_b,
             velocity: point_c,
         };
-        assert_eq!(21, moon.sum_total_energy());
+        assert_eq!(90, moon.sum_total_energy());
         assert_eq!(
-            63,
+            270,
             OrbitalSystem {
                 moons: vec![moon, moon, moon]
             }
@@ -193,8 +210,19 @@ mod tests {
     #[test]
     fn test_part_one_sample_one() {
         let mut os = OrbitalSystem::load("input/day_twelve_sample_one.txt");
-        os.take_steps(10);
-        println!("os post 10: {:#?}", os);
+        for i in 0..10 {
+            // TODO: move from manual verification to specific tests.
+            println!("os after {} steps: {}", i, os);
+            os.take_step();
+        }
+        println!("os post 10: {}", os);
         assert_eq!(179, os.sum_total_energy());
+    }
+
+    #[test]
+    fn test_part_one_sample_two() {
+        let mut os = OrbitalSystem::load("input/day_twelve_sample_two.txt");
+        os.take_steps(100);
+        assert_eq!(1940, os.sum_total_energy());
     }
 }
