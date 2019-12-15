@@ -56,6 +56,8 @@ impl RelativeTurn for Direction {
     }
 }
 
+// We specifically don't use geo::Coordinate, since we need additional things
+// like hash.
 #[derive(Debug, PartialEq, Eq, Default, Hash, Copy, Clone)]
 struct Point {
     x: i32,
