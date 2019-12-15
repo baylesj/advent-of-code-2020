@@ -80,14 +80,15 @@ pub fn calculate_visible_points(x: usize, y: usize, map: &AsteroidMap) -> Visibl
             }
 
             if (row == 14) && (col == 17) && (x == 23) && (y == 19) {
-            println!(
-                "row: {}, col: {}, rise: {}, run: {}, slope: {}, atan: {}",
-                row,
-                col,
-                rise,
-                run,
-                rise as f64 / run as f64,
-                at);
+                println!(
+                    "row: {}, col: {}, rise: {}, run: {}, slope: {}, atan: {}",
+                    row,
+                    col,
+                    rise,
+                    run,
+                    rise as f64 / run as f64,
+                    at
+                );
             }
 
             let key = format!("{:.1$}", at, 9);
@@ -148,14 +149,20 @@ pub fn part_two(input_filename: &str) -> i64 {
     // TODO: generalize to any case.
     assert!(NTH_ASTEROID_PLACE < sorted_keys.len());
 
-    for i in NTH_ASTEROID_PLACE-10..NTH_ASTEROID_PLACE+10 {
-        let visible_point = location.points[sorted_keys[i]]
-            .iter()
-            .min_by(|a, b| a.distance.partial_cmp(&b.distance).expect("ordered"))
-            .unwrap();
-        println!("n: {:#?}", visible_point);
-
+    for i in 0..location.points.len() {
+        if location.points[sorted_keys[i]][0].x == 14 && location.points[sorted_keys[i]][0].y == 17
+        {
+            println!("i: {}, {:#?}", i, location.points[sorted_keys[i]]);
+        }
     }
+    // for i in NTH_ASTEROID_PLACE-10..NTH_ASTEROID_PLACE+10 {
+    //     let visible_point = location.points[sorted_keys[i]]
+    //         .iter()
+    //         .min_by(|a, b| a.distance.partial_cmp(&b.distance).expect("ordered"))
+    //         .unwrap();
+    //     println!("n: {:#?}", visible_point);
+
+    // }
     10
     //(visible_point.x * 100 + visible_point.y) as i64
 }
