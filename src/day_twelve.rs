@@ -1,20 +1,21 @@
+use std::fmt::{Display, Formatter, Result};
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::BufReader;
 use std::iter::Sum;
+use std::ops::Add;
+
 #[path = "loadable.rs"]
 mod loadable;
 use loadable::LoadableFromFile;
-use std::fmt::{Display, Formatter, Result};
-use std::ops::Add;
 
 const INPUT_FILENAME: &'static str = "input/day_twelve.txt";
 
 #[derive(Debug, PartialEq, Eq, Default, Hash, Copy, Clone)]
 pub struct Point3D {
-    pub x: i64,
-    pub y: i64,
-    pub z: i64,
+    pub x: i16,
+    pub y: i16,
+    pub z: i16,
 }
 
 impl Add for Point3D {
@@ -52,6 +53,7 @@ impl Display for Moon {
 #[derive(Debug, Default, Clone)]
 pub struct OrbitalSystem {
     pub moons: Vec<Moon>,
+    pub step_count: i64,
 }
 
 impl Display for OrbitalSystem {
@@ -72,12 +74,12 @@ impl LoadableFromFile for OrbitalSystem {
         let mut orbital_system = OrbitalSystem::default();
         for line in reader.lines() {
             const CHARS_TO_TRIM: &[char] = &['<', '>', 'x', 'y', 'z', '=', ' '];
-            let fields: Vec<i64> = line
+            let fields: Vec<i16> = line
                 .unwrap()
                 .split(',')
                 .map(|m| {
                     m.trim_matches(|c: char| CHARS_TO_TRIM.contains(&c))
-                        .parse::<i64>()
+                        .parse::<i16>()
                         .expect("invalid point")
                 })
                 .collect();
@@ -106,7 +108,7 @@ impl TakeSteps for OrbitalSystem {
     }
 
     fn take_step(self: &mut Self) {
-        fn adj(l: i64, r: i64) -> i64 {
+        fn adj(l: i16, r: i16) -> i16 {
             if l < r {
                 1
             } else if l > r {
@@ -118,9 +120,9 @@ impl TakeSteps for OrbitalSystem {
 
         for i in 0..self.moons.len() {
             for j in i..self.moons.len() {
-                let x_adj: i64 = adj(self.moons[i].position.x, self.moons[j].position.x);
-                let y_adj: i64 = adj(self.moons[i].position.y, self.moons[j].position.y);
-                let z_adj: i64 = adj(self.moons[i].position.z, self.moons[j].position.z);
+                let x_adj: i16 = adj(self.moons[i].position.x, self.moons[j].position.x);
+                let y_adj: i16 = adj(self.moons[i].position.y, self.moons[j].position.y);
+                let z_adj: i16 = adj(self.moons[i].position.z, self.moons[j].position.z);
                 self.moons[i].velocity.x += x_adj;
                 self.moons[i].velocity.y += y_adj;
                 self.moons[i].velocity.z += z_adj;
@@ -133,6 +135,8 @@ impl TakeSteps for OrbitalSystem {
         for moon in self.moons.iter_mut() {
             moon.position = moon.position + moon.velocity;
         }
+
+        self.step_count += 1;
     }
 }
 
@@ -142,7 +146,7 @@ trait SumTotalEnergy {
 
 impl SumTotalEnergy for Point3D {
     fn sum_total_energy(self: &Self) -> i64 {
-        self.x.abs() + self.y.abs() + self.z.abs()
+        self.x.abs() as i64 + self.y.abs() as i64 + self.z.abs() as i64
     }
 }
 
@@ -164,12 +168,38 @@ pub fn part_one(initial_system: &OrbitalSystem, steps: i64) -> i64 {
     live_system.sum_total_energy()
 }
 
+pub fn part_two(initial_system: &OrbitalSystem) -> i64 {
+    let mut live_system = initial_system.clone();
+    println!("initial system: {:#?}", initial_system);
+    // HINT: use the LCM. Assuming all orbits are periodic, we just need
+    // to find the least common multiple of periodicity.
+    let mut periods = vec![None; live_system.moons.len()];
+    while periods.iter().any(|p| p.is_none()) {
+        println!("live system: {:#?}", live_system);
+        live_system.take_step();
+        for i in 0..live_system.moons.len() {
+            if periods[i].is_none() {
+                if live_system.moons[i].position.x == initial_system.moons[i].position.x
+                    && live_system.moons[i].position.y == initial_system.moons[i].position.y
+                    && live_system.moons[i].position.z == initial_system.moons[i].position.z
+                {
+                    println!("found period: {}", periods[i].unwrap());
+                    periods[i] = Some(live_system.step_count as i64);
+                }
+            }
+        }
+    }
+
+    println!("periods: {:#?}", periods);
+    periods.iter().map(|p| p.unwrap()).product()
+}
+
 pub fn solve() {
     let initial_system = OrbitalSystem::load(INPUT_FILENAME);
     println!(
         "Day twelve, part one: {}, part two: {}",
         part_one(&initial_system, 1000),
-        0
+        part_two(&initial_system)
     );
 }
 
@@ -208,7 +238,8 @@ mod tests {
         assert_eq!(
             270,
             OrbitalSystem {
-                moons: vec![moon, moon, moon]
+                moons: vec![moon, moon, moon],
+                step_count: 0
             }
             .sum_total_energy()
         );
@@ -219,7 +250,7 @@ mod tests {
         let mut os = OrbitalSystem::load("input/day_twelve_sample_one.txt");
         for i in 0..10 {
             // TODO: move from manual verification to specific tests.
-            println!("os after {} steps: {}", i, os);
+            println!("os after {} steps: {}", i, os,);
             os.take_step();
         }
         println!("os post 10: {}", os);
