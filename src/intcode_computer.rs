@@ -1,7 +1,8 @@
-use enum_primitive_derive::Primitive;
-use num_traits::FromPrimitive;
+use log::debug;
+use num_enum::{IntoPrimitive, TryFromPrimitive};
 use queues::*;
 use std::clone::Clone;
+use std::convert::TryFrom;
 use std::convert::TryInto;
 use std::fs;
 
@@ -11,7 +12,8 @@ pub use self::loadable::LoadableFromFile;
 mod loadable;
 
 // List of operations supported by this computer.
-#[derive(Primitive, Debug, Clone, Copy, PartialEq)]
+#[repr(i64)]
+#[derive(IntoPrimitive, TryFromPrimitive, Debug, Clone, Copy, PartialEq)]
 enum OpCode {
     Add = 1,
     Multiply = 2,
@@ -76,8 +78,8 @@ fn evaluate_output_index(index: usize, program: &mut Program, mode: ParameterMod
     }
     if output_index > program.buffer.len() as i64 {
         let new_size: i64 = output_index * 2;
-        println!(
-            "INFO: received index {}, resizing to new size: {}",
+        debug!(
+            "received index {}, resizing to new size: {}",
             output_index, new_size
         );
 
@@ -98,8 +100,8 @@ fn evaluate_index(index: usize, program: &mut Program, mode: ParameterMode) -> u
 
     if actual_index > program.buffer.len() {
         let new_size: usize = actual_index * 2;
-        println!(
-            "INFO: received index {}, resizing to new size: {}",
+        debug!(
+            "received index {}, resizing to new size: {}",
             actual_index, new_size
         );
         program.buffer.resize(new_size, 0);
@@ -213,7 +215,7 @@ fn dig_mode(op: i64, place: u32) -> ParameterMode {
 
 fn perform_operation(program: &mut Program) {
     let op = program.buffer[program.ptr];
-    let op_code = OpCode::from_i64(dig(op, 1) + dig(op, 0)).expect("invalid opcode");
+    let op_code = OpCode::try_from(dig(op, 1) + dig(op, 0)).expect("invalid opcode");
     let modes: Vec<ParameterMode> = vec![dig_mode(op, 2), dig_mode(op, 3), dig_mode(op, 4)];
 
     match op_code {
@@ -274,7 +276,6 @@ impl LoadableFromFile for Program {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use num_traits::ToPrimitive;
 
     fn test_operation_immediate_mode(
         op_code: OpCode,
@@ -287,7 +288,8 @@ mod tests {
             program.io.add(*i).ok();
         }
         // 1 = Immediate mode, so add for every possible parameter.
-        program.buffer.push(op_code.to_i64().unwrap() + 11100);
+        let op: i64 = op_code.into();
+        program.buffer.push(op + 11100);
         // TODO: avoid unnecessary copies?
         program.buffer.append(&mut input.clone());
 
@@ -296,7 +298,7 @@ mod tests {
         for i in 0..output.len() {
             program.buffer.push(parameter_start_index + i as i64);
         }
-        program.buffer.push(OpCode::Halt.to_i64().unwrap());
+        program.buffer.push(OpCode::Halt.into());
         program.buffer.append(&mut output.clone());
         program.run();
 
@@ -317,7 +319,7 @@ mod tests {
         for i in io {
             program.io.add(*i).ok();
         }
-        program.buffer.push(op_code.to_i64().unwrap());
+        program.buffer.push(op_code.into());
         // +2 for op_code and OpCode::Halt.
         let parameter_start_index: i64 = input.len() as i64 + output.len() as i64 + 2;
         for i in 0..input.len() {
@@ -328,7 +330,7 @@ mod tests {
                 .buffer
                 .push(parameter_start_index + input.len() as i64 + i as i64);
         }
-        program.buffer.push(OpCode::Halt.to_i64().unwrap());
+        program.buffer.push(OpCode::Halt.into());
         program.buffer.append(&mut input.clone());
         for o in output {
             program.buffer.push(-1 * o);
@@ -453,19 +455,20 @@ mod tests {
 
     #[test]
     fn test_set_relative_base() {
+        let add: i64 = OpCode::Add.into();
         let mut program = Program::default();
         program.buffer = vec![
-            OpCode::SetRelativeBase.to_i64().unwrap(), // index 0
-            4,                                          // index 1
+            OpCode::SetRelativeBase.into(), // index 0
+            4,                              // index 1
             // Now the relative base is four...
-            2200 + OpCode::Add.to_i64().unwrap(), // index 2
-            3,                                     // value 3 + rel base = points to 7
-            4,                                     // value 4 + rel base = points to 8
-            9,                                     // index 5 -> points direct to 9
-            99,                                    // index 6
-            10,                                    // index 7
-            20,                                    // index 8
-            -1,                                    // index 9
+            2200 + add, // index 2
+            3,          // value 3 + rel base = points to 7
+            4,          // value 4 + rel base = points to 8
+            9,          // index 5 -> points direct to 9
+            99,         // index 6
+            10,         // index 7
+            20,         // index 8
+            -1,         // index 9
         ];
 
         program.run();

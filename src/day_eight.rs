@@ -79,7 +79,7 @@ fn part_two(image: &Image) {
 
     for line in image_buffer.chunks(IMAGE_SIZE.width) {
         println!(
-            "{}",
+            "    {}",
             line.iter()
                 .map(|c| if *c as char == PIXEL_BLACK {
                     '⬛'
