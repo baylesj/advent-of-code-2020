@@ -63,8 +63,8 @@ pub fn calculate_visible_points(x: usize, y: usize, map: &AsteroidMap) -> Visibl
                 continue;
             }
 
-            let rise: i64 = y as i64 - row as i64;
-            let run: i64 = x as i64 - col as i64;
+            let rise: i64 = row as i64 - y as i64;
+            let run: i64 = col as i64 - x as i64;
 
             // For part two, we want to map "straight up" as the first entry,
             // and go counterclockwise. Arctangent gives us a direct way to
@@ -77,6 +77,17 @@ pub fn calculate_visible_points(x: usize, y: usize, map: &AsteroidMap) -> Visibl
             let mut at: f64 = -1.0 * ((rise as f64 / run as f64).atan() - PI / 2.0);
             if run < 0 {
                 at += PI;
+            }
+
+            if (row == 14) && (col == 17) && (x == 23) && (y == 19) {
+            println!(
+                "row: {}, col: {}, rise: {}, run: {}, slope: {}, atan: {}",
+                row,
+                col,
+                rise,
+                run,
+                rise as f64 / run as f64,
+                at);
             }
 
             let key = format!("{:.1$}", at, 9);
@@ -132,19 +143,21 @@ pub fn part_two(input_filename: &str) -> i64 {
     let sorted_keys: Vec<&String> = location.points.keys().collect();
 
     println!("location x, y: {}, {}", location.x, location.y);
+    //println!("location.points: {:#?}", location.points);
     // Found experimentally.
     // TODO: generalize to any case.
     assert!(NTH_ASTEROID_PLACE < sorted_keys.len());
 
-    let visible_point = location.points[sorted_keys[NTH_ASTEROID_PLACE]]
-        .iter()
-        .min_by(|a, b| a.distance.partial_cmp(&b.distance).expect("ordered"))
-        .unwrap();
-    println!(
-        "sorted keys: {:#?}",
-        location.points[sorted_keys[NTH_ASTEROID_PLACE]]
-    );
-    (visible_point.x * 100 + visible_point.y) as i64
+    for i in NTH_ASTEROID_PLACE-10..NTH_ASTEROID_PLACE+10 {
+        let visible_point = location.points[sorted_keys[i]]
+            .iter()
+            .min_by(|a, b| a.distance.partial_cmp(&b.distance).expect("ordered"))
+            .unwrap();
+        println!("n: {:#?}", visible_point);
+
+    }
+    10
+    //(visible_point.x * 100 + visible_point.y) as i64
 }
 
 pub fn solve() {
@@ -182,5 +195,10 @@ mod tests {
     #[test]
     fn test_part_one() {
         assert_eq!(part_one(INPUT_FILENAME), 278);
+    }
+
+    #[test]
+    fn test_part_two() {
+        assert_eq!(part_two(INPUT_FILENAME), 1417);
     }
 }
