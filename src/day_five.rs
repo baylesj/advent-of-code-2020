@@ -7,7 +7,7 @@ use queues::IsQueue;
 
 const INPUT_FILENAME: &str = "input/day_five.txt";
 
-pub fn part_one(program: &mut Program) -> i128 {
+pub fn part_one(program: &mut Program) -> i64 {
     program.io.add(1).ok();
     program.run_until_halted();
 
@@ -18,7 +18,7 @@ pub fn part_one(program: &mut Program) -> i128 {
     program.io.peek().unwrap()
 }
 
-pub fn part_two(program: &mut Program) -> i128 {
+pub fn part_two(program: &mut Program) -> i64 {
     program.io.add(5).ok();
     program.run_until_halted();
     // All except the last output should be diagnostic code 0.
@@ -43,11 +43,11 @@ mod tests {
 
     #[test]
     fn test_part_one() {
-        assert_eq!(13978427, part_one(Program::load(INPUT_FILENAME)));
+        assert_eq!(13978427, part_one(&mut Program::load(INPUT_FILENAME)));
     }
 
     #[test]
     fn test_part_two() {
-        assert_eq!(11189491, part_two(Program::load(INPUT_FILENAME)));
+        assert_eq!(11189491, part_two(&mut Program::load(INPUT_FILENAME)));
     }
 }

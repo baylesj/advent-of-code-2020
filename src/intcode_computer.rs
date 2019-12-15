@@ -25,7 +25,7 @@ enum OpCode {
     Halt = 99,
 }
 
-pub type ProgramBuffer = Vec<i128>;
+pub type ProgramBuffer = Vec<i64>;
 
 #[derive(PartialEq, Clone, Copy, Debug)]
 pub enum ProgramState {
@@ -45,8 +45,8 @@ impl Default for ProgramState {
 pub struct Program {
     pub buffer: ProgramBuffer,
     pub state: ProgramState,
-    pub io: Queue<i128>,
-    relative_base: i128,
+    pub io: Queue<i64>,
+    relative_base: i64,
     ptr: usize,
 }
 
@@ -70,12 +70,12 @@ enum ParameterMode {
 }
 
 fn evaluate_output_index(index: usize, program: &mut Program, mode: ParameterMode) -> usize {
-    let mut output_index = program.buffer[index] as i128;
+    let mut output_index = program.buffer[index] as i64;
     if mode == ParameterMode::Relative {
-        output_index += program.relative_base as i128;
+        output_index += program.relative_base as i64;
     }
-    if output_index > program.buffer.len() as i128 {
-        let new_size: i128 = output_index * 2;
+    if output_index > program.buffer.len() as i64 {
+        let new_size: i64 = output_index * 2;
         println!(
             "INFO: received index {}, resizing to new size: {}",
             output_index, new_size
@@ -107,14 +107,14 @@ fn evaluate_index(index: usize, program: &mut Program, mode: ParameterMode) -> u
     actual_index
 }
 
-fn access_parameter(index: usize, program: &mut Program, mode: ParameterMode) -> i128 {
+fn access_parameter(index: usize, program: &mut Program, mode: ParameterMode) -> i64 {
     let index: usize = evaluate_index(index, program, mode);
     program.buffer[index]
 }
 
 fn operation_add(program: &mut Program, modes: &Vec<ParameterMode>) {
-    let a: i128 = access_parameter(program.ptr + 1, program, modes[0]);
-    let b: i128 = access_parameter(program.ptr + 2, program, modes[1]);
+    let a: i64 = access_parameter(program.ptr + 1, program, modes[0]);
+    let b: i64 = access_parameter(program.ptr + 2, program, modes[1]);
     let r_i: usize = evaluate_output_index(program.ptr + 3, program, modes[2]);
     program.buffer[r_i] = a + b;
     program.ptr += 4;
@@ -122,30 +122,30 @@ fn operation_add(program: &mut Program, modes: &Vec<ParameterMode>) {
 
 // TODO: create generic and pass operator?
 fn operation_multiply(program: &mut Program, modes: &Vec<ParameterMode>) {
-    let a: i128 = access_parameter(program.ptr + 1, program, modes[0]);
-    let b: i128 = access_parameter(program.ptr + 2, program, modes[1]);
+    let a: i64 = access_parameter(program.ptr + 1, program, modes[0]);
+    let b: i64 = access_parameter(program.ptr + 2, program, modes[1]);
     let r_i: usize = evaluate_output_index(program.ptr + 3, program, modes[2]);
     program.buffer[r_i] = a * b;
     program.ptr += 4;
 }
 
 fn operation_input(program: &mut Program, modes: &Vec<ParameterMode>) {
-    let value: i128 = program.io.remove().expect("requested input on empty stack");
+    let value: i64 = program.io.remove().expect("requested input on empty stack");
     let r_i: usize = evaluate_output_index(program.ptr + 1, program, modes[0]);
     program.buffer[r_i] = value;
     program.ptr += 2;
 }
 
 fn operation_output(program: &mut Program, modes: &Vec<ParameterMode>) {
-    let value: i128 = access_parameter(program.ptr + 1, program, modes[0]);
+    let value: i64 = access_parameter(program.ptr + 1, program, modes[0]);
     program.io.add(value).ok();
     program.state = ProgramState::Paused;
     program.ptr += 2;
 }
 
 fn operation_jump_if_true(program: &mut Program, modes: &Vec<ParameterMode>) {
-    let a: i128 = access_parameter(program.ptr + 1, program, modes[0]);
-    let b: i128 = access_parameter(program.ptr + 2, program, modes[1]);
+    let a: i64 = access_parameter(program.ptr + 1, program, modes[0]);
+    let b: i64 = access_parameter(program.ptr + 2, program, modes[1]);
     if a != 0 {
         program.ptr = b as usize;
     } else {
@@ -154,8 +154,8 @@ fn operation_jump_if_true(program: &mut Program, modes: &Vec<ParameterMode>) {
 }
 
 fn operation_jump_if_false(program: &mut Program, modes: &Vec<ParameterMode>) {
-    let a: i128 = access_parameter(program.ptr + 1, program, modes[0]);
-    let b: i128 = access_parameter(program.ptr + 2, program, modes[1]);
+    let a: i64 = access_parameter(program.ptr + 1, program, modes[0]);
+    let b: i64 = access_parameter(program.ptr + 2, program, modes[1]);
     if a == 0 {
         program.ptr = b as usize;
     } else {
@@ -164,8 +164,8 @@ fn operation_jump_if_false(program: &mut Program, modes: &Vec<ParameterMode>) {
 }
 
 fn operation_less_than(program: &mut Program, modes: &Vec<ParameterMode>) {
-    let a: i128 = access_parameter(program.ptr + 1, program, modes[0]);
-    let b: i128 = access_parameter(program.ptr + 2, program, modes[1]);
+    let a: i64 = access_parameter(program.ptr + 1, program, modes[0]);
+    let b: i64 = access_parameter(program.ptr + 2, program, modes[1]);
     let r_i: usize = evaluate_output_index(program.ptr + 3, program, modes[2]);
     if a < b {
         program.buffer[r_i] = 1;
@@ -176,8 +176,8 @@ fn operation_less_than(program: &mut Program, modes: &Vec<ParameterMode>) {
 }
 
 fn operation_equals(program: &mut Program, modes: &Vec<ParameterMode>) {
-    let a: i128 = access_parameter(program.ptr + 1, program, modes[0]);
-    let b: i128 = access_parameter(program.ptr + 2, program, modes[1]);
+    let a: i64 = access_parameter(program.ptr + 1, program, modes[0]);
+    let b: i64 = access_parameter(program.ptr + 2, program, modes[1]);
     let r_i: usize = evaluate_output_index(program.ptr + 3, program, modes[2]);
     if a == b {
         program.buffer[r_i] = 1;
@@ -188,7 +188,7 @@ fn operation_equals(program: &mut Program, modes: &Vec<ParameterMode>) {
 }
 
 fn operation_set_relative_base(program: &mut Program, modes: &Vec<ParameterMode>) {
-    let offset: i128 = access_parameter(program.ptr + 1, program, modes[0]);
+    let offset: i64 = access_parameter(program.ptr + 1, program, modes[0]);
     program.relative_base += offset;
     program.ptr += 2;
 }
@@ -197,13 +197,13 @@ fn operation_halt(program: &mut Program) {
     program.state = ProgramState::Stopped;
 }
 
-fn dig(op: i128, place: u32) -> i128 {
-    let t = i128::pow(10, place);
+fn dig(op: i64, place: u32) -> i64 {
+    let t = i64::pow(10, place);
     ((op / t) % 10) * t
 }
 
-fn dig_mode(op: i128, place: u32) -> ParameterMode {
-    match dig(op, place) / i128::pow(10, place) {
+fn dig_mode(op: i64, place: u32) -> ParameterMode {
+    match dig(op, place) / i64::pow(10, place) {
         0 => ParameterMode::Position,
         1 => ParameterMode::Immediate,
         2 => ParameterMode::Relative,
@@ -213,7 +213,7 @@ fn dig_mode(op: i128, place: u32) -> ParameterMode {
 
 fn perform_operation(program: &mut Program) {
     let op = program.buffer[program.ptr];
-    let op_code = OpCode::from_i128(dig(op, 1) + dig(op, 0)).expect("invalid opcode");
+    let op_code = OpCode::from_i64(dig(op, 1) + dig(op, 0)).expect("invalid opcode");
     let modes: Vec<ParameterMode> = vec![dig_mode(op, 2), dig_mode(op, 3), dig_mode(op, 4)];
 
     match op_code {
@@ -262,7 +262,7 @@ impl LoadableFromFile for Program {
         let fc: String = fs::read_to_string(filename).expect("invalid filename");
 
         let mut program = Program::default();
-        program.buffer = fc.split(',').map(|x| x.parse::<i128>().unwrap()).collect();
+        program.buffer = fc.split(',').map(|x| x.parse::<i64>().unwrap()).collect();
         program
     }
 }
@@ -278,25 +278,25 @@ mod tests {
 
     fn test_operation_immediate_mode(
         op_code: OpCode,
-        input: &Vec<i128>,
-        output: &Vec<i128>,
-        io: &Vec<i128>,
+        input: &Vec<i64>,
+        output: &Vec<i64>,
+        io: &Vec<i64>,
     ) -> Program {
         let mut program = Program::default();
         for i in io {
             program.io.add(*i).ok();
         }
         // 1 = Immediate mode, so add for every possible parameter.
-        program.buffer.push(op_code.to_i128().unwrap() + 11100);
+        program.buffer.push(op_code.to_i64().unwrap() + 11100);
         // TODO: avoid unnecessary copies?
         program.buffer.append(&mut input.clone());
 
         // Output is always position mode.
-        let parameter_start_index: i128 = input.len() as i128 + output.len() as i128 + 2;
+        let parameter_start_index: i64 = input.len() as i64 + output.len() as i64 + 2;
         for i in 0..output.len() {
-            program.buffer.push(parameter_start_index + i as i128);
+            program.buffer.push(parameter_start_index + i as i64);
         }
-        program.buffer.push(OpCode::Halt.to_i128().unwrap());
+        program.buffer.push(OpCode::Halt.to_i64().unwrap());
         program.buffer.append(&mut output.clone());
         program.run();
 
@@ -309,26 +309,26 @@ mod tests {
 
     fn test_operation_parameter_mode(
         op_code: OpCode,
-        input: &Vec<i128>,
-        output: &Vec<i128>,
-        io: &Vec<i128>,
+        input: &Vec<i64>,
+        output: &Vec<i64>,
+        io: &Vec<i64>,
     ) -> Program {
         let mut program = Program::default();
         for i in io {
             program.io.add(*i).ok();
         }
-        program.buffer.push(op_code.to_i128().unwrap());
+        program.buffer.push(op_code.to_i64().unwrap());
         // +2 for op_code and OpCode::Halt.
-        let parameter_start_index: i128 = input.len() as i128 + output.len() as i128 + 2;
+        let parameter_start_index: i64 = input.len() as i64 + output.len() as i64 + 2;
         for i in 0..input.len() {
-            program.buffer.push(parameter_start_index + i as i128);
+            program.buffer.push(parameter_start_index + i as i64);
         }
         for i in 0..output.len() {
             program
                 .buffer
-                .push(parameter_start_index + input.len() as i128 + i as i128);
+                .push(parameter_start_index + input.len() as i64 + i as i64);
         }
-        program.buffer.push(OpCode::Halt.to_i128().unwrap());
+        program.buffer.push(OpCode::Halt.to_i64().unwrap());
         program.buffer.append(&mut input.clone());
         for o in output {
             program.buffer.push(-1 * o);
@@ -345,9 +345,9 @@ mod tests {
 
     fn test_operation(
         op_code: OpCode,
-        input_opt: Option<Vec<i128>>,
-        output_opt: Option<Vec<i128>>,
-        io_opt: Option<Vec<i128>>,
+        input_opt: Option<Vec<i64>>,
+        output_opt: Option<Vec<i64>>,
+        io_opt: Option<Vec<i64>>,
     ) -> Vec<Program> {
         let input = input_opt.unwrap_or_default();
         let output = output_opt.unwrap_or_default();
@@ -455,10 +455,10 @@ mod tests {
     fn test_set_relative_base() {
         let mut program = Program::default();
         program.buffer = vec![
-            OpCode::SetRelativeBase.to_i128().unwrap(), // index 0
+            OpCode::SetRelativeBase.to_i64().unwrap(), // index 0
             4,                                          // index 1
             // Now the relative base is four...
-            2200 + OpCode::Add.to_i128().unwrap(), // index 2
+            2200 + OpCode::Add.to_i64().unwrap(), // index 2
             3,                                     // value 3 + rel base = points to 7
             4,                                     // value 4 + rel base = points to 8
             9,                                     // index 5 -> points direct to 9

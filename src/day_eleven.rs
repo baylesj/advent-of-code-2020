@@ -17,13 +17,13 @@ enum TileColor {
 }
 
 struct Point {
-  x: i128,
-  y: i128
+  x: i64,
+  y: i64
 }
 
 pub fn part_one(input_filename: &str) -> i64 {
     let mut program = Program::load(input_filename);
-    program.io.add(TileColor::Black.to_i128().unwrap()).ok();
+    program.io.add(TileColor::Black.to_i64().unwrap()).ok();
     program.run();
 
     println!("io: {:#?}", program.io);

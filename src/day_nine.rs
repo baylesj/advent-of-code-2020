@@ -6,7 +6,7 @@ mod intcode_computer;
 
 const INPUT_FILENAME: &str = "input/day_nine.txt";
 
-pub fn part_one(input_filename: &str) -> i128 {
+pub fn part_one(input_filename: &str) -> i64 {
     let mut program = Program::load(input_filename);
     program.io.add(1).ok();
     program.run_until_halted();
@@ -16,7 +16,7 @@ pub fn part_one(input_filename: &str) -> i128 {
     program.io.remove().unwrap()
 }
 
-pub fn part_two(input_filename: &str) -> i128 {
+pub fn part_two(input_filename: &str) -> i64 {
     let mut program = Program::load(input_filename);
     program.io.add(2).ok();
     program.run_until_halted();
@@ -51,7 +51,7 @@ mod tests {
         let mut program = Program::load("input/day_nine_sample_two.txt");
         program.run_until_halted();
         let output = program.io.remove().unwrap();
-        assert!(i128::pow(10, 15) < output && output < i128::pow(10, 16));
+        assert!(i64::pow(10, 15) < output && output < i64::pow(10, 16));
     }
 
     #[test]
