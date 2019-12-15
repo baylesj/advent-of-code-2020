@@ -2,7 +2,6 @@ use std::collections::BTreeMap;
 use std::f64::consts::PI;
 use std::fs::File;
 use std::io::{prelude::*, BufReader};
-use ordered_float::OrderedFloat;
 
 #[path = "loadable.rs"]
 mod loadable;
@@ -82,7 +81,10 @@ fn calculate_visible_points(x: usize, y: usize, map: &AsteroidMap) -> VisiblePoi
                 continue;
             }
 
-            let rise: i64 = row as i64 - y as i64;
+            // TODO: this inverse makes for an easier mental
+            // model (moving from y = 12 to y = 11 is "up" according
+            // to the spec), but is not congruent. Refactor.
+            let rise: i64 = y as i64 - row as i64;
             let run: i64 = col as i64 - x as i64;
             let key = to_key(rise, run);
 
@@ -130,27 +132,13 @@ pub fn part_one(input_filename: &str) -> i64 {
     get_best_location(input_filename).points.len() as i64
 }
 
-// Question is, what is the 200th asteroid to be vaporized?
-// Minus one to account for 0-indexing.
-const NTH_ASTEROID_PLACE: usize = 199;
-pub fn part_two(input_filename: &str) -> i64 {
+pub fn part_two(input_filename: &str, nth: usize) -> i64 {
     let location = get_best_location(input_filename);
     let sorted_keys: Vec<&i64> = location.points.keys().collect();
-    println!("sorted keys: {:#?}", sorted_keys);
-    println!("location x, y: {}, {}", location.x, location.y);
-    //println!("location.points: {:#?}", location.points);
-    // Found experimentally.
-    // TODO: generalize to any case.
-    assert!(NTH_ASTEROID_PLACE < sorted_keys.len());
+    // TODO: generalize to any nth < number of asteroids.
+    assert!(nth - 1 < sorted_keys.len());
 
-    for i in 0..location.points.len() {
-        if location.points[&sorted_keys[i]][0].x == 14
-            && location.points[&sorted_keys[i]][0].y == 17
-        {
-            println!("i: {}, {:#?}", i, location.points[&sorted_keys[i]]);
-        }
-    }
-    let visible_point = location.points[&sorted_keys[NTH_ASTEROID_PLACE]]
+    let visible_point = location.points[&sorted_keys[nth - 1]]
         .iter()
         .min_by(|a, b| a.distance.partial_cmp(&b.distance).expect("ordered"))
         .unwrap();
@@ -162,7 +150,7 @@ pub fn solve() {
     println!(
         "Day ten, part one: {}, part two: {}",
         part_one(INPUT_FILENAME),
-        part_two(INPUT_FILENAME)
+        part_two(INPUT_FILENAME, 200)
     );
 }
 
@@ -209,8 +197,21 @@ mod tests {
         assert_eq!(part_one(INPUT_FILENAME), 278);
     }
 
-    // #[test]
-    // fn test_part_two() {
-    //     assert_eq!(part_two(INPUT_FILENAME), 1417);
-    // }
+    #[test]
+    fn test_part_two_sample_four() {
+        assert_eq!(part_two("input/day_ten_sample_four.txt", 1), 1112);
+        assert_eq!(part_two("input/day_ten_sample_four.txt", 2), 1201);
+        assert_eq!(part_two("input/day_ten_sample_four.txt", 50), 1609);
+        assert_eq!(part_two("input/day_ten_sample_four.txt", 100), 1016);
+        assert_eq!(part_two("input/day_ten_sample_four.txt", 200), 802);
+
+        // TODO: add support for "rolling over" e.g. values > the size
+        // of the array of slopes.
+        //assert_eq!(part_two("input/day_ten_sample_four.txt", 299), 1101);
+    }
+
+    #[test]
+    fn test_part_two() {
+        assert_eq!(part_two(INPUT_FILENAME, 200), 1417);
+    }
 }
