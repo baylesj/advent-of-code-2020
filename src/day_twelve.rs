@@ -2,10 +2,10 @@ use std::fs::File;
 use std::io::prelude::*;
 use std::io::BufReader;
 use std::iter::Sum;
-
 #[path = "loadable.rs"]
 mod loadable;
 use loadable::LoadableFromFile;
+use std::ops::Add;
 
 const INPUT_FILENAME: &'static str = "input/day_twelve.txt";
 
@@ -14,6 +14,17 @@ pub struct Point3D {
     pub x: i64,
     pub y: i64,
     pub z: i64,
+}
+
+impl Add for Point3D {
+    type Output = Self;
+    fn add(self, other: Self) -> Self {
+        Self {
+            x: self.x + other.x,
+            y: self.y + other.y,
+            z: self.z + other.z,
+        }
+    }
 }
 
 #[derive(Debug, Default, Copy, Clone)]
@@ -56,38 +67,68 @@ impl LoadableFromFile for OrbitalSystem {
     }
 }
 
-trait Stepping {
+trait TakeSteps {
     fn take_steps(self: &mut Self, step_count: i64);
     fn step(self: &mut Self);
 }
 
-impl Stepping for OrbitalSystem {
+impl TakeSteps for OrbitalSystem {
     fn take_steps(self: &mut Self, step_count: i64) {
         for _ in 0..step_count {
             self.step();
         }
     }
 
-    fn step(self: &mut Self) {}
+    fn step(self: &mut Self) {
+        for i in 0..self.moons.len() {
+            for j in i..self.moons.len() {
+                let x_adj: i64 = if self.moons[i].position.x < self.moons[j].position.x {
+                    1
+                } else {
+                    -1
+                };
+                let y_adj: i64 = if self.moons[i].position.y < self.moons[j].position.y {
+                    1
+                } else {
+                    -1
+                };
+                let z_adj: i64 = if self.moons[i].position.z < self.moons[j].position.z {
+                    1
+                } else {
+                    -1
+                };
+                self.moons[i].position.x += x_adj;
+                self.moons[i].position.y += y_adj;
+                self.moons[i].position.z += z_adj;
+                self.moons[j].position.x -= x_adj;
+                self.moons[j].position.y -= y_adj;
+                self.moons[j].position.z -= z_adj;
+            }
+        }
+
+        for moon in self.moons.iter_mut() {
+            moon.position = moon.position + moon.velocity;
+        }
+    }
 }
 
-trait EnergySummation {
+trait SumTotalEnergy {
     fn sum_total_energy(self: &Self) -> i64;
 }
 
-impl EnergySummation for Point3D {
+impl SumTotalEnergy for Point3D {
     fn sum_total_energy(self: &Self) -> i64 {
         self.x.abs() + self.y.abs() + self.z.abs()
     }
 }
 
-impl EnergySummation for Moon {
+impl SumTotalEnergy for Moon {
     fn sum_total_energy(self: &Self) -> i64 {
         self.position.sum_total_energy() + self.velocity.sum_total_energy()
     }
 }
 
-impl EnergySummation for OrbitalSystem {
+impl SumTotalEnergy for OrbitalSystem {
     fn sum_total_energy(self: &Self) -> i64 {
         i64::sum(self.moons.iter().map(|m| m.sum_total_energy()))
     }
@@ -151,6 +192,9 @@ mod tests {
 
     #[test]
     fn test_part_one_sample_one() {
-        let _os = OrbitalSystem::load("input/day_twelve_sample_one.txt");
+        let mut os = OrbitalSystem::load("input/day_twelve_sample_one.txt");
+        os.take_steps(10);
+        println!("os post 10: {:#?}", os);
+        assert_eq!(179, os.sum_total_energy());
     }
 }

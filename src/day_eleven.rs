@@ -223,6 +223,6 @@ mod tests {
     #[test]
     fn test_part_one() {
         let mut program = Program::load(INPUT_FILENAME);
-        assert_eq!(732, part_one(&mut program));
+        assert_eq!(2322, part_one(&mut program));
     }
 }
