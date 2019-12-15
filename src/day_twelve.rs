@@ -5,8 +5,8 @@ use std::iter::Sum;
 #[path = "loadable.rs"]
 mod loadable;
 use loadable::LoadableFromFile;
-use std::ops::Add;
 use std::fmt::{Display, Formatter, Result};
+use std::ops::Add;
 
 const INPUT_FILENAME: &'static str = "input/day_twelve.txt";
 
@@ -36,9 +36,16 @@ pub struct Moon {
 
 impl Display for Moon {
     fn fmt(&self, f: &mut Formatter) -> Result {
-        write!(f, "pos=<x={}, y={}, z={}>, vel=<x={}, y={}, z={}>",
-      self.position.x, self.position.y, self.position.z,
-    self.velocity.x, self.velocity.y, self.velocity.z)
+        write!(
+            f,
+            "pos=<x={}, y={}, z={}>, vel=<x={}, y={}, z={}>",
+            self.position.x,
+            self.position.y,
+            self.position.z,
+            self.velocity.x,
+            self.velocity.y,
+            self.velocity.z
+        )
     }
 }
 
@@ -48,13 +55,13 @@ pub struct OrbitalSystem {
 }
 
 impl Display for OrbitalSystem {
-  fn fmt(&self, f: &mut Formatter) -> Result {
-      write!(f, "Moons:\n").ok();
-      for moon in &self.moons {
-        write!(f, "{}\n", moon).ok();
-      }
-      Ok(())
-  }
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        write!(f, "Moons:\n").ok();
+        for moon in &self.moons {
+            write!(f, "{}\n", moon).ok();
+        }
+        Ok(())
+    }
 }
 
 impl LoadableFromFile for OrbitalSystem {
@@ -224,5 +231,12 @@ mod tests {
         let mut os = OrbitalSystem::load("input/day_twelve_sample_two.txt");
         os.take_steps(100);
         assert_eq!(1940, os.sum_total_energy());
+    }
+
+    #[test]
+    fn test_part_one() {
+        let mut os = OrbitalSystem::load("input/day_twelve.txt");
+        os.take_steps(1000);
+        assert_eq!(6423, os.sum_total_energy());
     }
 }
