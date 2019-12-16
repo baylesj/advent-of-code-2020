@@ -48,6 +48,8 @@ pub struct Program {
     pub buffer: ProgramBuffer,
     pub state: ProgramState,
     pub io: Queue<i64>,
+    // TODO: callbacks?
+    pub static_input: Option<i64>,
     relative_base: i64,
     ptr: usize,
 }
@@ -58,6 +60,7 @@ impl Clone for Program {
             buffer: self.buffer.clone(),
             state: ProgramState::Initialized,
             io: Queue::new(),
+            static_input: None,
             relative_base: self.relative_base,
             ptr: 0,
         }
@@ -132,7 +135,12 @@ fn operation_multiply(program: &mut Program, modes: &Vec<ParameterMode>) {
 }
 
 fn operation_input(program: &mut Program, modes: &Vec<ParameterMode>) {
-    let value: i64 = program.io.remove().expect("requested input on empty stack");
+    let value: i64;
+    if program.static_input.is_some() {
+        value = program.static_input.unwrap();
+    } else {
+        value = program.io.remove().expect("requested input on empty stack");
+    }
     let r_i: usize = evaluate_output_index(program.ptr + 1, program, modes[0]);
     program.buffer[r_i] = value;
     program.ptr += 2;

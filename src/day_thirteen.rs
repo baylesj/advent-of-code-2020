@@ -136,6 +136,18 @@ impl FrameBuffer for Buffer {
     }
 }
 
+fn get_tile(program: &mut Program) -> Result<Tile, &str> {
+    if program.state == ProgramState::Stopped {
+        return Err("Program is stopped");
+    }
+
+    program.run();
+    program.run();
+    program.run();
+
+    pop_tile(&mut program.io)
+}
+
 trait GameActions {
     fn start(&mut self);
     fn update(&mut self, position: JoystickPosition);
@@ -144,27 +156,26 @@ trait GameActions {
 
 impl GameActions for GameState {
     fn start(&mut self) {
-        self.program.run();
-        self.program.run();
-        self.program.run();
-        let mut tile = pop_tile(&mut self.program.io).unwrap();
-        while tile.id != TileId::Score {
-            self.tiles.push(tile);
-            self.program.run();
-            self.program.run();
-            self.program.run();
-            tile = pop_tile(&mut self.program.io).unwrap();
+        while let Some(tile) = get_tile(&mut self.program).ok() {
+            if tile.id == TileId::Score {
+                self.score = tile.raw_id;
+                break;
+            } else {
+                self.tiles.push(tile);
+            }
         }
-        self.score = tile.raw_id;
     }
 
     fn update(&mut self, position: JoystickPosition) {
         self.tiles.clear();
-        self.program.io.add(position.into()).ok();
+        self.program.static_input = Some(position.into());
         self.start();
     }
 
     fn draw(&self) {
+        if self.tiles.is_empty() {
+            return;
+        }
         let max_x = self.tiles.iter().map(|t| t.location.x).max().unwrap() as i64;
         let max_y = self.tiles.iter().map(|t| t.location.y).max().unwrap() as i64;
         // NOTE: plus one because len = max value + 1
@@ -200,11 +211,10 @@ pub fn part_two(input_filename: &str) -> i64 {
     state.program.buffer[0] = 2;
     state.start();
     state.draw();
-    state.update(JoystickPosition::Left);
-    state.update(JoystickPosition::Left);
-    state.update(JoystickPosition::Left);
-    state.update(JoystickPosition::Left);
-    state.draw();
+    for _ in 0..100000 {
+        state.update(JoystickPosition::Left);
+        state.draw();
+    }
     123
 }
 
