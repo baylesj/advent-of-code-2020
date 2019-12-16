@@ -18,6 +18,26 @@ pub struct Point3D {
     pub z: i128,
 }
 
+pub trait ArrayLike {
+    fn size() -> usize;
+    fn get(&self, i: usize) -> i128;
+}
+
+impl ArrayLike for Point3D {
+    fn size() -> usize {
+        3
+    }
+
+    fn get(&self, i: usize) -> i128 {
+        match i {
+            0 => self.x,
+            1 => self.y,
+            2 => self.z,
+            _ => panic!("out of bounds"),
+        }
+    }
+}
+
 impl Add for Point3D {
     type Output = Self;
     fn add(self, other: Self) -> Self {
@@ -140,6 +160,18 @@ impl TakeSteps for OrbitalSystem {
     }
 }
 
+trait DimensionSlice {
+    fn dimension_slice(self: &Self, dimension: i128) -> Vec<i128>;
+}
+
+impl DimensionSlice for OrbitalSystem {
+    fn dimension_slice(self: &Self, dimension: i128) -> Vec<i128> {
+        self.moons.iter().map(|m| vec![m.position.get(dimension as usize), m.velocity.get(dimension as usize)])
+        .flat_map(|v| v.iter()).cloned().collect()
+
+    }
+}
+
 trait SumTotalEnergy {
     fn sum_total_energy(self: &Self) -> i128;
 }
@@ -173,25 +205,26 @@ pub fn part_two(initial_system: &OrbitalSystem) -> i128 {
     println!("initial system: {:#?}", initial_system);
     // HINT: use the LCM. Assuming all orbits are periodic, we just need
     // to find the least common multiple of periodicity.
-    let mut periods = vec![None; live_system.moons.len()];
+    let mut periods = vec![None; Point3D::size()];
     while periods.iter().any(|p| p.is_none()) {
         //println!("live system: {:#?}", live_system);
         live_system.take_step();
-        for i in 0..live_system.moons.len() {
+        'outer: for i in 0..periods.len() {
             if periods[i].is_none() {
-                //live_system.moons[i].position.x == initial_system.moons[i].position.x
-                //&& live_system.moons[i].position.y == initial_system.moons[i].position.y
-                //&& live_system.moons[i].position.z == initial_system.moons[i].position.z
-                if (live_system.moons[i].velocity == Point3D::default()) {
-                    periods[i] = Some(live_system.step_count as i128);
-                    println!("found period: {}", periods[i].unwrap());
+                'inner: for j in 0..live_system.moons.len() {
+                    if live_system.moons[i].position.get(j)
+                        != initial_system.moons[i].position.get(j)
+                    {
+                        continue 'outer;
+                    }
                 }
+                periods[i] = Some(live_system.step_count as i128);
             }
         }
     }
 
     println!("periods: {:#?}", periods);
-    periods.iter().map(|p| p.unwrap()).product()
+    lcm(lcm(periods[0], periods[1]), periods[2])
 }
 
 pub fn solve() {
