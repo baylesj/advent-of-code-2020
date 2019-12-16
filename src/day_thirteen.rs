@@ -7,6 +7,7 @@ use std::iter::FromIterator;
 mod intcode_computer;
 use intcode_computer::{LoadableFromFile, Program, ProgramState, Runnable};
 use queues::IsQueue;
+use queues::Queue;
 
 const INPUT_FILENAME: &'static str = "input/day_thirteen.txt";
 
@@ -20,15 +21,39 @@ enum TileId {
     Ball = 4,
 }
 
+#[derive(Debug, Copy, Clone)]
+struct Tile {
+    x: i64,
+    y: i64,
+    id: TileId,
+}
+
+fn pop_tile(queue: &mut Queue<i64>) -> Result<Tile, &str> {
+    if queue.peek().is_err() {
+        return Err("empty queue");
+    }
+    let x = queue.remove().unwrap();
+    if queue.peek().is_err() {
+        return Err("empty queue");
+    }
+    let y = queue.remove().unwrap();
+    if queue.peek().is_err() {
+        return Err("empty queue");
+    }
+    let tid = TileId::try_from(queue.remove().unwrap()).unwrap();
+    Ok(Tile {
+        x: x,
+        y: y,
+        id: tid,
+    })
+}
+
 pub fn part_one(program: &mut Program) -> i64 {
     program.run_until_halted();
 
     let mut sum = 0;
-
-    while program.io.peek().is_ok() {
-        assert!(program.io.remove().is_ok()); // x
-        assert!(program.io.remove().is_ok()); // y
-        if program.io.remove().unwrap_or_default() == TileId::Block.into() {
+    while let Some(tile) = pop_tile(&mut program.io).ok() {
+        if tile.id == TileId::Block {
             sum += 1;
         }
     }
