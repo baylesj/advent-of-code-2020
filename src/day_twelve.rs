@@ -1,3 +1,4 @@
+use num::integer::lcm;
 use std::fmt::{Display, Formatter, Result};
 use std::fs::File;
 use std::io::prelude::*;
@@ -161,14 +162,16 @@ impl TakeSteps for OrbitalSystem {
 }
 
 trait DimensionSlice {
-    fn dimension_slice(self: &Self, dimension: i128) -> Vec<i128>;
+    fn dimension_slice(self: &Self, dimension: usize) -> Vec<i128>;
 }
 
 impl DimensionSlice for OrbitalSystem {
-    fn dimension_slice(self: &Self, dimension: i128) -> Vec<i128> {
-        self.moons.iter().map(|m| vec![m.position.get(dimension as usize), m.velocity.get(dimension as usize)])
-        .flat_map(|v| v.iter()).cloned().collect()
-
+    fn dimension_slice(self: &Self, dimension: usize) -> Vec<i128> {
+        self.moons
+            .iter()
+            .map(|m| vec![m.position.get(dimension), m.velocity.get(dimension)])
+            .flat_map(|v| v.into_iter())
+            .collect()
     }
 }
 
@@ -202,27 +205,22 @@ pub fn part_one(initial_system: &OrbitalSystem, steps: i128) -> i128 {
 
 pub fn part_two(initial_system: &OrbitalSystem) -> i128 {
     let mut live_system = initial_system.clone();
-    println!("initial system: {:#?}", initial_system);
+    let mut slices = Vec::new();
+    for i in 0..Point3D::size() {
+        slices.push(initial_system.dimension_slice(i));
+    }
+
     // HINT: use the LCM. Assuming all orbits are periodic, we just need
     // to find the least common multiple of periodicity.
-    let mut periods = vec![None; Point3D::size()];
-    while periods.iter().any(|p| p.is_none()) {
-        //println!("live system: {:#?}", live_system);
+    let mut periods = vec![0; Point3D::size()];
+    while periods.iter().any(|p| *p == 0) {
         live_system.take_step();
-        'outer: for i in 0..periods.len() {
-            if periods[i].is_none() {
-                'inner: for j in 0..live_system.moons.len() {
-                    if live_system.moons[i].position.get(j)
-                        != initial_system.moons[i].position.get(j)
-                    {
-                        continue 'outer;
-                    }
-                }
-                periods[i] = Some(live_system.step_count as i128);
+        for i in 0..Point3D::size() {
+            if periods[i] == 0 && live_system.dimension_slice(i) == slices[i] {
+                periods[i] = live_system.step_count;
             }
         }
     }
-
     println!("periods: {:#?}", periods);
     lcm(lcm(periods[0], periods[1]), periods[2])
 }
