@@ -139,7 +139,7 @@ fn print(state: &PainterState) {
     }
 }
 
-fn paint(program: &mut Program, initial_color: TileColor) -> i64 {
+fn paint(program: &mut Program, initial_color: TileColor) -> PainterState {
     let mut state = PainterState::default();
     // All tiles start out black
     program.io.add(initial_color.into()).ok();
@@ -169,17 +169,17 @@ fn paint(program: &mut Program, initial_color: TileColor) -> i64 {
         program.run();
         program.run();
     }
-
-    print(&state);
-    (state.white_tiles.len() + state.black_tiles.len()) as i64
+    state
 }
 
 pub fn part_one(program: &mut Program) -> i64 {
-    paint(program, TileColor::Black)
+    let state = paint(program, TileColor::Black);
+    (state.white_tiles.len() + state.black_tiles.len()) as i64
 }
 
-pub fn part_two(program: &mut Program) -> i64 {
-    paint(program, TileColor::White)
+pub fn part_two(program: &mut Program) {
+    let state = paint(program, TileColor::White);
+    print(&state);
 }
 
 pub fn solve() {
@@ -188,7 +188,7 @@ pub fn solve() {
     println!("Day eleven, part one:");
     println!("total of {} white tiles", part_one(&mut program.clone()));
     println!("part two:");
-    println!("total of {} white tiles", part_two(&mut program));
+    part_two(&mut program);
 }
 
 #[cfg(test)]

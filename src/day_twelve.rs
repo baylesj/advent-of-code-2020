@@ -152,8 +152,8 @@ impl TakeSteps for OrbitalSystem {
         for i in 0..self.moons.len() {
             for j in i..self.moons.len() {
                 for k in 0..Point3D::size() {
-                    let adj: i128 = adj(self.moons[i].position.get(k),
-                self.moons[j].position.get(k));
+                    let adj: i128 =
+                        adj(self.moons[i].position.get(k), self.moons[j].position.get(k));
                     let nvi = self.moons[i].velocity.get(k) + adj;
                     let nvj = self.moons[j].velocity.get(k) - adj;
                     self.moons[i].velocity.set(k, nvi);
@@ -187,8 +187,10 @@ impl DimensionSlice for OrbitalSystem {
     fn dimension_equals(&self, dimension: usize, slice: &Vec<i128>) -> bool {
         let mut slice_iter = slice.iter();
 
-        self.moons.iter().all(|m| m.position.get(dimension) == *slice_iter.next().unwrap()
-    && m.velocity.get(dimension) == *slice_iter.next().unwrap())
+        self.moons.iter().all(|m| {
+            m.position.get(dimension) == *slice_iter.next().unwrap()
+                && m.velocity.get(dimension) == *slice_iter.next().unwrap()
+        })
     }
 }
 
@@ -238,7 +240,6 @@ pub fn part_two(initial_system: &OrbitalSystem) -> i128 {
             }
         }
     }
-    println!("periods: {:#?}", periods);
     lcm(lcm(periods[0], periods[1]), periods[2])
 }
 
