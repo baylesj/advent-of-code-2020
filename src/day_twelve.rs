@@ -13,9 +13,9 @@ const INPUT_FILENAME: &'static str = "input/day_twelve.txt";
 
 #[derive(Debug, PartialEq, Eq, Default, Hash, Copy, Clone)]
 pub struct Point3D {
-    pub x: i16,
-    pub y: i16,
-    pub z: i16,
+    pub x: i128,
+    pub y: i128,
+    pub z: i128,
 }
 
 impl Add for Point3D {
@@ -29,7 +29,7 @@ impl Add for Point3D {
     }
 }
 
-#[derive(Debug, Default, Copy, Clone)]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq)]
 pub struct Moon {
     pub position: Point3D,
     pub velocity: Point3D,
@@ -53,7 +53,7 @@ impl Display for Moon {
 #[derive(Debug, Default, Clone)]
 pub struct OrbitalSystem {
     pub moons: Vec<Moon>,
-    pub step_count: i64,
+    pub step_count: i128,
 }
 
 impl Display for OrbitalSystem {
@@ -74,12 +74,12 @@ impl LoadableFromFile for OrbitalSystem {
         let mut orbital_system = OrbitalSystem::default();
         for line in reader.lines() {
             const CHARS_TO_TRIM: &[char] = &['<', '>', 'x', 'y', 'z', '=', ' '];
-            let fields: Vec<i16> = line
+            let fields: Vec<i128> = line
                 .unwrap()
                 .split(',')
                 .map(|m| {
                     m.trim_matches(|c: char| CHARS_TO_TRIM.contains(&c))
-                        .parse::<i16>()
+                        .parse::<i128>()
                         .expect("invalid point")
                 })
                 .collect();
@@ -96,19 +96,19 @@ impl LoadableFromFile for OrbitalSystem {
 }
 
 trait TakeSteps {
-    fn take_steps(self: &mut Self, step_count: i64);
+    fn take_steps(self: &mut Self, step_count: i128);
     fn take_step(self: &mut Self);
 }
 
 impl TakeSteps for OrbitalSystem {
-    fn take_steps(self: &mut Self, step_count: i64) {
+    fn take_steps(self: &mut Self, step_count: i128) {
         for _ in 0..step_count {
             self.take_step();
         }
     }
 
     fn take_step(self: &mut Self) {
-        fn adj(l: i16, r: i16) -> i16 {
+        fn adj(l: i128, r: i128) -> i128 {
             if l < r {
                 1
             } else if l > r {
@@ -120,9 +120,9 @@ impl TakeSteps for OrbitalSystem {
 
         for i in 0..self.moons.len() {
             for j in i..self.moons.len() {
-                let x_adj: i16 = adj(self.moons[i].position.x, self.moons[j].position.x);
-                let y_adj: i16 = adj(self.moons[i].position.y, self.moons[j].position.y);
-                let z_adj: i16 = adj(self.moons[i].position.z, self.moons[j].position.z);
+                let x_adj: i128 = adj(self.moons[i].position.x, self.moons[j].position.x);
+                let y_adj: i128 = adj(self.moons[i].position.y, self.moons[j].position.y);
+                let z_adj: i128 = adj(self.moons[i].position.z, self.moons[j].position.z);
                 self.moons[i].velocity.x += x_adj;
                 self.moons[i].velocity.y += y_adj;
                 self.moons[i].velocity.z += z_adj;
@@ -141,50 +141,50 @@ impl TakeSteps for OrbitalSystem {
 }
 
 trait SumTotalEnergy {
-    fn sum_total_energy(self: &Self) -> i64;
+    fn sum_total_energy(self: &Self) -> i128;
 }
 
 impl SumTotalEnergy for Point3D {
-    fn sum_total_energy(self: &Self) -> i64 {
-        self.x.abs() as i64 + self.y.abs() as i64 + self.z.abs() as i64
+    fn sum_total_energy(self: &Self) -> i128 {
+        self.x.abs() as i128 + self.y.abs() as i128 + self.z.abs() as i128
     }
 }
 
 impl SumTotalEnergy for Moon {
-    fn sum_total_energy(self: &Self) -> i64 {
+    fn sum_total_energy(self: &Self) -> i128 {
         self.position.sum_total_energy() * self.velocity.sum_total_energy()
     }
 }
 
 impl SumTotalEnergy for OrbitalSystem {
-    fn sum_total_energy(self: &Self) -> i64 {
-        i64::sum(self.moons.iter().map(|m| m.sum_total_energy()))
+    fn sum_total_energy(self: &Self) -> i128 {
+        i128::sum(self.moons.iter().map(|m| m.sum_total_energy()))
     }
 }
 
-pub fn part_one(initial_system: &OrbitalSystem, steps: i64) -> i64 {
+pub fn part_one(initial_system: &OrbitalSystem, steps: i128) -> i128 {
     let mut live_system = initial_system.clone();
     live_system.take_steps(steps);
     live_system.sum_total_energy()
 }
 
-pub fn part_two(initial_system: &OrbitalSystem) -> i64 {
+pub fn part_two(initial_system: &OrbitalSystem) -> i128 {
     let mut live_system = initial_system.clone();
     println!("initial system: {:#?}", initial_system);
     // HINT: use the LCM. Assuming all orbits are periodic, we just need
     // to find the least common multiple of periodicity.
     let mut periods = vec![None; live_system.moons.len()];
     while periods.iter().any(|p| p.is_none()) {
-        println!("live system: {:#?}", live_system);
+        //println!("live system: {:#?}", live_system);
         live_system.take_step();
         for i in 0..live_system.moons.len() {
             if periods[i].is_none() {
-                if live_system.moons[i].position.x == initial_system.moons[i].position.x
-                    && live_system.moons[i].position.y == initial_system.moons[i].position.y
-                    && live_system.moons[i].position.z == initial_system.moons[i].position.z
-                {
+                //live_system.moons[i].position.x == initial_system.moons[i].position.x
+                //&& live_system.moons[i].position.y == initial_system.moons[i].position.y
+                //&& live_system.moons[i].position.z == initial_system.moons[i].position.z
+                if (live_system.moons[i].velocity == Point3D::default()) {
+                    periods[i] = Some(live_system.step_count as i128);
                     println!("found period: {}", periods[i].unwrap());
-                    periods[i] = Some(live_system.step_count as i64);
                 }
             }
         }
