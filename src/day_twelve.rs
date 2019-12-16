@@ -22,6 +22,7 @@ pub struct Point3D {
 pub trait ArrayLike {
     fn size() -> usize;
     fn get(&self, i: usize) -> i128;
+    fn set(&mut self, i: usize, v: i128);
 }
 
 impl ArrayLike for Point3D {
@@ -34,6 +35,15 @@ impl ArrayLike for Point3D {
             0 => self.x,
             1 => self.y,
             2 => self.z,
+            _ => panic!("out of bounds"),
+        }
+    }
+
+    fn set(&mut self, i: usize, v: i128) {
+        match i {
+            0 => self.x = v,
+            1 => self.y = v,
+            2 => self.z = v,
             _ => panic!("out of bounds"),
         }
     }
@@ -117,18 +127,18 @@ impl LoadableFromFile for OrbitalSystem {
 }
 
 trait TakeSteps {
-    fn take_steps(self: &mut Self, step_count: i128);
-    fn take_step(self: &mut Self);
+    fn take_steps(&mut self, step_count: i128);
+    fn take_step(&mut self);
 }
 
 impl TakeSteps for OrbitalSystem {
-    fn take_steps(self: &mut Self, step_count: i128) {
+    fn take_steps(&mut self, step_count: i128) {
         for _ in 0..step_count {
             self.take_step();
         }
     }
 
-    fn take_step(self: &mut Self) {
+    fn take_step(&mut self) {
         fn adj(l: i128, r: i128) -> i128 {
             if l < r {
                 1
@@ -141,15 +151,14 @@ impl TakeSteps for OrbitalSystem {
 
         for i in 0..self.moons.len() {
             for j in i..self.moons.len() {
-                let x_adj: i128 = adj(self.moons[i].position.x, self.moons[j].position.x);
-                let y_adj: i128 = adj(self.moons[i].position.y, self.moons[j].position.y);
-                let z_adj: i128 = adj(self.moons[i].position.z, self.moons[j].position.z);
-                self.moons[i].velocity.x += x_adj;
-                self.moons[i].velocity.y += y_adj;
-                self.moons[i].velocity.z += z_adj;
-                self.moons[j].velocity.x -= x_adj;
-                self.moons[j].velocity.y -= y_adj;
-                self.moons[j].velocity.z -= z_adj;
+                for k in 0..Point3D::size() {
+                    let adj: i128 = adj(self.moons[i].position.get(k),
+                self.moons[j].position.get(k));
+                    let nvi = self.moons[i].velocity.get(k) + adj;
+                    let nvj = self.moons[j].velocity.get(k) - adj;
+                    self.moons[i].velocity.set(k, nvi);
+                    self.moons[j].velocity.set(k, nvj);
+                }
             }
         }
 
@@ -162,7 +171,8 @@ impl TakeSteps for OrbitalSystem {
 }
 
 trait DimensionSlice {
-    fn dimension_slice(self: &Self, dimension: usize) -> Vec<i128>;
+    fn dimension_slice(&self, dimension: usize) -> Vec<i128>;
+    fn dimension_equals(&self, dimension: usize, slice: &Vec<i128>) -> bool;
 }
 
 impl DimensionSlice for OrbitalSystem {
@@ -172,6 +182,13 @@ impl DimensionSlice for OrbitalSystem {
             .map(|m| vec![m.position.get(dimension), m.velocity.get(dimension)])
             .flat_map(|v| v.into_iter())
             .collect()
+    }
+
+    fn dimension_equals(&self, dimension: usize, slice: &Vec<i128>) -> bool {
+        let mut slice_iter = slice.iter();
+
+        self.moons.iter().all(|m| m.position.get(dimension) == *slice_iter.next().unwrap()
+    && m.velocity.get(dimension) == *slice_iter.next().unwrap())
     }
 }
 
@@ -216,7 +233,7 @@ pub fn part_two(initial_system: &OrbitalSystem) -> i128 {
     while periods.iter().any(|p| *p == 0) {
         live_system.take_step();
         for i in 0..Point3D::size() {
-            if periods[i] == 0 && live_system.dimension_slice(i) == slices[i] {
+            if periods[i] == 0 && live_system.dimension_equals(i, &slices[i]) {
                 periods[i] = live_system.step_count;
             }
         }
@@ -278,27 +295,25 @@ mod tests {
 
     #[test]
     fn test_part_one_sample_one() {
-        let mut os = OrbitalSystem::load("input/day_twelve_sample_one.txt");
-        for i in 0..10 {
-            // TODO: move from manual verification to specific tests.
-            println!("os after {} steps: {}", i, os,);
-            os.take_step();
-        }
-        println!("os post 10: {}", os);
-        assert_eq!(179, os.sum_total_energy());
+        let os = OrbitalSystem::load("input/day_twelve_sample_one.txt");
+        assert_eq!(179, part_one(&os, 10));
     }
 
     #[test]
     fn test_part_one_sample_two() {
-        let mut os = OrbitalSystem::load("input/day_twelve_sample_two.txt");
-        os.take_steps(100);
-        assert_eq!(1940, os.sum_total_energy());
+        let os = OrbitalSystem::load("input/day_twelve_sample_two.txt");
+        assert_eq!(1940, part_one(&os, 100));
     }
 
     #[test]
     fn test_part_one() {
-        let mut os = OrbitalSystem::load("input/day_twelve.txt");
-        os.take_steps(1000);
-        assert_eq!(6423, os.sum_total_energy());
+        let os = OrbitalSystem::load("input/day_twelve.txt");
+        assert_eq!(6423, part_one(&os, 1000));
+    }
+
+    #[test]
+    fn test_part_two() {
+        let os = OrbitalSystem::load("input/day_twelve.txt");
+        assert_eq!(327636285682704, part_two(&os));
     }
 }
