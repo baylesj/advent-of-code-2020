@@ -135,12 +135,14 @@ fn operation_multiply(program: &mut Program, modes: &Vec<ParameterMode>) {
 }
 
 fn operation_input(program: &mut Program, modes: &Vec<ParameterMode>) {
-    let value: i64;
-    if program.static_input.is_some() {
-        value = program.static_input.unwrap();
-    } else {
-        value = program.io.remove().expect("requested input on empty stack");
+    if program.io.size() == 0 {
+        println!("Paused, waiting for input");
+        program.state = ProgramState::Paused;
+        return;
     }
+
+    let value: i64;
+    value = program.io.remove().expect("checked");
     let r_i: usize = evaluate_output_index(program.ptr + 1, program, modes[0]);
     program.buffer[r_i] = value;
     program.ptr += 2;

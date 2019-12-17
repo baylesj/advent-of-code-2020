@@ -1,9 +1,6 @@
-use matrix::prelude::*;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
-use std::collections::HashSet;
 use std::convert::TryFrom;
 use std::fmt;
-use std::iter::FromIterator;
 
 #[path = "intcode_computer.rs"]
 mod intcode_computer;
@@ -39,22 +36,21 @@ struct Tile {
 }
 
 fn pop_tile(queue: &mut Queue<i64>) -> Result<Tile, &str> {
-    if queue.peek().is_err() {
-        return Err("empty queue");
+    if queue.size() < 3 {
+        return Err("non-full queue");
+    }
+    if queue.size() % 3 != 0 {
+        println!("queue: {:#?}", queue);
+        assert!(false);
     }
     let x = queue.remove().unwrap();
-    if queue.peek().is_err() {
-        return Err("empty queue");
-    }
     let y = queue.remove().unwrap();
-    if queue.peek().is_err() {
-        return Err("empty queue");
-    }
     let raw_id = queue.remove().unwrap();
     let tid: TileId;
     if x == -1 && y == 0 {
         tid = TileId::Score;
     } else {
+        println!("x: {}, y: {}, raw_id: {}", x, y, raw_id);
         tid = TileId::try_from(raw_id).unwrap();
     }
     Ok(Tile {
@@ -69,6 +65,8 @@ pub struct GameState {
     tiles: Vec<Tile>,
     score: i64,
     program: Program,
+    ball_x: i64,
+    paddle_x: i64,
 }
 
 #[derive(Debug, PartialEq, Eq, Copy, Clone, IntoPrimitive, TryFromPrimitive)]
@@ -141,35 +139,54 @@ fn get_tile(program: &mut Program) -> Result<Tile, &str> {
         return Err("Program is stopped");
     }
 
-    program.run();
-    program.run();
-    program.run();
-
-    pop_tile(&mut program.io)
+    if program.io.size() > 2 {
+        pop_tile(&mut program.io)
+    } else {
+        Err("probably waiting for input")
+    }
 }
 
 trait GameActions {
-    fn start(&mut self);
-    fn update(&mut self, position: JoystickPosition);
+    fn run(&mut self);
     fn draw(&self);
 }
 
 impl GameActions for GameState {
-    fn start(&mut self) {
-        while let Some(tile) = get_tile(&mut self.program).ok() {
-            if tile.id == TileId::Score {
-                self.score = tile.raw_id;
-                break;
-            } else {
+    fn run(&mut self) {
+        while self.program.state != ProgramState::Stopped {
+            // Handle output
+            while self.program.io.size() > 2 {
+                let tile = get_tile(&mut self.program).expect("tile");
+                if tile.id == TileId::Ball {
+                    self.ball_x = tile.location.x;
+                } else if tile.id == TileId::HorizontalPaddle {
+                    self.paddle_x = tile.location.x;
+                } else if tile.id == TileId::Score {
+                    self.score = tile.raw_id;
+                    break;
+                }
                 self.tiles.push(tile);
             }
-        }
-    }
 
-    fn update(&mut self, position: JoystickPosition) {
-        self.tiles.clear();
-        self.program.static_input = Some(position.into());
-        self.start();
+            // Handle input
+            if self.program.state == ProgramState::Paused && self.program.io.size() == 0 {
+                let input: i64;
+                if self.paddle_x < self.ball_x {
+                    input = JoystickPosition::Right.into();
+                } else if self.paddle_x == self.ball_x {
+                    input = JoystickPosition::Neutral.into();
+                } else {
+                    input = JoystickPosition::Left.into();
+                }
+
+                    // TODO: split input and output queues;
+                println!("putting in input: {}", input);
+                self.program.io.add(input).expect("should be able to add");
+            }
+
+            println!("Running one loop:");
+            self.program.run();
+        }
     }
 
     fn draw(&self) {
@@ -209,13 +226,8 @@ pub fn part_two(input_filename: &str) -> i64 {
     state.program = Program::load(input_filename);
     // Set the number of quarters in the arcade cabinet.
     state.program.buffer[0] = 2;
-    state.start();
-    state.draw();
-    for _ in 0..100000 {
-        state.update(JoystickPosition::Left);
-        state.draw();
-    }
-    123
+    state.run();
+    state.score
 }
 
 pub fn solve() {
