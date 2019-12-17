@@ -39,10 +39,6 @@ fn pop_tile(queue: &mut Queue<i64>) -> Result<Tile, &str> {
     if queue.size() < 3 {
         return Err("non-full queue");
     }
-    if queue.size() % 3 != 0 {
-        println!("queue: {:#?}", queue);
-        assert!(false);
-    }
     let x = queue.remove().unwrap();
     let y = queue.remove().unwrap();
     let raw_id = queue.remove().unwrap();
@@ -50,7 +46,6 @@ fn pop_tile(queue: &mut Queue<i64>) -> Result<Tile, &str> {
     if x == -1 && y == 0 {
         tid = TileId::Score;
     } else {
-        println!("x: {}, y: {}, raw_id: {}", x, y, raw_id);
         tid = TileId::try_from(raw_id).unwrap();
     }
     Ok(Tile {
@@ -169,7 +164,8 @@ impl GameActions for GameState {
             }
 
             // Handle input
-            if self.program.state == ProgramState::Paused && self.program.io.size() == 0 {
+            if self.program.state == ProgramState::PausedWaitingForInput {
+                assert!(self.program.io.size() == 0);
                 let input: i64;
                 if self.paddle_x < self.ball_x {
                     input = JoystickPosition::Right.into();
@@ -179,12 +175,11 @@ impl GameActions for GameState {
                     input = JoystickPosition::Left.into();
                 }
 
-                    // TODO: split input and output queues;
-                println!("putting in input: {}", input);
+                // TODO: split input and output queues;
                 self.program.io.add(input).expect("should be able to add");
+                self.program.run();
             }
 
-            println!("Running one loop:");
             self.program.run();
         }
     }
@@ -204,8 +199,6 @@ impl GameActions for GameState {
         for tile in &self.tiles {
             display.set(&tile.location, display_char(&tile.id));
         }
-
-        println!("{}\ncurrent score: {}", display, self.score);
     }
 }
 
@@ -247,5 +240,11 @@ mod tests {
     fn test_part_one() {
         let mut program = Program::load(INPUT_FILENAME);
         assert_eq!(320, part_one(&mut program));
+    }
+
+    #[test]
+    fn test_part_two() {
+        let mut program = Program::load(INPUT_FILENAME);
+        assert_eq!(15156, part_one(&mut program));
     }
 }

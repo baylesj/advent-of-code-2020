@@ -34,6 +34,7 @@ pub enum ProgramState {
     Initialized,
     Running,
     Paused,
+    PausedWaitingForInput,
     Stopped,
 }
 
@@ -136,8 +137,7 @@ fn operation_multiply(program: &mut Program, modes: &Vec<ParameterMode>) {
 
 fn operation_input(program: &mut Program, modes: &Vec<ParameterMode>) {
     if program.io.size() == 0 {
-        println!("Paused, waiting for input");
-        program.state = ProgramState::Paused;
+        program.state = ProgramState::PausedWaitingForInput;
         return;
     }
 
