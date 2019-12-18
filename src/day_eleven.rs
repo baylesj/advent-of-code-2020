@@ -8,6 +8,10 @@ mod intcode_computer;
 use intcode_computer::{LoadableFromFile, Program, ProgramState, Runnable};
 use queues::IsQueue;
 
+#[path = "yet_another_geometry_mod.rs"]
+mod yet_another_geometry_mod;
+use yet_another_geometry_mod::{Advance, Direction, Point2D, RelativeTurn};
+
 const INPUT_FILENAME: &'static str = "input/day_eleven.txt";
 
 #[derive(IntoPrimitive, TryFromPrimitive)]
@@ -17,79 +21,17 @@ enum TileColor {
     White = 1,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq)]
-enum Direction {
-    Left,
-    Up,
-    Right,
-    Down,
-}
-
-impl Default for Direction {
-    fn default() -> Self {
-        return Direction::Up;
-    }
-}
-
-trait RelativeTurn {
-    fn to_left(self: &Self) -> Direction;
-    fn to_right(self: &Self) -> Direction;
-}
-
-impl RelativeTurn for Direction {
-    fn to_left(self: &Self) -> Direction {
-        match self {
-            Direction::Left => Direction::Down,
-            Direction::Down => Direction::Right,
-            Direction::Right => Direction::Up,
-            Direction::Up => Direction::Left,
-        }
-    }
-
-    fn to_right(self: &Self) -> Direction {
-        match self {
-            Direction::Up => Direction::Right,
-            Direction::Right => Direction::Down,
-            Direction::Down => Direction::Left,
-            Direction::Left => Direction::Up,
-        }
-    }
-}
-
-// We specifically don't use geo::Coordinate, since we need additional things
-// like hash.
-#[derive(Debug, PartialEq, Eq, Default, Hash, Copy, Clone)]
-struct Point {
-    x: i32,
-    y: i32,
-}
-
-trait Advance {
-    fn advance(self: &mut Self, direction: Direction);
-}
-
-impl Advance for Point {
-    fn advance(self: &mut Self, direction: Direction) {
-        match direction {
-            Direction::Left => self.x -= 1,
-            Direction::Up => self.y -= 1,
-            Direction::Right => self.x += 1,
-            Direction::Down => self.y += 1,
-        }
-    }
-}
-
 #[derive(Default, Debug)]
 struct PainterState {
-    white_tiles: HashSet<Point>,
+    white_tiles: HashSet<Point2D>,
     // Important note from prompt: painting a tile black
     // does count as painting, not "erasing."
-    black_tiles: HashSet<Point>,
-    current_location: Point,
+    black_tiles: HashSet<Point2D>,
+    current_location: Point2D,
     current_direction: Direction,
 
-    min_point: Point,
-    max_point: Point,
+    min_point: Point2D,
+    max_point: Point2D,
 }
 
 trait Update {
@@ -99,10 +41,10 @@ trait Update {
 impl Update for PainterState {
     fn update(self: &mut Self) {
         self.current_location.advance(self.current_direction);
-        self.min_point.x = i32::min(self.min_point.x, self.current_location.x);
-        self.min_point.y = i32::min(self.min_point.y, self.current_location.y);
-        self.max_point.x = i32::max(self.max_point.x, self.current_location.x);
-        self.max_point.y = i32::max(self.max_point.y, self.current_location.y);
+        self.min_point.x = i64::min(self.min_point.x, self.current_location.x);
+        self.min_point.y = i64::min(self.min_point.y, self.current_location.y);
+        self.max_point.x = i64::max(self.max_point.x, self.current_location.x);
+        self.max_point.y = i64::max(self.max_point.y, self.current_location.y);
     }
 }
 
@@ -123,7 +65,7 @@ impl CurrentColor for PainterState {
 fn print(state: &PainterState) {
     let mut line: Vec<char> =
         Vec::with_capacity((state.max_point.x + 1 - state.min_point.x) as usize);
-    let mut point = Point::default();
+    let mut point = Point2D::default();
     for y in state.min_point.y..state.max_point.y + 1 {
         point.y = y;
         for x in state.min_point.x..state.max_point.x + 1 {
@@ -197,15 +139,15 @@ mod tests {
 
     #[test]
     fn test_advance() {
-        let mut actual = Point::default();
+        let mut actual = Point2D::default();
         actual.advance(Direction::Right);
-        assert_eq!(Point { x: 1, y: 0 }, actual);
+        assert_eq!(Point2D { x: 1, y: 0 }, actual);
         actual.advance(Direction::Up);
-        assert_eq!(Point { x: 1, y: -1 }, actual);
+        assert_eq!(Point2D { x: 1, y: -1 }, actual);
         actual.advance(Direction::Left);
-        assert_eq!(Point { x: 0, y: -1 }, actual);
+        assert_eq!(Point2D { x: 0, y: -1 }, actual);
         actual.advance(Direction::Down);
-        assert_eq!(Point { x: 0, y: 0 }, actual);
+        assert_eq!(Point2D { x: 0, y: 0 }, actual);
     }
 
     #[test]

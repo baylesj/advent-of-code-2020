@@ -8,6 +8,10 @@ use intcode_computer::{LoadableFromFile, Program, ProgramState, Runnable};
 use queues::IsQueue;
 use queues::Queue;
 
+#[path = "yet_another_geometry_mod.rs"]
+mod yet_another_geometry_mod;
+use yet_another_geometry_mod::Point2D;
+
 const INPUT_FILENAME: &'static str = "input/day_thirteen.txt";
 
 #[derive(Debug, PartialEq, Eq, Copy, Clone, IntoPrimitive, TryFromPrimitive)]
@@ -19,13 +23,6 @@ enum TileId {
     HorizontalPaddle = 3,
     Ball = 4,
     Score = 5,
-}
-
-// TODO: combine with Point3D and put in Yet another geometry package?
-#[derive(Debug, PartialEq, Eq, Default, Hash, Copy, Clone)]
-pub struct Point2D {
-    pub x: i64,
-    pub y: i64,
 }
 
 #[derive(Debug, Copy, Clone)]

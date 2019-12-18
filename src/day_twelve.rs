@@ -4,61 +4,16 @@ use std::fs::File;
 use std::io::prelude::*;
 use std::io::BufReader;
 use std::iter::Sum;
-use std::ops::Add;
 
 #[path = "loadable.rs"]
 mod loadable;
 use loadable::LoadableFromFile;
 
+#[path = "yet_another_geometry_mod.rs"]
+mod yet_another_geometry_mod;
+use yet_another_geometry_mod::{ArrayLike, Point3D};
+
 const INPUT_FILENAME: &'static str = "input/day_twelve.txt";
-
-#[derive(Debug, PartialEq, Eq, Default, Hash, Copy, Clone)]
-pub struct Point3D {
-    pub x: i128,
-    pub y: i128,
-    pub z: i128,
-}
-
-pub trait ArrayLike {
-    fn size() -> usize;
-    fn get(&self, i: usize) -> i128;
-    fn set(&mut self, i: usize, v: i128);
-}
-
-impl ArrayLike for Point3D {
-    fn size() -> usize {
-        3
-    }
-
-    fn get(&self, i: usize) -> i128 {
-        match i {
-            0 => self.x,
-            1 => self.y,
-            2 => self.z,
-            _ => panic!("out of bounds"),
-        }
-    }
-
-    fn set(&mut self, i: usize, v: i128) {
-        match i {
-            0 => self.x = v,
-            1 => self.y = v,
-            2 => self.z = v,
-            _ => panic!("out of bounds"),
-        }
-    }
-}
-
-impl Add for Point3D {
-    type Output = Self;
-    fn add(self, other: Self) -> Self {
-        Self {
-            x: self.x + other.x,
-            y: self.y + other.y,
-            z: self.z + other.z,
-        }
-    }
-}
 
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq)]
 pub struct Moon {
