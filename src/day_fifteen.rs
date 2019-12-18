@@ -156,8 +156,8 @@ pub fn part_one(program: &mut Program) -> MazeState {
     state
 }
 
-// Assumes program
-pub fn part_two(maze_state: &MazeState) -> i64 {
+// TODO: come up with algorithm.
+pub fn part_two(maze_state: &mut MazeState) -> i64 {
     // We already know how many steps to the end:
     let steps_to_end = maze_state.steps;
     let mut max: i64 = 0;
@@ -169,11 +169,12 @@ pub fn part_two(maze_state: &MazeState) -> i64 {
 
 pub fn solve() {
     let mut program = Program::load(INPUT_FILENAME);
-    let state = part_one(&mut program);
+    let mut state = part_one(&mut program);
+    let part_one_answer = state.steps;
     println!(
         "Day fifteen, part one: {}, part two: {}",
-        state.steps,
-        part_two(&state)
+        part_one_answer,
+        part_two(&mut state)
     );
 }
 
