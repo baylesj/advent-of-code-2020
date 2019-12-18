@@ -1,6 +1,6 @@
 use advent_of_code::{
-    day_eight, day_eleven, day_five, day_four, day_fourteen, day_nine, day_one, day_seven, day_six,
-    day_ten, day_thirteen, day_three, day_twelve, day_two,
+    day_eight, day_eleven, day_fifteen, day_five, day_four, day_fourteen, day_nine, day_one,
+    day_seven, day_six, day_ten, day_thirteen, day_three, day_twelve, day_two,
 };
 
 // TODO: clean this up, overly procedural.
@@ -19,4 +19,5 @@ fn main() {
     day_twelve::solve();
     day_thirteen::solve();
     day_fourteen::solve();
+    day_fifteen::solve();
 }
