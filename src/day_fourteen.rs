@@ -4,15 +4,16 @@ use std::collections::HashMap;
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::BufReader;
+use std::time::Instant;
 
 const INPUT_FILENAME: &str = "input/day_fourteen.txt";
 
-type Reactant = (String, i128);
+type Reactant = (String, i64);
 
 #[derive(Debug, Default, Clone)]
 struct Reaction {
     chemical: String,
-    quantity: i128,
+    quantity: i64,
     reactants: Vec<Reactant>,
 }
 
@@ -55,11 +56,12 @@ fn parse_reactions(input_filename: &str) -> HashMap<String, Reaction> {
     reactions
 }
 
-fn reduce_to_ore_to_fuel(reactions: HashMap<String, Reaction>) -> i128 {
+// TODO: perf is terrible.
+fn reduce_to_ore_to_fuel(reactions: &mut HashMap<String, Reaction>, amount: i64) -> i64 {
     // start with FUEL, not with ORE
     let mut reduced_reactions = Vec::new();
-    let mut current_reactions: Vec<Reactant> = vec![("FUEL".to_string(), 1)];
-    let mut left_overs: HashMap<String, i128> = HashMap::new();
+    let mut current_reactions: Vec<Reactant> = vec![("FUEL".to_string(), amount)];
+    let mut left_overs: HashMap<String, i64> = HashMap::new();
 
     while current_reactions.len() > 0 {
         let tmp_reactions = current_reactions.clone();
@@ -98,14 +100,45 @@ fn reduce_to_ore_to_fuel(reactions: HashMap<String, Reaction>) -> i128 {
     total_ore
 }
 
-pub fn part_one(input_filename: &str) -> i128 {
+pub fn part_one(input_filename: &str) -> i64 {
+    let mut reactions = parse_reactions(input_filename);
+    reduce_to_ore_to_fuel(&mut reactions, 1)
+}
+
+pub fn part_two(input_filename: &str, goal: i64) -> i64 {
     let reactions = parse_reactions(input_filename);
 
-    reduce_to_ore_to_fuel(reactions)
+    let mut left = 4935420; // guess taken from part one.
+    let mut right = 5500000; // random guess.
+    let mut mid = (left + right) / 2;
+    while left != mid && mid != right {
+        let mid_result = reduce_to_ore_to_fuel(&mut reactions.clone(), mid);
+        if mid_result == goal {
+            return mid;
+        } else if mid_result < goal {
+            left = mid;
+        } else {
+            right = mid;
+        }
+
+        mid = (left + right) / 2;
+        println!(
+            "left: {}, mid: {}, right: {}, res: {}",
+            left, mid, right, mid_result
+        );
+    }
+
+    mid
 }
 
 pub fn solve() {
-    println!("Day fourteen, part one: {}", part_one(INPUT_FILENAME));
+    let now = Instant::now();
+    println!(
+        "Day fourteen, part one: {}, part two: {}",
+        part_one(INPUT_FILENAME),
+        part_two(INPUT_FILENAME, 1000000000000)
+    );
+    println!("Time elapsed: {}ms", now.elapsed().as_millis());
 }
 
 #[cfg(test)]
