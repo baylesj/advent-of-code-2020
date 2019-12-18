@@ -224,9 +224,9 @@ pub fn part_one(initial_system: &OrbitalSystem, steps: i128) -> i128 {
 
 pub fn part_two(initial_system: &OrbitalSystem) -> i128 {
     let mut live_system = initial_system.clone();
-    let mut slices = Vec::new();
+    let mut initial_dimensions = Vec::new();
     for i in 0..Point3D::size() {
-        slices.push(initial_system.dimension_slice(i));
+        initial_dimensions.push(initial_system.dimension_slice(i));
     }
 
     // HINT: use the LCM. Assuming all orbits are periodic, we just need
@@ -235,7 +235,7 @@ pub fn part_two(initial_system: &OrbitalSystem) -> i128 {
     while periods.iter().any(|p| *p == 0) {
         live_system.take_step();
         for i in 0..Point3D::size() {
-            if periods[i] == 0 && live_system.dimension_equals(i, &slices[i]) {
+            if periods[i] == 0 && live_system.dimension_equals(i, &initial_dimensions[i]) {
                 periods[i] = live_system.step_count;
             }
         }

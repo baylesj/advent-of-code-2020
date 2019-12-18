@@ -4,7 +4,6 @@ use std::collections::HashMap;
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::BufReader;
-use std::time::Instant;
 
 const INPUT_FILENAME: &str = "input/day_fourteen.txt";
 
@@ -55,14 +54,17 @@ fn parse_reactions(input_filename: &str) -> HashMap<String, Reaction> {
 }
 
 fn reduce_to_ore_to_fuel(reactions: &mut HashMap<String, Reaction>, amount: i64) -> i64 {
-    let mut reduced_reactions = Vec::new();
+    // Reduced reactions contains a list of fully reduced reactants, meaning
+    //
+    let mut total_ore_usage: i64 = 0;
     let mut current_reactions: Vec<Reactant> = vec![("FUEL".to_string(), amount)];
     let mut left_overs: HashMap<String, i64> = HashMap::new();
 
     while current_reactions.len() > 0 {
-        let tmp_reactions = current_reactions.clone();
-        current_reactions.clear();
-        for reaction in tmp_reactions {
+        let current: Vec<Reactant> = current_reactions;
+        // TODO: presize?
+        current_reactions = Vec::new();
+        for reaction in current {
             let mut current_value;
             let mut value_count;
             if reaction.0 != "ORE" {
@@ -87,16 +89,11 @@ fn reduce_to_ore_to_fuel(reactions: &mut HashMap<String, Reaction>, amount: i64)
                     current_reactions.push((reactant.0.to_string(), reactant.1 * value_count))
                 }
             } else {
-                reduced_reactions.push(reaction.clone());
+                total_ore_usage += reaction.1;
             }
         }
     }
-
-    let mut total_ore = 0;
-    for reaction in reduced_reactions {
-        total_ore += reaction.1;
-    }
-    total_ore
+    total_ore_usage
 }
 
 pub fn part_one(input_filename: &str) -> i64 {
@@ -127,15 +124,10 @@ pub fn part_two(input_filename: &str, goal: i64) -> i64 {
 }
 
 pub fn solve() {
-    let now = Instant::now();
     println!(
         "Day fourteen, part one: {}, part two: {}",
         part_one(INPUT_FILENAME),
         part_two(INPUT_FILENAME, 1000000000000)
-    );
-    println!(
-        "Time elapsed for day fourteen: {}ms",
-        now.elapsed().as_millis()
     );
 }
 
