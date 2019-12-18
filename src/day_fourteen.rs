@@ -7,11 +7,13 @@ use std::io::BufReader;
 
 const INPUT_FILENAME: &str = "input/day_fourteen.txt";
 
+type Reactant = (String, i128);
+
 #[derive(Debug, Default, Clone)]
 struct Reaction {
     chemical: String,
     quantity: i128,
-    reactants: HashMap<String, i128>,
+    reactants: Vec<Reactant>,
 }
 
 fn parse_reactions(input_filename: &str) -> HashMap<String, Reaction> {
@@ -28,9 +30,8 @@ fn parse_reactions(input_filename: &str) -> HashMap<String, Reaction> {
         let mut reaction = Reaction::default();
         let l = line.expect("line should be valid");
 
-        type Match = (String, i128);
         // TODO: avoid copy?
-        let ts: Vec<Match> = RE
+        let ts: Vec<Reactant> = RE
             .captures_iter(&l)
             .map(|c| {
                 (
@@ -41,9 +42,10 @@ fn parse_reactions(input_filename: &str) -> HashMap<String, Reaction> {
             .collect();
 
         let ts_last = ts.len() - 1;
-        for item in 0..ts_last {
-            reaction.reactants.insert(ts[item].0.clone(), ts[item].1);
+        for i in 0..ts_last {
+            reaction.reactants.push(ts[i].clone());
         }
+
         // We can move to ax + by + ... + cz = 0 form by "subtracting" the output.
         reaction.chemical = ts[ts_last].0.clone();
         reaction.quantity = ts[ts_last].1;
@@ -55,10 +57,10 @@ fn parse_reactions(input_filename: &str) -> HashMap<String, Reaction> {
 
 fn reduce_to_ore_to_fuel(reactions: HashMap<String, Reaction>) -> i128 {
     // start with FUEL, not with ORE
-    type Reactant = (String, i128);
     let mut reduced_reactions = Vec::new();
     let mut current_reactions: Vec<Reactant> = vec![("FUEL".to_string(), 1)];
     let mut left_overs: HashMap<String, i128> = HashMap::new();
+
     while current_reactions.len() > 0 {
         let tmp_reactions = current_reactions.clone();
         current_reactions.clear();
@@ -74,9 +76,10 @@ fn reduce_to_ore_to_fuel(reactions: HashMap<String, Reaction>) -> i128 {
                     value_count = 1;
                 }
 
-                let diff = reaction.1 - current_value;
-                current_value += reactions[&reaction.0].quantity * diff;
-                value_count += diff;
+                while current_value < reaction.1 {
+                    current_value += reactions[&reaction.0].quantity;
+                    value_count += 1;
+                }
 
                 left_overs.insert(reaction.0.to_string(), current_value - reaction.1);
                 for reactant in &reactions[&reaction.0].reactants {
@@ -97,7 +100,6 @@ fn reduce_to_ore_to_fuel(reactions: HashMap<String, Reaction>) -> i128 {
 
 pub fn part_one(input_filename: &str) -> i128 {
     let reactions = parse_reactions(input_filename);
-    println!("Reaction list: {:#?}", reactions);
 
     reduce_to_ore_to_fuel(reactions)
 }
