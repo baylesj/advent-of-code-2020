@@ -1,3 +1,5 @@
+use ansi_term::Color;
+use ansi_term::Style;
 use std::time::Instant;
 
 use advent_of_code::{
@@ -7,11 +9,21 @@ use advent_of_code::{
 
 fn log_elapsed(last: &Instant, day: i64) -> Instant {
     let now = Instant::now();
-    println!(
-        "time elapsed for day {}: {}ms",
-        day,
-        now.duration_since(*last).as_millis()
-    );
+    let time_elapsed = now.duration_since(*last).as_millis();
+
+    let log_message = format!("\ttime elapsed for day {}:", day);
+    let log_time = format!("{}ms", time_elapsed);
+
+    let color: Color;
+    if time_elapsed < 150 {
+        color = Color::Green;
+    } else if time_elapsed < 500 {
+        color = Color::Yellow;
+    } else {
+        color = Color::Red;
+    }
+    let style = Style::new().italic();
+    println!("{} {}", style.paint(log_message), color.paint(log_time));
     now
 }
 
