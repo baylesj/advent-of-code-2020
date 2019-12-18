@@ -40,18 +40,14 @@ impl Default for RepairDroidStatus {
     }
 }
 
-type Candidate = (i64, i64);
-
 #[derive(Debug, Default)]
 pub struct MazeState {
     pub steps: i64,
     location: Point2D,
     visited: HashMap<Point2D, i64>,
+    dimensions: Point2D,
     direction: Direction,
     droid_status: RepairDroidStatus,
-    in_dead_end: bool,
-    current_dead_end_size: i64,
-    max_candidates: Vec<Candidate>,
 }
 
 fn command_from_direction(direction: &Direction) -> MovementCommand {
@@ -103,28 +99,34 @@ fn pick_new_direction(state: &mut MazeState) {
         let mut speculative_location = state.location.clone();
         speculative_location.advance(*direction);
         if !state.visited.contains_key(&speculative_location) {
-            if state.in_dead_end {
-                state
-                    .max_candidates
-                    .push((state.current_dead_end_size, state.visited[&state.location]));
-                state.in_dead_end = false;
-            }
             state.direction = *direction;
             return;
         }
         visit_values.push(state.visited[&speculative_location]);
     }
 
-    // if we have already visited all of our neighbors, this is a dead-end.
-    if state.in_dead_end {
-        state.current_dead_end_size += 1;
-    } else {
-        state.in_dead_end = true;
-        state.current_dead_end_size = 1;
-    }
     mark_dead_end(state, state.location.clone());
     // Go back to last valid.
     state.direction = DIRECTIONS_IN_PRIORITY_ORDER[min_index(&visit_values)];
+}
+
+fn visualize(tiles: &HashMap<Point2D, i64>, dimensions: &Point2D) {
+    let mut p = Point2D::default();
+    for y in 0..dimensions.y {
+        p.y = y;
+        let mut row: Vec<char> = vec![' '; dimensions.x as usize + 1];
+        for x in 0..dimensions.x {
+            p.x = x;
+            match *tiles.get(&p).unwrap_or(&-1) {
+                i64::MAX => row[x as usize] = '#',
+                -1 => row[x as usize] = '?',
+                _ => (),
+            }
+        }
+        let row_as_string: String = row.iter().cloned().collect();
+        println!("{}", row_as_string);
+    }
+    println!("dimensions: {}", dimensions);
 }
 
 pub fn part_one(program: &mut Program) -> MazeState {
@@ -139,6 +141,8 @@ pub fn part_one(program: &mut Program) -> MazeState {
             }
             RepairDroidStatus::MovedSuccessfully => {
                 state.location.advance(state.direction);
+                state.dimensions.x = i64::max(state.dimensions.x, state.location.x);
+                state.dimensions.y = i64::max(state.dimensions.y, state.location.y);
                 state.steps += 1;
                 // We always prefer to go right when possible.
                 if state.visited.contains_key(&state.location) {
@@ -153,18 +157,13 @@ pub fn part_one(program: &mut Program) -> MazeState {
     }
     // Don't forget the final step!
     state.steps += 1;
+    visualize(&state.visited, &state.dimensions);
     state
 }
 
 // TODO: come up with algorithm.
 pub fn part_two(maze_state: &mut MazeState) -> i64 {
-    // We already know how many steps to the end:
-    let steps_to_end = maze_state.steps;
-    let mut max: i64 = 0;
-    for candidate in &maze_state.max_candidates {
-        max = i64::max(max, candidate.0 + steps_to_end - candidate.1);
-    }
-    max
+    maze_state.steps
 }
 
 pub fn solve() {
