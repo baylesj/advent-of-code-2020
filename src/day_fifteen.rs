@@ -12,7 +12,7 @@ use intcode_computer::Runnable;
 
 #[path = "yet_another_geometry_mod.rs"]
 mod yet_another_geometry_mod;
-use yet_another_geometry_mod::{Advance, Direction, Point2D, RelativeTurn};
+use yet_another_geometry_mod::{Advance, Direction, Point2D};
 
 const INPUT_FILENAME: &str = "input/day_fifteen.txt";
 
@@ -40,13 +40,18 @@ impl Default for RepairDroidStatus {
     }
 }
 
+type Candidate = (i64, i64);
+
 #[derive(Debug, Default)]
-struct MazeState {
-    steps: i64,
+pub struct MazeState {
+    pub steps: i64,
     location: Point2D,
     visited: HashMap<Point2D, i64>,
     direction: Direction,
     droid_status: RepairDroidStatus,
+    in_dead_end: bool,
+    current_dead_end_size: i64,
+    max_candidates: Vec<Candidate>,
 }
 
 fn command_from_direction(direction: &Direction) -> MovementCommand {
@@ -98,6 +103,12 @@ fn pick_new_direction(state: &mut MazeState) {
         let mut speculative_location = state.location.clone();
         speculative_location.advance(*direction);
         if !state.visited.contains_key(&speculative_location) {
+            if state.in_dead_end {
+                state
+                    .max_candidates
+                    .push((state.current_dead_end_size, state.visited[&state.location]));
+                state.in_dead_end = false;
+            }
             state.direction = *direction;
             return;
         }
@@ -105,14 +116,18 @@ fn pick_new_direction(state: &mut MazeState) {
     }
 
     // if we have already visited all of our neighbors, this is a dead-end.
+    if state.in_dead_end {
+        state.current_dead_end_size += 1;
+    } else {
+        state.in_dead_end = true;
+        state.current_dead_end_size = 1;
+    }
     mark_dead_end(state, state.location.clone());
     // Go back to last valid.
     state.direction = DIRECTIONS_IN_PRIORITY_ORDER[min_index(&visit_values)];
 }
 
-pub fn part_one(program: &mut Program) -> i64 {
-    // Initial assumption: only one route (dumb probably).
-
+pub fn part_one(program: &mut Program) -> MazeState {
     let mut state = MazeState::default();
     while state.droid_status != RepairDroidStatus::FoundOxygenSystem {
         match state.droid_status {
@@ -137,19 +152,28 @@ pub fn part_one(program: &mut Program) -> i64 {
         attempt_movement(program, &mut state);
     }
     // Don't forget the final step!
-    state.steps + 1
+    state.steps += 1;
+    state
 }
 
-pub fn part_two(program: &mut Program) -> i64 {
-    1
+// Assumes program
+pub fn part_two(maze_state: &MazeState) -> i64 {
+    // We already know how many steps to the end:
+    let steps_to_end = maze_state.steps;
+    let mut max: i64 = 0;
+    for candidate in &maze_state.max_candidates {
+        max = i64::max(max, candidate.0 + steps_to_end - candidate.1);
+    }
+    max
 }
 
 pub fn solve() {
     let mut program = Program::load(INPUT_FILENAME);
+    let state = part_one(&mut program);
     println!(
         "Day fifteen, part one: {}, part two: {}",
-        part_one(&mut program.clone()),
-        part_two(&mut program)
+        state.steps,
+        part_two(&state)
     );
 }
 
@@ -160,6 +184,6 @@ mod tests {
     #[test]
     fn test_part_one() {
         let mut program = Program::load(INPUT_FILENAME);
-        assert_eq!(236, part_one(&mut program));
+        assert_eq!(236, part_one(&mut program).steps);
     }
 }
