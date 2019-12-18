@@ -154,4 +154,12 @@ pub fn solve() {
 }
 
 #[cfg(test)]
-mod tests {}
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_part_one() {
+        let mut program = Program::load(INPUT_FILENAME);
+        assert_eq!(236, part_one(&mut program));
+    }
+}
