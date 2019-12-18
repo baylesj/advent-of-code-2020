@@ -5,16 +5,16 @@ use std::fs::File;
 use std::io::prelude::*;
 use std::io::BufReader;
 
-// TODO: downloading MKL just for solving a linear set of equations is dumb.
-use intel_mkl_src;
-use ndarray::prelude::*;
-use ndarray_linalg::Solve;
-
 const INPUT_FILENAME: &str = "input/day_fourteen.txt";
 
-type Reaction = HashMap<String, i64>;
+#[derive(Debug, Default, Clone)]
+struct Reaction {
+    chemical: String,
+    quantity: i128,
+    reactants: HashMap<String, i128>,
+}
 
-fn parse_reactions(input_filename: &str) -> Vec<Reaction> {
+fn parse_reactions(input_filename: &str) -> HashMap<String, Reaction> {
     let file = File::open(input_filename).expect("Invalid filename");
     let reader = BufReader::new(file);
 
@@ -23,12 +23,12 @@ fn parse_reactions(input_filename: &str) -> Vec<Reaction> {
             Regex::new(r"((?P<quantity>[0-9]+) (?P<chemical>[a-zA-Z]+))").unwrap();
     }
 
-    let mut reactions = Vec::new();
+    let mut reactions = HashMap::new();
     for line in reader.lines() {
         let mut reaction = Reaction::default();
         let l = line.expect("line should be valid");
 
-        type Match = (String, i64);
+        type Match = (String, i128);
         // TODO: avoid copy?
         let ts: Vec<Match> = RE
             .captures_iter(&l)
@@ -42,54 +42,62 @@ fn parse_reactions(input_filename: &str) -> Vec<Reaction> {
 
         let ts_last = ts.len() - 1;
         for item in 0..ts_last {
-            reaction.insert(ts[item].0.clone(), ts[item].1);
+            reaction.reactants.insert(ts[item].0.clone(), ts[item].1);
         }
         // We can move to ax + by + ... + cz = 0 form by "subtracting" the output.
-        reaction.insert(ts[ts_last].0.clone(), -1 * ts[ts_last].1);
-        reactions.push(reaction);
+        reaction.chemical = ts[ts_last].0.clone();
+        reaction.quantity = ts[ts_last].1;
+        reactions.insert(reaction.chemical.to_string(), reaction);
     }
 
     reactions
 }
 
-fn reduce_to_ore_to_fuel(reactions: Vec<Reaction>) -> i64 {
-    let all_keys: Vec<String> = reactions.iter().flat_map(|r| r.keys()).cloned().collect();
+fn reduce_to_ore_to_fuel(reactions: HashMap<String, Reaction>) -> i128 {
+    // start with FUEL, not with ORE
+    type Reactant = (String, i128);
+    let mut reduced_reactions = Vec::new();
+    let mut current_reactions: Vec<Reactant> = vec![("FUEL".to_string(), 1)];
+    let mut left_overs: HashMap<String, i128> = HashMap::new();
+    while current_reactions.len() > 0 {
+        let tmp_reactions = current_reactions.clone();
+        current_reactions.clear();
+        for reaction in tmp_reactions {
+            let mut current_value;
+            let mut value_count;
+            if reaction.0 != "ORE" {
+                if left_overs.contains_key(&reaction.0) {
+                    current_value = left_overs[&reaction.0];
+                    value_count = 0;
+                } else {
+                    current_value = reactions[&reaction.0].quantity;
+                    value_count = 1;
+                }
 
-    let num_rows = reactions.len() + 1;
-    let num_cols = all_keys.len();
-    let mut system = Array::from_elem((num_rows, num_cols), 0.);
-    for row in 0..num_rows - 1 {
-        for col in 0..num_cols {
-            let entry = system.get_mut((row, col)).unwrap();
-            *entry = *reactions[row].get(&all_keys[col]).unwrap_or(&0) as f64;
+                let diff = reaction.1 - current_value;
+                current_value += reactions[&reaction.0].quantity * diff;
+                value_count += diff;
+
+                left_overs.insert(reaction.0.to_string(), current_value - reaction.1);
+                for reactant in &reactions[&reaction.0].reactants {
+                    current_reactions.push((reactant.0.to_string(), reactant.1 * value_count))
+                }
+            } else {
+                reduced_reactions.push(reaction.clone());
+            }
         }
     }
 
-    let mut ore_idx: usize = 0;
-    let mut fuel_idx: usize = 0;
-    for i in 0..num_cols {
-        if all_keys[i] == "ORE" {
-            ore_idx = i;
-        } else if all_keys[i] == "FUEL" {
-            fuel_idx = i;
-        }
+    let mut total_ore = 0;
+    for reaction in reduced_reactions {
+        total_ore += reaction.1;
     }
-    let last_entry = system.get_mut((num_rows - 1, ore_idx)).unwrap();
-    *last_entry = 1.;
-    let mut b: Array1<f64> = Array::from_elem(num_rows, 0.);
-    b[num_rows - 1] = 1.;
-    println!("all_keys: {:#?}", all_keys);
-
-    println!("system: {:#?}", system);
-    println!("b: {:#?}", b);
-    let solution = system.solve_into(b).unwrap();
-
-    solution[fuel_idx as usize] as i64
+    total_ore
 }
 
-pub fn part_one(input_filename: &str) -> i64 {
+pub fn part_one(input_filename: &str) -> i128 {
     let reactions = parse_reactions(input_filename);
-    //println!("Reaction list: {:#?}", reactions);
+    println!("Reaction list: {:#?}", reactions);
 
     reduce_to_ore_to_fuel(reactions)
 }
