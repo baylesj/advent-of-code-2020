@@ -87,25 +87,24 @@ fn get_first_n_as_num(n: usize, vector: &Vec<i16>) -> usize {
 pub fn part_two(input_filename: &str) -> i64 {
     const OFFSET_SIZE: usize = 7;
     const OUTPUT_SIZE: usize = 8;
-    const NUM_PHASES: usize = 4; //100;
-    const NUM_TIMES_INPUT_REPEATED: usize = 1; //10000;
+    const NUM_PHASES: usize = 100;
+    const NUM_TIMES_INPUT_REPEATED: usize = 10000;
 
     let input = load(input_filename);
-    let offset = 0; //get_first_n_as_num(OFFSET_SIZE, &input);
+    let offset = get_first_n_as_num(OFFSET_SIZE, &input);
     let final_input_size: usize = input.len() * NUM_TIMES_INPUT_REPEATED;
     // Position starts the character AFTER offset.
-    let position_in_input = 0; //offset % final_input_size + 1;
+    let position_in_input = offset % final_input_size;
     let final_input_fragment_size = final_input_size - position_in_input;
 
     // This algorithm is only well formed for the last half of inputs.
-    //assert!(position_in_input >= final_input_size / 2);
+    assert!(position_in_input >= final_input_size / 2);
     let mut final_input = vec![0; final_input_fragment_size];
     for i in position_in_input..final_input_size {
         final_input[i - position_in_input] = input[i % input.len()];
     }
 
-    println!("final_input: {:?}", final_input);
-    for i in 0..NUM_PHASES {
+    for _ in 0..NUM_PHASES {
         let mut sum: i64 = final_input[final_input.len() - 1] as i64;
         for i in (0..final_input_fragment_size - 1).rev() {
             // Sum has to use the "old" final_input, and final_input needs
@@ -114,7 +113,6 @@ pub fn part_two(input_filename: &str) -> i64 {
             sum += final_input[i] as i64;
             final_input[i] = next;
         }
-        println!("p: {}, i: {:?}", i, final_input);
     }
 
     get_first_n_as_num(OUTPUT_SIZE, &final_input[0..OUTPUT_SIZE].to_vec()) as i64
@@ -124,8 +122,8 @@ pub fn solve() {
     println!(
         "Day sixteen, part one: {}, part two: {}",
         //part_one(INPUT_FILENAME),
-        1,                                             //part_one(INPUT_FILENAME),
-        part_two("input/day_sixteen_sample_zero.txt")  //INPUT_FILENAME)
+        1, //part_one(INPUT_FILENAME),
+        part_two(INPUT_FILENAME)
     );
 }
 
@@ -161,5 +159,10 @@ mod tests {
     #[test]
     pub fn test_part_one() {
         assert_eq!(63483758, part_one("input/day_sixteen.txt"))
+    }
+
+    #[test]
+    pub fn test_part_two() {
+        assert_eq!(96099551, part_two("input/day_sixteen.txt"))
     }
 }
