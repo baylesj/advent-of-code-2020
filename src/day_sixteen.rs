@@ -44,6 +44,19 @@ pub fn run_phase(input: &Vec<i16>) -> Vec<i16> {
     output
 }
 
+// Size 8 example:
+// bottom to top:
+// on row N, zero out N - 1 elements, sum N ones, zero N ones, subtract N
+// 0 0 0 0 0 0 0 1 -> A8 = i8
+// 0 0 0 0 0 0 1 1 -> B7 = A8 + i7
+// 0 0 0 0 0 1 1 1 -> C6 = B7 + i6
+// 0 0 0 0 1 1 1 1 -> D5 = C6 + i5 (row 5, zero out 4, sum 5 elemnets)
+// 0 0 0 1 1 1 1 0 -> E4 = D5 + i4 - A8 (row 4, zero out 3, sum 4, ...)
+// 0 0 1 1 1 0 0 0 -> F3 = E4 + i3 - C6
+// 0 1 1 0 0 - - 0 -> G2 = F3 + i2 - E4 (row 1, zero out 1, sum 2, zero out 2, minus 2)
+// 1 0 - 0 1 0 - 0 -> H1 = F + i1 - G (row 0, zero out 0, sum 1, zero out 0, minus 1, zero)
+
+// can store partial sums
 pub fn part_one(input_filename: &str) -> i64 {
     const NUM_PHASES: i64 = 100;
     let mut input = load(input_filename);
