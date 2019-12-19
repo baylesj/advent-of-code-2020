@@ -1,5 +1,7 @@
 use ansi_term::Color;
 use ansi_term::Style;
+use std::collections::HashSet;
+use std::env;
 use std::time::Instant;
 
 use advent_of_code::{
@@ -29,37 +31,70 @@ fn log_elapsed(last: &Instant, day: i64) -> Instant {
 
 // TODO: clean this up, overly procedural.
 fn main() {
+    let args: HashSet<i64> = env::args().map(|a| a.parse::<i64>().unwrap_or(0)).collect();
     let mut now = Instant::now();
-    day_one::solve();
-    now = log_elapsed(&now, 1);
-    day_two::solve();
-    now = log_elapsed(&now, 2);
-    day_three::solve();
-    now = log_elapsed(&now, 3);
-    day_four::solve();
-    now = log_elapsed(&now, 4);
-    day_five::solve();
-    now = log_elapsed(&now, 5);
-    day_six::solve();
-    now = log_elapsed(&now, 6);
-    day_seven::solve();
-    now = log_elapsed(&now, 7);
-    day_eight::solve();
-    now = log_elapsed(&now, 8);
-    day_nine::solve();
-    now = log_elapsed(&now, 9);
-    day_ten::solve();
-    now = log_elapsed(&now, 10);
-    day_eleven::solve();
-    now = log_elapsed(&now, 11);
-    day_twelve::solve();
-    now = log_elapsed(&now, 12);
-    day_thirteen::solve();
-    now = log_elapsed(&now, 13);
-    day_fourteen::solve();
-    now = log_elapsed(&now, 14);
-    day_fifteen::solve();
-    now = log_elapsed(&now, 15);
-    day_sixteen::solve();
-    now = log_elapsed(&now, 16);
+    if args.contains(&1) {
+        day_one::solve();
+        now = log_elapsed(&now, 1);
+    }
+    if args.contains(&2) {
+        day_two::solve();
+        now = log_elapsed(&now, 2);
+    }
+    if args.contains(&3) {
+        day_three::solve();
+        now = log_elapsed(&now, 3);
+    }
+    if args.contains(&4) {
+        day_four::solve();
+        now = log_elapsed(&now, 4);
+    }
+    if args.contains(&5) {
+        day_five::solve();
+        now = log_elapsed(&now, 5);
+    }
+    if args.contains(&6) {
+        day_six::solve();
+        now = log_elapsed(&now, 6);
+    }
+    if args.contains(&7) {
+        day_seven::solve();
+        now = log_elapsed(&now, 7);
+    }
+    if args.contains(&8) {
+        day_eight::solve();
+        now = log_elapsed(&now, 8);
+    }
+    if args.contains(&9) {
+        day_nine::solve();
+        now = log_elapsed(&now, 9);
+    }
+    if args.contains(&10) {
+        day_ten::solve();
+        now = log_elapsed(&now, 10);
+    }
+    if args.contains(&11) {
+        day_eleven::solve();
+        now = log_elapsed(&now, 11);
+    }
+    if args.contains(&12) {
+        day_twelve::solve();
+        now = log_elapsed(&now, 12);
+    }
+    if args.contains(&13) {
+        day_thirteen::solve();
+        now = log_elapsed(&now, 13);
+    }
+    if args.contains(&14) {
+        day_fourteen::solve();
+        now = log_elapsed(&now, 14);
+    }
+    if args.contains(&15) {
+        day_fifteen::solve();
+        now = log_elapsed(&now, 15);
+    }
+    if args.contains(&16) {
+        day_sixteen::solve();
+        log_elapsed(&now, 16);
+    }
 }

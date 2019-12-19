@@ -38,7 +38,6 @@ pub fn calculate_weights(length: usize) -> Vec<i16> {
 pub fn run_phase(input: &Vec<i16>, weights: &Vec<i16>) -> Vec<i16> {
     let mut output = vec![0; input.len()];
     for j in 0..input.len() {
-        // TODO: move to nlog(n)?
         for i in 0..input.len() {
             let w = weights[j * input.len() + i];
             if w > 0 {
@@ -53,19 +52,7 @@ pub fn run_phase(input: &Vec<i16>, weights: &Vec<i16>) -> Vec<i16> {
     output
 }
 
-// Size 8 example:
-// bottom to top:
-// on row N, zero out N - 1 elements, sum N ones, zero N ones, subtract N
-// 0 0 0 0 0 0 0 1 -> A8 = i8
-// 0 0 0 0 0 0 1 1 -> B7 = A8 + i7
-// 0 0 0 0 0 1 1 1 -> C6 = B7 + i6
-// 0 0 0 0 1 1 1 1 -> D5 = C6 + i5 (row 5, zero out 4, sum 5 elemnets)
-// 0 0 0 1 1 1 1 0 -> E4 = D5 + i4 - A8 (row 4, zero out 3, sum 4, ...)
-// 0 0 1 1 1 0 0 0 -> F3 = E4 + i3 - C6
-// 0 1 1 0 0 - - 0 -> G2 = F3 + i2 - E4 (row 1, zero out 1, sum 2, zero out 2, minus 2)
-// 1 0 - 0 1 0 - 0 -> H1 = F + i1 - G (row 0, zero out 0, sum 1, zero out 0, minus 1, zero)
-
-// can store partial sums
+/// can store partial sums
 pub fn part_one(input_filename: &str) -> i64 {
     const NUM_PHASES: i64 = 100;
     let mut input = load(input_filename);
@@ -84,15 +71,61 @@ pub fn part_one(input_filename: &str) -> i64 {
     output
 }
 
-pub fn part_two() -> i64 {
-    1
+fn get_first_n_as_num(n: usize, vector: &Vec<i16>) -> usize {
+    let values = vector[0..n].to_vec();
+    assert_eq!(values.len(), n);
+
+    let mut num: usize = 0;
+    for i in 0..n {
+        num *= 10;
+        num += values[i] as usize;
+    }
+    num
+}
+
+// For part two, we can avoid solving the general problem
+pub fn part_two(input_filename: &str) -> i64 {
+    const OFFSET_SIZE: usize = 7;
+    const OUTPUT_SIZE: usize = 8;
+    const NUM_PHASES: usize = 4; //100;
+    const NUM_TIMES_INPUT_REPEATED: usize = 1; //10000;
+
+    let input = load(input_filename);
+    let offset = 0; //get_first_n_as_num(OFFSET_SIZE, &input);
+    let final_input_size: usize = input.len() * NUM_TIMES_INPUT_REPEATED;
+    // Position starts the character AFTER offset.
+    let position_in_input = 0; //offset % final_input_size + 1;
+    let final_input_fragment_size = final_input_size - position_in_input;
+
+    // This algorithm is only well formed for the last half of inputs.
+    //assert!(position_in_input >= final_input_size / 2);
+    let mut final_input = vec![0; final_input_fragment_size];
+    for i in position_in_input..final_input_size {
+        final_input[i - position_in_input] = input[i % input.len()];
+    }
+
+    println!("final_input: {:?}", final_input);
+    for i in 0..NUM_PHASES {
+        let mut sum: i64 = final_input[final_input.len() - 1] as i64;
+        for i in (0..final_input_fragment_size - 1).rev() {
+            // Sum has to use the "old" final_input, and final_input needs
+            // the "old" sum, so store the calculation first.
+            let next = ((final_input[i] as i64 + sum) % 10) as i16;
+            sum += final_input[i] as i64;
+            final_input[i] = next;
+        }
+        println!("p: {}, i: {:?}", i, final_input);
+    }
+
+    get_first_n_as_num(OUTPUT_SIZE, &final_input[0..OUTPUT_SIZE].to_vec()) as i64
 }
 
 pub fn solve() {
     println!(
         "Day sixteen, part one: {}, part two: {}",
-        part_one(INPUT_FILENAME),
-        part_two()
+        //part_one(INPUT_FILENAME),
+        1,                                             //part_one(INPUT_FILENAME),
+        part_two("input/day_sixteen_sample_zero.txt")  //INPUT_FILENAME)
     );
 }
 
