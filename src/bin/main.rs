@@ -5,6 +5,7 @@ use std::time::Instant;
 use advent_of_code::{
     day_eight, day_eleven, day_fifteen, day_five, day_four, day_fourteen, day_nine, day_one,
     day_seven, day_six, day_ten, day_thirteen, day_three, day_twelve, day_two,
+    day_sixteen
 };
 
 fn log_elapsed(last: &Instant, day: i64) -> Instant {
