@@ -104,7 +104,10 @@ mod tests {
     pub fn test_calculate_weights() {
         assert_eq!(vec![1, 0, 0, 1], calculate_weights(2));
         assert_eq!(vec![1, 0, -1, 0, 1, 1, 0, 0, 1], calculate_weights(3));
-        assert_eq!(vec![1, 0, -1, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1], calculate_weights(4));
+        assert_eq!(
+            vec![1, 0, -1, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1],
+            calculate_weights(4)
+        );
     }
 
     #[test]
