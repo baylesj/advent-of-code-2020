@@ -2,15 +2,18 @@ use std::fs;
 
 const INPUT_FILENAME: &str = "input/day_sixteen.txt";
 
-fn load(input_filename: &str) -> Vec<i8> {
-    fs::read_to_string(input_filename).expect("valid file").chars().
-        map(|c| c.to_digit(10).expect("NaN") as i8).collect()
+fn load(input_filename: &str) -> Vec<i16> {
+    fs::read_to_string(input_filename)
+        .expect("valid file")
+        .chars()
+        .map(|c| c.to_digit(10).expect("NaN") as i16)
+        .collect()
 }
 
-const BASE_PATTERN: [i8; 4] = [0, 1, 0, -1];
-pub fn calculate_weights(output_index: usize, length: usize) -> Vec<i8> {
+const BASE_PATTERN: [i16; 4] = [0, 1, 0, -1];
+pub fn calculate_weights(output_index: usize, length: usize) -> Vec<i16> {
     let mut i = 0;
-    let mut output = vec![0i8; length];
+    let mut output = vec![0i16; length];
     let mut is_first_digit = true;
     while i < length {
         for b in BASE_PATTERN.iter() {
@@ -22,7 +25,7 @@ pub fn calculate_weights(output_index: usize, length: usize) -> Vec<i8> {
                 output[i] = *b;
                 i += 1;
                 if i >= length {
-                  return output;
+                    return output;
                 }
             }
         }
@@ -30,13 +33,11 @@ pub fn calculate_weights(output_index: usize, length: usize) -> Vec<i8> {
     output
 }
 
-pub fn run_phase(input: &Vec<i8>) -> Vec<i8> {
+pub fn run_phase(input: &Vec<i16>) -> Vec<i16> {
     let mut output = vec![0; input.len()];
     for i in 0..input.len() {
         let weights = calculate_weights(i, input.len());
-        output[i] = weights.iter().zip(
-            input.iter()
-        ).map(|(a, b)| (a * b)).sum();
+        output[i] = weights.iter().zip(input.iter()).map(|(a, b)| (a * b)).sum();
         output[i] = output[i].abs() % 10;
     }
 
@@ -65,7 +66,11 @@ pub fn part_two() -> i64 {
 }
 
 pub fn solve() {
-    println!("Day sixteen, part one: {}, part two: {}", part_one(INPUT_FILENAME), part_two());
+    println!(
+        "Day sixteen, part one: {}, part two: {}",
+        part_one(INPUT_FILENAME),
+        part_two()
+    );
 }
 
 #[cfg(test)]
@@ -81,7 +86,10 @@ mod tests {
 
     #[test]
     pub fn test_run_phase() {
-        assert_eq!(vec![4, 8, 2, 2, 6, 1, 5, 8], run_phase(&vec![1,2,3,4,5,6,7,8]));
+        assert_eq!(
+            vec![4, 8, 2, 2, 6, 1, 5, 8],
+            run_phase(&vec![1, 2, 3, 4, 5, 6, 7, 8])
+        );
     }
 
     #[test]
@@ -92,11 +100,15 @@ mod tests {
     #[test]
     pub fn test_part_one_sample_two() {
         assert_eq!(73745418, part_one("input/day_sixteen_sample_two.txt"))
-
     }
 
     #[test]
     pub fn test_part_one_sample_three() {
         assert_eq!(52432133, part_one("input/day_sixteen_sample_three.txt"))
+    }
+
+    #[test]
+    pub fn test_part_one() {
+        assert_eq!(63483758, part_one("input/day_sixteen.txt"))
     }
 }
