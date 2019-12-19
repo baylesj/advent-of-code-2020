@@ -45,7 +45,7 @@ pub struct MazeState {
     pub steps: i64,
     location: Point2D,
     visited: HashMap<Point2D, i64>,
-    dimensions: Point2D,
+    dimensions: (Point2D, Point2D),
     direction: Direction,
     droid_status: RepairDroidStatus,
 }
@@ -110,23 +110,30 @@ fn pick_new_direction(state: &mut MazeState) {
     state.direction = DIRECTIONS_IN_PRIORITY_ORDER[min_index(&visit_values)];
 }
 
-fn visualize(tiles: &HashMap<Point2D, i64>, dimensions: &Point2D) {
+fn visualize(tiles: &HashMap<Point2D, i64>, dimensions: &(Point2D, Point2D), location: &Point2D) {
     let mut p = Point2D::default();
-    for y in 0..dimensions.y {
+    for y in dimensions.0.y..dimensions.1.y {
         p.y = y;
-        let mut row: Vec<char> = vec![' '; dimensions.x as usize + 1];
-        for x in 0..dimensions.x {
+        // TODO: why is the offset weird?
+        let mut row: Vec<char> = vec![' '; (dimensions.1.x + dimensions.0.x) as usize + 10];
+        for x in dimensions.0.x..dimensions.1.x {
             p.x = x;
+            let idx = (x + dimensions.0.x.abs()) as usize;
+            if p == *location {
+                row[idx] = 'O';
+                continue;
+            }
             match *tiles.get(&p).unwrap_or(&-1) {
-                i64::MAX => row[x as usize] = '#',
-                -1 => row[x as usize] = '?',
+                i64::MAX => row[idx] = '#',
+                -1 => row[idx] = '?',
                 _ => (),
             }
         }
         let row_as_string: String = row.iter().cloned().collect();
         println!("{}", row_as_string);
     }
-    println!("dimensions: {}", dimensions);
+    println!("dimensions: {:#?}", dimensions);
+    println!("location: {}", location);
 }
 
 pub fn part_one(program: &mut Program) -> MazeState {
@@ -141,8 +148,10 @@ pub fn part_one(program: &mut Program) -> MazeState {
             }
             RepairDroidStatus::MovedSuccessfully => {
                 state.location.advance(state.direction);
-                state.dimensions.x = i64::max(state.dimensions.x, state.location.x);
-                state.dimensions.y = i64::max(state.dimensions.y, state.location.y);
+                state.dimensions.0.x = i64::min(state.dimensions.0.x, state.location.x);
+                state.dimensions.0.y = i64::min(state.dimensions.0.y, state.location.y);
+                state.dimensions.1.x = i64::max(state.dimensions.1.x, state.location.x);
+                state.dimensions.1.y = i64::max(state.dimensions.1.y, state.location.y);
                 state.steps += 1;
                 // We always prefer to go right when possible.
                 if state.visited.contains_key(&state.location) {
@@ -157,7 +166,7 @@ pub fn part_one(program: &mut Program) -> MazeState {
     }
     // Don't forget the final step!
     state.steps += 1;
-    visualize(&state.visited, &state.dimensions);
+    visualize(&state.visited, &state.dimensions, &state.location);
     state
 }
 
