@@ -11,34 +11,32 @@ fn load(input_filename: &str) -> Vec<i16> {
 }
 
 const BASE_PATTERN: [i16; 4] = [0, 1, 0, -1];
-pub fn calculate_weights(output_index: usize, length: usize) -> Vec<i16> {
+pub fn calculate_output(index: usize, input: &Vec<i16>) -> i16 {
     let mut i = 0;
-    let mut output = vec![0i16; length];
+    let mut output = 0;
     let mut is_first_digit = true;
-    while i < length {
+    while i < input.len() {
         for b in BASE_PATTERN.iter() {
-            for _ in 0..output_index + 1 {
+            for _ in 0..index + 1 {
                 if is_first_digit {
                     is_first_digit = false;
                     continue;
                 }
-                output[i] = *b;
+                output += *b * input[index];
                 i += 1;
-                if i >= length {
-                    return output;
+                if i >= input.len() {
+                    return output.abs() % 10;
                 }
             }
         }
     }
-    output
+    output.abs() % 10
 }
 
 pub fn run_phase(input: &Vec<i16>) -> Vec<i16> {
     let mut output = vec![0; input.len()];
     for i in 0..input.len() {
-        let weights = calculate_weights(i, input.len());
-        output[i] = weights.iter().zip(input.iter()).map(|(a, b)| (a * b)).sum();
-        output[i] = output[i].abs() % 10;
+        output[i] = calculate_output(i, input);
     }
 
     output
