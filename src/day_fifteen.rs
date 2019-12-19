@@ -45,7 +45,6 @@ struct MazeState {
     pub steps: i64,
     location: Point2D,
     visited: HashMap<Point2D, i64>,
-    dimensions: (Point2D, Point2D),
     direction: Direction,
     droid_status: RepairDroidStatus,
 }
@@ -109,32 +108,6 @@ fn pick_new_direction(state: &mut MazeState) {
     state.direction = DIRECTIONS_IN_PRIORITY_ORDER[min_index(&visit_values)];
 }
 
-fn visualize(tiles: &HashMap<Point2D, i64>, dimensions: &(Point2D, Point2D), location: &Point2D) {
-    let mut p = Point2D::default();
-    for y in dimensions.0.y..dimensions.1.y {
-        p.y = y;
-        // TODO: why is the offset weird?
-        let mut row: Vec<char> = vec![' '; (dimensions.1.x + dimensions.0.x) as usize + 10];
-        for x in dimensions.0.x..dimensions.1.x {
-            p.x = x;
-            let idx = (x + dimensions.0.x.abs()) as usize;
-            if p == *location {
-                row[idx] = 'O';
-                continue;
-            }
-            match *tiles.get(&p).unwrap_or(&-1) {
-                i64::MAX => row[idx] = '#',
-                -1 => row[idx] = '?',
-                _ => (),
-            }
-        }
-        let row_as_string: String = row.iter().cloned().collect();
-        println!("{}", row_as_string);
-    }
-    println!("dimensions: {:#?}", dimensions);
-    println!("location: {}", location);
-}
-
 pub fn part_one(program: &mut Program) -> i64 {
     let mut state = MazeState::default();
     while state.droid_status != RepairDroidStatus::FoundOxygenSystem {
@@ -147,10 +120,6 @@ pub fn part_one(program: &mut Program) -> i64 {
             }
             RepairDroidStatus::MovedSuccessfully => {
                 state.location.advance(state.direction);
-                state.dimensions.0.x = i64::min(state.dimensions.0.x, state.location.x);
-                state.dimensions.0.y = i64::min(state.dimensions.0.y, state.location.y);
-                state.dimensions.1.x = i64::max(state.dimensions.1.x, state.location.x);
-                state.dimensions.1.y = i64::max(state.dimensions.1.y, state.location.y);
                 state.steps += 1;
                 // We always prefer to go right when possible.
                 if state.visited.contains_key(&state.location) {
@@ -165,7 +134,6 @@ pub fn part_one(program: &mut Program) -> i64 {
     }
     // Don't forget the final step!
     state.steps += 1;
-    visualize(&state.visited, &state.dimensions, &state.location);
     state.steps
 }
 
@@ -216,8 +184,9 @@ pub fn part_two(program: &mut Program) -> i64 {
         origin: None,
     }];
 
-    let mut steps = 0;
+    let mut steps = -1;
     while current_searchers.len() > 0 {
+        steps += 1;
         let mut next_layer: Vec<Searcher> = Vec::new();
         for searcher in &current_searchers {
             let result = next_searchers(&searcher);
@@ -227,7 +196,6 @@ pub fn part_two(program: &mut Program) -> i64 {
             }
         }
         current_searchers = next_layer;
-        steps += 1;
     }
 
     steps
@@ -249,6 +217,13 @@ mod tests {
     #[test]
     fn test_part_one() {
         let mut program = Program::load(INPUT_FILENAME);
-        assert_eq!(236, part_one(&mut program).steps);
+        assert_eq!(236, part_one(&mut program));
+    }
+
+    #[test]
+    fn test_part_two() {
+        let mut program = Program::load(INPUT_FILENAME);
+        assert_eq!(236, part_one(&mut program));
+        assert_eq!(368, part_two(&mut program));
     }
 }
