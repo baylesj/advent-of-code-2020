@@ -81,6 +81,21 @@ impl Default for Direction {
     }
 }
 
+pub trait Inverse {
+    fn inverse(&self) -> Self;
+}
+
+impl Inverse for Direction {
+    fn inverse(&self) -> Self {
+        match self {
+            Direction::Left => Direction::Right,
+            Direction::Up => Direction::Down,
+            Direction::Right => Direction::Left,
+            Direction::Down => Direction::Up,
+        }
+    }
+}
+
 pub trait RelativeTurn {
     fn to_left(self: &Self) -> Direction;
     fn to_right(self: &Self) -> Direction;
