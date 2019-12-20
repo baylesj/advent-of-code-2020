@@ -80,7 +80,7 @@ fn evaluate_output_index(index: usize, program: &mut Program, mode: ParameterMod
     if mode == ParameterMode::Relative {
         output_index += program.relative_base as i64;
     }
-    if output_index > program.buffer.len() as i64 {
+    if output_index >= program.buffer.len() as i64 {
         let new_size: i64 = output_index * 2;
         debug!(
             "received index {}, resizing to new size: {}",
@@ -102,7 +102,7 @@ fn evaluate_index(index: usize, program: &mut Program, mode: ParameterMode) -> u
         }
     }
 
-    if actual_index > program.buffer.len() {
+    if actual_index >= program.buffer.len() {
         let new_size: usize = actual_index * 2;
         debug!(
             "received index {}, resizing to new size: {}",
@@ -260,7 +260,9 @@ impl Runnable for Program {
     // This implementation runs until HALT operation occurs.
     fn run_until_halted(self: &mut Self) {
         self.state = ProgramState::Running;
-        while self.state != ProgramState::Stopped {
+        while self.state != ProgramState::Stopped
+            && self.state != ProgramState::PausedWaitingForInput
+        {
             if self.state != ProgramState::Running {
                 self.state = ProgramState::Running;
             }
