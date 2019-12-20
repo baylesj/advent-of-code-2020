@@ -5,17 +5,28 @@ use queues::IsQueue;
 
 const INPUT_FILENAME: &str = "input/day_seventeen.txt";
 
-pub fn part_one(input_filename: &str) -> i64 {
+fn get_grid(input_filename: &str) -> Vec<char> {
     let mut program = Program::load(input_filename);
     program.run_until_halted();
 
-    let mut chars = vec!['0'; program.io.size() + 10];
+    let mut chars = Vec::new();
     for _ in 0..program.io.size() {
-        chars.push(program.io.remove().expect("io lies!") as u8 as char);
+        let i: u8 = program.io.remove().expect("io size wrong") as u8;
+        if i > 0 && i as char != '0' {
+            chars.push(i as char);
+        }
     }
-    let s: String = chars.iter().collect();
+    chars
+}
+
+fn print_grid(grid: &Vec<char>) {
+    let s: String = grid.iter().cloned().collect();
     println!("{}", s);
-    println!("state: {:?}", program.state);
+}
+
+pub fn part_one(input_filename: &str) -> i64 {
+    let grid = get_grid(input_filename);
+    print_grid(&grid);
     1
 }
 
