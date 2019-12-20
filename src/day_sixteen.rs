@@ -118,13 +118,12 @@ pub fn part_two(input_filename: &str) -> i64 {
     get_first_n_as_num(OUTPUT_SIZE, &final_input[0..OUTPUT_SIZE].to_vec()) as i64
 }
 
-pub fn solve() {
-    println!(
-        "Day sixteen, part one: {}, part two: {}",
-        //part_one(INPUT_FILENAME),
-        1, //part_one(INPUT_FILENAME),
+pub fn solve() -> String {
+    format!(
+        "part one: {}, part two: {}",
+        part_one(INPUT_FILENAME),
         part_two(INPUT_FILENAME)
-    );
+    )
 }
 
 #[cfg(test)]

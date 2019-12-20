@@ -198,13 +198,13 @@ pub fn part_two(initial_system: &OrbitalSystem) -> i128 {
     lcm(lcm(periods[0], periods[1]), periods[2])
 }
 
-pub fn solve() {
+pub fn solve() -> String {
     let initial_system = OrbitalSystem::load(INPUT_FILENAME);
-    println!(
-        "Day twelve, part one: {}, part two: {}",
+    format!(
+        "part one: {}, part two: {}",
         part_one(&initial_system, 1000),
         part_two(&initial_system)
-    );
+    )
 }
 
 #[cfg(test)]

@@ -62,7 +62,8 @@ impl CurrentColor for PainterState {
     }
 }
 
-fn print(state: &PainterState) {
+fn print(state: &PainterState) -> String {
+    let mut output: String = String::default();
     let mut line: Vec<char> =
         Vec::with_capacity((state.max_point.x + 1 - state.min_point.x) as usize);
     let mut point = Point2D::default();
@@ -76,9 +77,10 @@ fn print(state: &PainterState) {
                 '⬛'
             });
         }
-        println!("{}", String::from_iter(&line));
+        output += &format!("    {}\n", String::from_iter(&line));
         line.truncate(0);
     }
+    output
 }
 
 fn paint(program: &mut Program, initial_color: TileColor) -> PainterState {
@@ -119,18 +121,18 @@ pub fn part_one(program: &mut Program) -> i64 {
     (state.white_tiles.len() + state.black_tiles.len()) as i64
 }
 
-pub fn part_two(program: &mut Program) {
+pub fn part_two(program: &mut Program) -> String {
     let state = paint(program, TileColor::White);
-    print(&state);
+    print(&state)
 }
 
-pub fn solve() {
-    // TODO: fix cloning
+pub fn solve() -> String {
     let mut program = Program::load(INPUT_FILENAME);
-    println!("Day eleven, part one:");
-    println!("total of {} white tiles", part_one(&mut program.clone()));
-    println!("part two:");
-    part_two(&mut program);
+    format!(
+        "part one: {} white tiles, part two:\n{}",
+        part_one(&mut program.clone()),
+        part_two(&mut program)
+    )
 }
 
 #[cfg(test)]

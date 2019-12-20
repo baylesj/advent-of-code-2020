@@ -83,12 +83,12 @@ pub fn part_two(input_filename: &str) -> i64 {
     max_signal
 }
 
-pub fn solve() {
-    println!(
-        "Day seven, part 1: {}, part 2: {}",
+pub fn solve() -> String {
+    format!(
+        "part 1: {}, part 2: {}",
         part_one(INPUT_FILENAME),
         part_two(INPUT_FILENAME)
-    );
+    )
 }
 
 #[cfg(test)]

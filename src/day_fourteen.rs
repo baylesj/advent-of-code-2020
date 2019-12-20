@@ -123,12 +123,12 @@ pub fn part_two(input_filename: &str, goal: i64) -> i64 {
     mid
 }
 
-pub fn solve() {
-    println!(
-        "Day fourteen, part one: {}, part two: {}",
+pub fn solve() -> String {
+    format!(
+        "part one: {}, part two: {}",
         part_one(INPUT_FILENAME),
         part_two(INPUT_FILENAME, 1000000000000)
-    );
+    )
 }
 
 #[cfg(test)]

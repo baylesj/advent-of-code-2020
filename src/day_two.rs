@@ -40,9 +40,9 @@ pub fn part_two(input_filename: &str) -> i64 {
     -1
 }
 
-pub fn solve() {
-    println!(
-        "Day two, part one: {}, part two: {}",
+pub fn solve() -> String {
+    format!(
+        "part one: {}, part two: {}",
         part_one(INPUT_FILENAME),
         part_two(INPUT_FILENAME)
     )

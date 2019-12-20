@@ -146,12 +146,12 @@ pub fn part_two(input_filename: &str, nth: usize) -> i64 {
     (visible_point.x * 100 + visible_point.y) as i64
 }
 
-pub fn solve() {
-    println!(
-        "Day ten, part one: {}, part two: {}",
+pub fn solve() -> String {
+    format!(
+        "part one: {}, part two: {}",
         part_one(INPUT_FILENAME),
         part_two(INPUT_FILENAME, 200)
-    );
+    )
 }
 
 #[cfg(test)]

@@ -57,16 +57,13 @@ fn get_matches(image: &Image) -> Vec<Matches> {
     matches
 }
 
-fn part_one(image: &Image) {
+fn part_one(image: &Image) -> String {
     let matches = get_matches(&image);
     let fewest_black = matches.iter().min_by_key(|m| m.black).expect("failed min");
-    println!(
-        "Day eight, part one: {}, part two: ",
-        (fewest_black.white * fewest_black.transparent)
-    )
+    (fewest_black.white * fewest_black.transparent).to_string()
 }
 
-fn part_two(image: &Image) {
+fn part_two(image: &Image) -> String {
     let mut chunks_it = image.chunks(LAYER_SIZE);
     let mut image_buffer: Vec<Pixel> = chunks_it.next().expect("missing first layer").to_vec();
     while let Some(chunk) = chunks_it.next() {
@@ -77,9 +74,10 @@ fn part_two(image: &Image) {
         }
     }
 
+    let mut output = String::default();
     for line in image_buffer.chunks(IMAGE_SIZE.width) {
-        println!(
-            "    {}",
+        output += &format!(
+            "    {}\n",
             line.iter()
                 .map(|c| if *c as char == PIXEL_BLACK {
                     '⬛'
@@ -89,11 +87,14 @@ fn part_two(image: &Image) {
                 .collect::<String>()
         );
     }
+    output
 }
 
 pub fn solve() -> String {
     let image = load_input();
-    part_one(&image);
-    part_two(&image);
-    "".to_string()
+    format!(
+        "part one: {}, part two:\n{}",
+        part_one(&image),
+        part_two(&image)
+    )
 }

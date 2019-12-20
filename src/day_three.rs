@@ -173,7 +173,7 @@ fn load_all_instructions() -> Result<WireSegments, &'static str> {
 }
 
 use geo::algorithm::intersects::Intersects;
-pub fn solve() {
+pub fn solve() -> String {
     let instructions = load_all_instructions().expect("invalid instructions");
 
     let intersects: bool = instructions
@@ -183,9 +183,8 @@ pub fn solve() {
         .first_wire
         .intersections(&instructions.second_wire);
 
-    println!(
-        //"intersects: {}, min distance: {}, expected 159, min steps: {}, expected 610",
-        "Day three, intersects: {}, min distance: {}, min steps: {}",
+    format!(
+        "intersects: {}, min distance: {}, min steps: {}",
         intersects,
         intersections
             .iter()

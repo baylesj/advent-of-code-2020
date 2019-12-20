@@ -28,13 +28,13 @@ pub fn part_two(program: &mut Program) -> i64 {
     program.io.peek().unwrap()
 }
 
-pub fn solve() {
+pub fn solve() -> String {
     let mut program = Program::load(INPUT_FILENAME);
-    println!(
-        "Day five, part one: {}, part two: {}",
+    format!(
+        "part one: {}, part two: {}",
         part_one(&mut program.clone()),
         part_two(&mut program)
-    );
+    )
 }
 
 #[cfg(test)]

@@ -89,10 +89,6 @@ fn part_two() -> i32 {
     -1
 }
 
-pub fn solve() {
-    println!(
-        "Day six, part one: {}, part two: {}",
-        part_one(),
-        part_two()
-    )
+pub fn solve() -> String {
+    format!("part one: {}, part two: {}", part_one(), part_two())
 }

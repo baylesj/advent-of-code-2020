@@ -220,13 +220,13 @@ pub fn part_two(input_filename: &str) -> i64 {
     state.score
 }
 
-pub fn solve() {
+pub fn solve() -> String {
     let mut program = Program::load(INPUT_FILENAME);
-    println!(
-        "Day thirteen, part one: {}, part two: {}",
+    format!(
+        "part one: {}, part two: {}",
         part_one(&mut program),
         part_two(INPUT_FILENAME)
-    );
+    )
 }
 
 #[cfg(test)]

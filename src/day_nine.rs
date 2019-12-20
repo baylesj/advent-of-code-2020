@@ -26,12 +26,12 @@ pub fn part_two(input_filename: &str) -> i64 {
     program.io.remove().unwrap()
 }
 
-pub fn solve() {
-    println!(
-        "Day nine, part one: {:#?}, part two {:#?}",
+pub fn solve() -> String {
+    format!(
+        "part one: {:#?}, part two {:#?}",
         part_one(INPUT_FILENAME),
         part_two(INPUT_FILENAME)
-    );
+    )
 }
 
 #[cfg(test)]
