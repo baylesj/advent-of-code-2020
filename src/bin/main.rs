@@ -52,30 +52,31 @@ fn log_elapsed(last: &mut Instant, day: usize) {
 
 fn run_day(i: usize, now: &mut Instant) {
     let style = Style::new().bold();
-    let day_fragment = style.paint(format!("Day {}", i + 1));
-    println!("{}: {}", day_fragment, DAYS[i]());
-    log_elapsed(now, i + 1);
+    let day_fragment = style.paint(format!("Day {}", i));
+    println!("{}: {}", day_fragment, DAYS[i - 1]());
+    log_elapsed(now, i);
 }
 
 fn main() {
     let mut run_all = false;
-    let args: HashSet<usize> = env::args()
+    let args: HashSet<i64> = env::args()
         .map(|a| {
             if a == "-a" {
                 run_all = true;
             }
-            a.parse::<usize>().unwrap_or(0)
+            a.parse::<i64>().unwrap_or(0)
         })
+        .filter(|a| *a > 0)
         .collect();
 
     let mut now = Instant::now();
     if run_all {
         for i in 0..DAYS.len() {
-            run_day(i, &mut now);
+            run_day(i + 1, &mut now);
         }
     } else {
         for arg in args.iter() {
-            run_day(*arg, &mut now);
+            run_day(*arg as usize, &mut now);
         }
     }
 }
