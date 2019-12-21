@@ -39,7 +39,7 @@ impl Display for Moon {
 #[derive(Debug, Default, Clone)]
 pub struct OrbitalSystem {
     pub moons: Vec<Moon>,
-    pub step_count: i128,
+    pub step_count: i64,
 }
 
 impl Display for OrbitalSystem {
@@ -60,12 +60,12 @@ impl LoadableFromFile for OrbitalSystem {
         let mut orbital_system = OrbitalSystem::default();
         for line in reader.lines() {
             const CHARS_TO_TRIM: &[char] = &['<', '>', 'x', 'y', 'z', '=', ' '];
-            let fields: Vec<i128> = line
+            let fields: Vec<i64> = line
                 .unwrap()
                 .split(',')
                 .map(|m| {
                     m.trim_matches(|c: char| CHARS_TO_TRIM.contains(&c))
-                        .parse::<i128>()
+                        .parse::<i64>()
                         .expect("invalid point")
                 })
                 .collect();
@@ -82,19 +82,19 @@ impl LoadableFromFile for OrbitalSystem {
 }
 
 trait TakeSteps {
-    fn take_steps(&mut self, step_count: i128);
+    fn take_steps(&mut self, step_count: i64);
     fn take_step(&mut self);
 }
 
 impl TakeSteps for OrbitalSystem {
-    fn take_steps(&mut self, step_count: i128) {
+    fn take_steps(&mut self, step_count: i64) {
         for _ in 0..step_count {
             self.take_step();
         }
     }
 
     fn take_step(&mut self) {
-        fn adj(l: i128, r: i128) -> i128 {
+        fn adj(l: i64, r: i64) -> i64 {
             if l < r {
                 1
             } else if l > r {
@@ -107,7 +107,7 @@ impl TakeSteps for OrbitalSystem {
         for i in 0..self.moons.len() {
             for j in i..self.moons.len() {
                 for k in 0..Point3D::size() {
-                    let adj: i128 =
+                    let adj: i64 =
                         adj(self.moons[i].position.get(k), self.moons[j].position.get(k));
                     let nvi = self.moons[i].velocity.get(k) + adj;
                     let nvj = self.moons[j].velocity.get(k) - adj;
@@ -126,12 +126,12 @@ impl TakeSteps for OrbitalSystem {
 }
 
 trait DimensionSlice {
-    fn dimension_slice(&self, dimension: usize) -> Vec<i128>;
-    fn dimension_equals(&self, dimension: usize, slice: &Vec<i128>) -> bool;
+    fn dimension_slice(&self, dimension: usize) -> Vec<i64>;
+    fn dimension_equals(&self, dimension: usize, slice: &Vec<i64>) -> bool;
 }
 
 impl DimensionSlice for OrbitalSystem {
-    fn dimension_slice(self: &Self, dimension: usize) -> Vec<i128> {
+    fn dimension_slice(self: &Self, dimension: usize) -> Vec<i64> {
         self.moons
             .iter()
             .map(|m| vec![m.position.get(dimension), m.velocity.get(dimension)])
@@ -139,7 +139,7 @@ impl DimensionSlice for OrbitalSystem {
             .collect()
     }
 
-    fn dimension_equals(&self, dimension: usize, slice: &Vec<i128>) -> bool {
+    fn dimension_equals(&self, dimension: usize, slice: &Vec<i64>) -> bool {
         let mut slice_iter = slice.iter();
 
         self.moons.iter().all(|m| {
@@ -150,34 +150,34 @@ impl DimensionSlice for OrbitalSystem {
 }
 
 trait SumTotalEnergy {
-    fn sum_total_energy(self: &Self) -> i128;
+    fn sum_total_energy(self: &Self) -> i64;
 }
 
 impl SumTotalEnergy for Point3D {
-    fn sum_total_energy(self: &Self) -> i128 {
-        self.x.abs() as i128 + self.y.abs() as i128 + self.z.abs() as i128
+    fn sum_total_energy(self: &Self) -> i64 {
+        self.x.abs() as i64 + self.y.abs() as i64 + self.z.abs() as i64
     }
 }
 
 impl SumTotalEnergy for Moon {
-    fn sum_total_energy(self: &Self) -> i128 {
+    fn sum_total_energy(self: &Self) -> i64 {
         self.position.sum_total_energy() * self.velocity.sum_total_energy()
     }
 }
 
 impl SumTotalEnergy for OrbitalSystem {
-    fn sum_total_energy(self: &Self) -> i128 {
-        i128::sum(self.moons.iter().map(|m| m.sum_total_energy()))
+    fn sum_total_energy(self: &Self) -> i64 {
+        i64::sum(self.moons.iter().map(|m| m.sum_total_energy()))
     }
 }
 
-pub fn part_one(initial_system: &OrbitalSystem, steps: i128) -> i128 {
+pub fn part_one(initial_system: &OrbitalSystem, steps: i64) -> i64 {
     let mut live_system = initial_system.clone();
     live_system.take_steps(steps);
     live_system.sum_total_energy()
 }
 
-pub fn part_two(initial_system: &OrbitalSystem) -> i128 {
+pub fn part_two(initial_system: &OrbitalSystem) -> i64 {
     let mut live_system = initial_system.clone();
     let mut initial_dimensions = Vec::new();
     for i in 0..Point3D::size() {
