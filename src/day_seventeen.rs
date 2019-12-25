@@ -9,10 +9,7 @@ use yet_another_geometry_mod::{Advance, Direction, Matrix2D, Matrix2DLike, Point
 
 const INPUT_FILENAME: &str = "input/day_seventeen.txt";
 
-fn get_matrix(input_filename: &str) -> Matrix2D<char> {
-    let mut program = Program::load(input_filename);
-    program.run_until_halted();
-
+fn get_matrix_from_io(program: &mut Program) -> Matrix2D<char> {
     let mut chars = Vec::new();
     let mut num_cols: i64 = 0;
     for n in 0..program.io.size() {
@@ -34,7 +31,10 @@ fn get_matrix(input_filename: &str) -> Matrix2D<char> {
 }
 
 pub fn part_one(input_filename: &str) -> i64 {
-    let matrix = get_matrix(input_filename);
+    let mut program = Program::load(input_filename);
+    program.run_until_halted();
+
+    let matrix = get_matrix_from_io(&mut program);
     println!("Matrix: {}", matrix);
 
     // exclude the "walls" from consideration.
@@ -58,7 +58,20 @@ pub fn part_one(input_filename: &str) -> i64 {
     scaffold_intersections.iter().map(|i| i.x * i.y).sum()
 }
 
-pub fn part_two() -> i64 {
+pub fn part_two(input_filename: &str) -> i64 {
+    let mut program = Program::load(input_filename);
+    program.buffer[0] = 2;
+    program.run_until_halted();
+    program.io.add('\n' as i64);
+    program.run_until_halted();
+    program.io.add('\n' as i64);
+    program.run_until_halted();
+    program.io.add('\n' as i64);
+    program.run_until_halted();
+    program.io.add('y' as i64);
+    program.io.add('\n' as i64);
+    let matrix = get_matrix_from_io(&mut program);
+    println!("Matrix: {:#?}", matrix);
     1
 }
 
@@ -66,7 +79,7 @@ pub fn solve() -> String {
     format!(
         "part one: {}, part two: {}",
         part_one(INPUT_FILENAME),
-        part_two()
+        part_two(INPUT_FILENAME)
     )
 }
 
