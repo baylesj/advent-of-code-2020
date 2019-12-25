@@ -1,7 +1,6 @@
-#[path = "intcode_computer.rs"]
-mod intcode_computer;
-use intcode_computer::{LoadableFromFile, Program, Runnable};
-use queues::IsQueue;
+#[path = "runtime.rs"]
+mod runtime;
+use runtime::{LoadableFromFile, Runtime, Executable};
 
 #[path = "yet_another_geometry_mod.rs"]
 mod yet_another_geometry_mod;
@@ -9,11 +8,11 @@ use yet_another_geometry_mod::{Advance, Direction, Matrix2D, Matrix2DLike, Point
 
 const INPUT_FILENAME: &str = "input/day_seventeen.txt";
 
-fn get_matrix_from_io(program: &mut Program) -> Matrix2D<char> {
-    let mut chars = Vec::new();
+fn get_matrix_from_io(runtime: &mut Runtime) -> Matrix2D<char> {
+    let mut chars = Vec::with_capacity(runtime.io.len());
     let mut num_cols: i64 = 0;
-    for n in 0..program.io.size() {
-        let i: u8 = program.io.remove().expect("io size wrong") as u8;
+    for n in 0..runtime.io.len() {
+        let i: u8 = runtime.io[n] as u8;
         if i > 0 && i as char != '0' && i as char != '\n' {
             chars.push(i as char);
         } else if i as char == '\n' && num_cols == 0 {
@@ -31,10 +30,10 @@ fn get_matrix_from_io(program: &mut Program) -> Matrix2D<char> {
 }
 
 pub fn part_one(input_filename: &str) -> i64 {
-    let mut program = Program::load(input_filename);
-    program.run_until_halted();
+    let mut runtime = Runtime::load(input_filename);
+    runtime.run_until_halted();
 
-    let matrix = get_matrix_from_io(&mut program);
+    let matrix = get_matrix_from_io(&mut runtime);
     println!("Matrix: {}", matrix);
 
     // exclude the "walls" from consideration.
@@ -59,18 +58,18 @@ pub fn part_one(input_filename: &str) -> i64 {
 }
 
 pub fn part_two(input_filename: &str) -> i64 {
-    let mut program = Program::load(input_filename);
-    program.buffer[0] = 2;
-    program.run_until_halted();
-    program.io.add('\n' as i64);
-    program.run_until_halted();
-    program.io.add('\n' as i64);
-    program.run_until_halted();
-    program.io.add('\n' as i64);
-    program.run_until_halted();
-    program.io.add('y' as i64);
-    program.io.add('\n' as i64);
-    let matrix = get_matrix_from_io(&mut program);
+    let mut runtime = Runtime::load(input_filename);
+    runtime.buffer[0] = 2;
+    runtime.run_until_halted();
+    runtime.io.push_back('\n' as i64);
+    runtime.run_until_halted();
+    runtime.io.push_back('\n' as i64);
+    runtime.run_until_halted();
+    runtime.io.push_back('\n' as i64);
+    runtime.run_until_halted();
+    runtime.io.push_back('y' as i64);
+    runtime.io.push_back('\n' as i64);
+    let matrix = get_matrix_from_io(&mut runtime);
     println!("Matrix: {:#?}", matrix);
     1
 }
