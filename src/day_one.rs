@@ -4,6 +4,21 @@ use std::io::BufReader;
 
 const INPUT_FILENAME: &str = "input/day_one.txt";
 
+fn solve_2(data: &[i32], left: usize, right: usize, desired_sum: i32) -> i32 {
+    let mut l_i: usize = left;
+    let mut r_i: usize = right;
+    let mut current_sum: i32 = data[l_i] + data[r_i];
+    while current_sum != desired_sum {
+        if desired_sum < current_sum {
+            r_i -= 1;
+        } else {
+            l_i += 1;
+        }
+        assert!(l_i < r_i);
+        current_sum = data[l_i] + data[r_i];
+    }
+    data[l_i] * data[r_i]
+}
 // Algorithm:
 //     sort list
 // 1 4 5 7 9  adds to 13
@@ -48,5 +63,8 @@ pub fn solve() -> String {
         current_sum = data[l_i] + data[r_i];
     }
 
-    format!("part one: {}", data[l_i] * data[r_i])
+    format!(
+        "part one: {}",
+        solve_2(data.as_slice(), l_i, r_i, DESIRED_SUM)
+    )
 }
