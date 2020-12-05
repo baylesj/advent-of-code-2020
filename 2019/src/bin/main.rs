@@ -4,9 +4,31 @@ use std::collections::HashSet;
 use std::env;
 use std::time::Instant;
 
-use advent_of_code::day_one;
+use advent_of_code::{
+    day_eight, day_eleven, day_fifteen, day_five, day_four, day_fourteen, day_nine, day_one,
+    day_seven, day_seventeen, day_six, day_sixteen, day_ten, day_thirteen, day_three, day_twelve,
+    day_two,
+};
 
-const DAYS: [&dyn Fn() -> String; 1] = [&day_one::solve];
+const DAYS: [&dyn Fn() -> String; 17] = [
+    &day_one::solve,
+    &day_two::solve,
+    &day_three::solve,
+    &day_four::solve,
+    &day_five::solve,
+    &day_six::solve,
+    &day_seven::solve,
+    &day_eight::solve,
+    &day_nine::solve,
+    &day_ten::solve,
+    &day_eleven::solve,
+    &day_twelve::solve,
+    &day_thirteen::solve,
+    &day_fourteen::solve,
+    &day_fifteen::solve,
+    &day_sixteen::solve,
+    &day_seventeen::solve,
+];
 
 fn log_elapsed(last: &mut Instant, day: usize) {
     let now = Instant::now();
