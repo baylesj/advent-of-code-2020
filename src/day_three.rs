@@ -1,4 +1,5 @@
 use crate::loadable::LoadableFromFile;
+use std::fmt;
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::BufReader;
@@ -9,7 +10,17 @@ use yet_another_geometry_mod::{Matrix2D, Point2D};
 
 const INPUT_FILENAME: &'static str = "input/day_three.txt";
 
-type Square = bool;
+#[derive(PartialEq, Eq, Clone, Copy)]
+enum Square {
+    Blocked,
+    Free,
+}
+
+impl fmt::Display for Square {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", if *self == Square::Blocked { '#' } else { ' ' })
+    }
+}
 
 impl LoadableFromFile for Matrix2D<Square> {
     fn load(filename: &str) -> Matrix2D<Square> {
@@ -26,9 +37,13 @@ impl LoadableFromFile for Matrix2D<Square> {
                     println!("setting column count to: {}", column_count);
                 }
                 row_count += 1;
-                l.as_bytes()
-                    .iter()
-                    .for_each(|b| data.push(*b == ('#' as u8)))
+                l.as_bytes().iter().for_each(|b| {
+                    data.push(if *b == ('#' as u8) {
+                        Square::Blocked
+                    } else {
+                        Square::Free
+                    })
+                })
             }
         }
         println!("row count total: {}", row_count);

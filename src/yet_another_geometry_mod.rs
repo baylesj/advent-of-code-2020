@@ -5,6 +5,8 @@ use std::ops::Add;
 pub trait Advance {
     fn advance(self: &mut Self, direction: Direction);
     fn advance_copy(self: &Self, direction: Direction) -> Self;
+    fn advance_mult(self: &mut Self, direction: Direction, count: i64);
+    fn advance_copy_mult(self: &Self, direction: Direction, count: i64) -> Self;
 }
 
 pub trait ArrayLike {
@@ -96,31 +98,39 @@ impl RelativeTurn for Direction {
 
 impl Advance for Point2D {
     fn advance(self: &mut Self, direction: Direction) {
-        match direction {
-            Direction::Left => self.x -= 1,
-            Direction::Up => self.y -= 1,
-            Direction::Right => self.x += 1,
-            Direction::Down => self.y += 1,
-        }
+        self.advance_mult(direction, 1);
     }
 
     fn advance_copy(self: &Self, direction: Direction) -> Point2D {
+        self.advance_copy_mult(direction, 1)
+    }
+
+    fn advance_mult(self: &mut Self, direction: Direction, count: i64) {
+        match direction {
+            Direction::Left => self.x -= count,
+            Direction::Up => self.y -= count,
+            Direction::Right => self.x += count,
+            Direction::Down => self.y += count,
+        }
+    }
+
+    fn advance_copy_mult(self: &Self, direction: Direction, count: i64) -> Point2D {
         match direction {
             Direction::Left => Point2D {
-                x: self.x - 1,
+                x: self.x - count,
                 y: self.y,
             },
             Direction::Up => Point2D {
                 x: self.x,
-                y: self.y - 1,
+                y: self.y - count,
             },
             Direction::Right => Point2D {
-                x: self.x + 1,
+                x: self.x + count,
                 y: self.y,
             },
             Direction::Down => Point2D {
                 x: self.x,
-                y: self.y + 1,
+                y: self.y + count,
             },
         }
     }
@@ -230,32 +240,45 @@ mod tests {
 
     #[test]
     pub fn advance_in_place() {
-        let mut point = Point2D{x: 0, y: 0};
+        let mut point = Point2D { x: 0, y: 0 };
         point.advance(Direction::Left);
-        assert_eq!(Point2D{x: -1, y: 0}, point);
+        assert_eq!(Point2D { x: -1, y: 0 }, point);
         // Down is a matter of perspective, in YAGM down is positive increment.
         point.advance(Direction::Down);
-        assert_eq!(Point2D{x: -1, y: 1}, point);
+        assert_eq!(Point2D { x: -1, y: 1 }, point);
         point.advance(Direction::Right);
-        assert_eq!(Point2D{x: 0, y: 1}, point);
+        assert_eq!(Point2D { x: 0, y: 1 }, point);
         point.advance(Direction::Up);
-        assert_eq!(Point2D{x: 0, y: 0}, point);
+        assert_eq!(Point2D { x: 0, y: 0 }, point);
+    }
+
+    #[test]
+    pub fn advance_multiple_in_place() {
+        let mut point = Point2D { x: 0, y: 0 };
+        point.advance_mult(Direction::Left, 3);
+        assert_eq!(Point2D { x: -3, y: 0 }, point);
+        point.advance_mult(Direction::Down, 4);
+        assert_eq!(Point2D { x: -3, y: 4 }, point);
+        point.advance_mult(Direction::Right, 13);
+        assert_eq!(Point2D { x: 10, y: 4 }, point);
+        point.advance_mult(Direction::Up, 8);
+        assert_eq!(Point2D { x: 10, y: -4 }, point)
     }
 
     #[test]
     pub fn advance_a_copy() {
-        let point = Point2D{x: 0, y: 0};
+        let point = Point2D { x: 0, y: 0 };
 
         let copy_left = point.advance_copy(Direction::Left);
-        assert_eq!(Point2D{x: -1, y: 0}, copy_left);
+        assert_eq!(Point2D { x: -1, y: 0 }, copy_left);
 
         let copy_down = point.advance_copy(Direction::Down);
-        assert_eq!(Point2D{x: 0, y: 1}, copy_down);
+        assert_eq!(Point2D { x: 0, y: 1 }, copy_down);
 
         let copy_right = point.advance_copy(Direction::Right);
-        assert_eq!(Point2D{x: 1, y: 0}, copy_right);
+        assert_eq!(Point2D { x: 1, y: 0 }, copy_right);
 
         let copy_up = point.advance_copy(Direction::Up);
-        assert_eq!(Point2D{x: 0, y: -1}, copy_up);
+        assert_eq!(Point2D { x: 0, y: -1 }, copy_up);
     }
 }
