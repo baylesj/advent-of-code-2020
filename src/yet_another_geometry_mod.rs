@@ -223,3 +223,39 @@ impl<T: fmt::Display + Copy> fmt::Display for Matrix2D<T> {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    pub fn advance_in_place() {
+        let mut point = Point2D{x: 0, y: 0};
+        point.advance(Direction::Left);
+        assert_eq!(Point2D{x: -1, y: 0}, point);
+        // Down is a matter of perspective, in YAGM down is positive increment.
+        point.advance(Direction::Down);
+        assert_eq!(Point2D{x: -1, y: 1}, point);
+        point.advance(Direction::Right);
+        assert_eq!(Point2D{x: 0, y: 1}, point);
+        point.advance(Direction::Up);
+        assert_eq!(Point2D{x: 0, y: 0}, point);
+    }
+
+    #[test]
+    pub fn advance_a_copy() {
+        let point = Point2D{x: 0, y: 0};
+
+        let copy_left = point.advance_copy(Direction::Left);
+        assert_eq!(Point2D{x: -1, y: 0}, copy_left);
+
+        let copy_down = point.advance_copy(Direction::Down);
+        assert_eq!(Point2D{x: 0, y: 1}, copy_down);
+
+        let copy_right = point.advance_copy(Direction::Right);
+        assert_eq!(Point2D{x: 1, y: 0}, copy_right);
+
+        let copy_up = point.advance_copy(Direction::Up);
+        assert_eq!(Point2D{x: 0, y: -1}, copy_up);
+    }
+}

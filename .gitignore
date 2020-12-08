@@ -1,3 +1,4 @@
 /target
 2019/target
 **/*.rs.bk
+*.profraw
