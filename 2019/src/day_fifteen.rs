@@ -14,7 +14,7 @@ use intcode_computer::Runnable;
 mod yet_another_geometry_mod;
 use yet_another_geometry_mod::{Advance, Direction, Inverse, Point2D};
 
-const INPUT_FILENAME: &str = "input/day_fifteen.txt";
+const INPUT_FILENAME: &'static str = "input/day_fifteen.txt";
 
 #[derive(Debug, IntoPrimitive, TryFromPrimitive)]
 #[repr(i64)]

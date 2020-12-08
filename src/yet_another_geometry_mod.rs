@@ -53,8 +53,8 @@ pub struct Point3D {
 
 #[derive(Debug, PartialEq, Eq, Default, Hash, Clone)]
 pub struct Matrix2D<T> {
-    data: Vec<T>,
-    size: Point2D,
+    pub data: Vec<T>,
+    pub size: Point2D,
 }
 
 impl Default for Direction {

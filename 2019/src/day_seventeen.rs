@@ -1,12 +1,12 @@
 #[path = "runtime.rs"]
 mod runtime;
-use runtime::{LoadableFromFile, Runtime, Executable};
+use runtime::{Executable, LoadableFromFile, Runtime};
 
 #[path = "yet_another_geometry_mod.rs"]
 mod yet_another_geometry_mod;
 use yet_another_geometry_mod::{Advance, Direction, Matrix2D, Matrix2DLike, Point2D};
 
-const INPUT_FILENAME: &str = "input/day_seventeen.txt";
+const INPUT_FILENAME: &'static str = "input/day_seventeen.txt";
 
 fn get_matrix_from_io(runtime: &mut Runtime) -> Matrix2D<char> {
     let mut chars = Vec::with_capacity(runtime.io.len());

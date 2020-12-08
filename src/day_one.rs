@@ -2,9 +2,10 @@ use std::fs::File;
 use std::io::prelude::*;
 use std::io::BufReader;
 
-const INPUT_FILENAME: &str = "input/day_one.txt";
+const INPUT_FILENAME: &'static str = "input/day_one.txt";
+const DESIRED_SUM: i32 = 2020;
 
-fn solve_part_one(data: &[i32], left: usize, right: usize, desired_sum: i32) -> Option<i32> {
+pub fn solve_part_one(data: &[i32], left: usize, right: usize, desired_sum: i32) -> Option<i32> {
     let mut l_i: usize = left;
     let mut r_i: usize = right;
     let mut current_sum: i32 = data[l_i] + data[r_i];
@@ -22,7 +23,7 @@ fn solve_part_one(data: &[i32], left: usize, right: usize, desired_sum: i32) -> 
     None
 }
 
-fn solve_part_two(data: &[i32], desired_sum: i32) -> Option<i32> {
+pub fn solve_part_two(data: &[i32], desired_sum: i32) -> Option<i32> {
     let mut part_two_answer: Option<i32> = None;
     for i in 0..(data.len() - 2) {
         let partial = solve_part_one(
@@ -42,7 +43,7 @@ fn solve_part_two(data: &[i32], desired_sum: i32) -> Option<i32> {
     part_two_answer
 }
 
-pub fn solve() -> String {
+pub fn load_data() -> Vec<i32> {
     let file = File::open(INPUT_FILENAME).expect("Invalid filename");
     let reader = BufReader::new(file);
 
@@ -54,12 +55,38 @@ pub fn solve() -> String {
         })
         .collect();
     data.sort();
+    data
+}
 
-    const DESIRED_SUM: i32 = 2020;
+pub fn solve() -> String {
+    let data = load_data();
 
     format!(
         "part one: {}, part two: {}",
         solve_part_one(data.as_slice(), 0, data.len() - 1, DESIRED_SUM).unwrap(),
         solve_part_two(data.as_slice(), DESIRED_SUM).unwrap()
     )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    pub fn solves_part_one() {
+        let data = load_data();
+        assert_eq!(
+            751776,
+            solve_part_one(data.as_slice(), 0, data.len() - 1, DESIRED_SUM).unwrap()
+        )
+    }
+
+    #[test]
+    pub fn solves_part_two() {
+        let data = load_data();
+        assert_eq!(
+            42275090,
+            solve_part_two(data.as_slice(), DESIRED_SUM).unwrap()
+        )
+    }
 }

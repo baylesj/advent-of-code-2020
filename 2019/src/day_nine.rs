@@ -4,7 +4,7 @@ pub use self::intcode_computer::{LoadableFromFile, Program, Runnable};
 #[path = "intcode_computer.rs"]
 mod intcode_computer;
 
-const INPUT_FILENAME: &str = "input/day_nine.txt";
+const INPUT_FILENAME: &'static str = "input/day_nine.txt";
 
 pub fn part_one(input_filename: &str) -> i64 {
     let mut program = Program::load(input_filename);

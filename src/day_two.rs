@@ -6,7 +6,7 @@ use std::io::BufReader;
 use std::num::ParseIntError;
 use std::str::FromStr;
 
-const INPUT_FILENAME: &str = "input/day_two.txt";
+const INPUT_FILENAME: &'static str = "input/day_two.txt";
 
 struct PasswordAndPolicy {
     min_count: i8,

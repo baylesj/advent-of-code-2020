@@ -8,7 +8,7 @@ use intcode_computer::Program;
 use intcode_computer::ProgramState;
 use intcode_computer::Runnable;
 
-const INPUT_FILENAME: &str = "input/day_seven.txt";
+const INPUT_FILENAME: &'static str = "input/day_seven.txt";
 const PROGRAM_COUNT: usize = 5;
 
 fn run_permutation(input: i64, permutation: &[i64], programs: &mut Vec<Program>) -> i64 {

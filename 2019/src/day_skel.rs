@@ -3,7 +3,7 @@ use std::fs::File;
 use std::io::prelude::*;
 use std::io::BufReader;
 
-const INPUT_FILENAME: &str = "input/day_.txt";
+const INPUT_FILENAME: &'static str = "input/day_.txt";
 
 pub fn part_one() -> i64 {
     1

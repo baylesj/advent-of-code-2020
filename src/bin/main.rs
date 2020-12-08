@@ -5,9 +5,10 @@ use std::env;
 use std::time::Instant;
 
 use advent_of_code::day_one;
+use advent_of_code::day_three;
 use advent_of_code::day_two;
 
-const DAYS: [&dyn Fn() -> String; 2] = [&day_one::solve, &day_two::solve];
+const DAYS: [&dyn Fn() -> String; 3] = [&day_one::solve, &day_two::solve, &day_three::solve];
 
 fn log_elapsed(last: &mut Instant, day: usize) {
     let now = Instant::now();

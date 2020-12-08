@@ -1,6 +1,6 @@
 use std::fs;
 
-const INPUT_FILENAME: &str = "input/day_sixteen.txt";
+const INPUT_FILENAME: &'static str = "input/day_sixteen.txt";
 
 fn load(input_filename: &str) -> Vec<i16> {
     fs::read_to_string(input_filename)

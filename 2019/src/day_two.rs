@@ -4,7 +4,7 @@ use intcode_computer::LoadableFromFile;
 use intcode_computer::Program;
 use intcode_computer::Runnable;
 
-const INPUT_FILENAME: &str = "input/day_two.txt";
+const INPUT_FILENAME: &'static str = "input/day_two.txt";
 
 fn set_program_inputs(program: &mut Program, noun: i64, verb: i64) {
     program.buffer[1] = noun;

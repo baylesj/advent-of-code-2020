@@ -5,7 +5,7 @@ use intcode_computer::Program;
 use intcode_computer::Runnable;
 use queues::IsQueue;
 
-const INPUT_FILENAME: &str = "input/day_five.txt";
+const INPUT_FILENAME: &'static str = "input/day_five.txt";
 
 pub fn part_one(program: &mut Program) -> i64 {
     program.io.add(1).ok();

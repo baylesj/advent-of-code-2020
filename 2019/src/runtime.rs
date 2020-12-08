@@ -1,10 +1,10 @@
 use log::debug;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use std::clone::Clone;
+use std::collections::VecDeque;
 use std::convert::TryFrom;
 use std::convert::TryInto;
 use std::fs;
-use std::collections::VecDeque;
 
 #[path = "loadable.rs"]
 mod loadable;

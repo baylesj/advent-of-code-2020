@@ -51,7 +51,7 @@ fn meets_criteria_strict(password: Password) -> bool {
 }
 
 pub fn solve() -> String {
-    const PASSWORD_RANGE: Range<Password> = (138307..654505);
+    const PASSWORD_RANGE: Range<Password> = 138307..654505;
 
     let mut password_count: i64 = 0;
     let mut strict_password_count: i64 = 0;

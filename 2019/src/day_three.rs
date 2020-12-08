@@ -2,11 +2,11 @@ use geo;
 use std::fs;
 use std::str::FromStr;
 
-const INPUT_FILENAME: &str = "input/day_three.txt";
+const INPUT_FILENAME: &'static str = "input/day_three.txt";
 // TODO: doesn't work on day_three_sample.txt. Looking at the implementation
 // implies there's an offset issue from the original advent source?
-//const INPUT_FILENAME: &str = "input/day_three_sample.txt";
-//const INPUT_FILENAME: &str = "input/day_three_sample_two.txt";
+//const INPUT_FILENAME: &'static str = "input/day_three_sample.txt";
+//const INPUT_FILENAME: &'static str = "input/day_three_sample_two.txt";
 
 enum Instruction {
     Left(i32),
