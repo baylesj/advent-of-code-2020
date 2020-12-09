@@ -1,6 +1,7 @@
 use std::convert::TryInto;
 use std::fmt;
 use std::ops::Add;
+use std::ops::AddAssign;
 
 pub trait Advance {
     fn advance(self: &mut Self, direction: Direction);
@@ -142,6 +143,47 @@ impl fmt::Display for Point2D {
     }
 }
 
+impl ArrayLike for Point2D {
+    fn size() -> usize {
+        2
+    }
+
+    fn get(&self, i: usize) -> i64 {
+        match i {
+            0 => self.x,
+            1 => self.y,
+            _ => panic!("out of bounds"),
+        }
+    }
+
+    fn set(&mut self, i: usize, v: i64) {
+        match i {
+            0 => self.x = v,
+            1 => self.y = v,
+            _ => panic!("out of bounds"),
+        }
+    }
+}
+
+impl Add for Point2D {
+    type Output = Self;
+    fn add(self, other: Self) -> Self {
+        Self {
+            x: self.x + other.x,
+            y: self.y + other.y,
+        }
+    }
+}
+
+impl AddAssign for Point2D {
+    fn add_assign(&mut self, other: Self) {
+        *self = Self {
+            x: self.x + other.x,
+            y: self.y + other.y,
+        };
+    }
+}
+
 impl fmt::Display for Point3D {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "({}, {}, {})", self.x, self.y, self.z)
@@ -183,6 +225,16 @@ impl Add for Point3D {
     }
 }
 
+impl AddAssign for Point3D {
+    fn add_assign(&mut self, other: Self) {
+        *self = Self {
+            x: self.x + other.x,
+            y: self.y + other.y,
+            z: self.z + other.z,
+        };
+    }
+}
+
 impl<T: Copy> Matrix2DLike<T> for Matrix2D<T> {
     fn create(size: &Point2D) -> Self {
         Matrix2D {
@@ -219,7 +271,6 @@ impl<T: Copy> Matrix2DLike<T> for Matrix2D<T> {
 impl<T: fmt::Display + Copy> fmt::Display for Matrix2D<T> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut current = Point2D::default();
-        write!(f, "[\n").expect("didn't write!");
         for i in 0..self.size.y {
             current.y = i;
             write!(f, "[").expect("didn't write!");
@@ -229,7 +280,6 @@ impl<T: fmt::Display + Copy> fmt::Display for Matrix2D<T> {
             }
             write!(f, "]\n").expect("didn't write!");
         }
-        write!(f, "]\n").expect("didn't write!");
         Ok(())
     }
 }

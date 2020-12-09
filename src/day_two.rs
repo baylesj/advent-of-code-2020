@@ -1,4 +1,5 @@
 use crate::loadable::LoadableFromFile;
+use crate::validity::Validity;
 use regex::Regex;
 use std::fs::File;
 use std::io::prelude::*;
@@ -13,10 +14,6 @@ struct PasswordAndPolicy {
     max_count: i8,
     required_letter: char,
     password: String,
-}
-
-trait Validity {
-    fn is_valid(&self) -> bool;
 }
 
 impl Validity for PasswordAndPolicy {
@@ -79,4 +76,14 @@ pub fn solve() -> String {
             .iter()
             .fold(0, |sum, p| { sum + p.is_new_valid() as i32 })
     )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    pub fn solves() {
+        assert_eq!("part one: 506, part two: 443", solve());
+    }
 }

@@ -73,20 +73,7 @@ mod tests {
     use super::*;
 
     #[test]
-    pub fn solves_part_one() {
-        let data = load_data();
-        assert_eq!(
-            751776,
-            solve_part_one(data.as_slice(), 0, data.len() - 1, DESIRED_SUM).unwrap()
-        )
-    }
-
-    #[test]
-    pub fn solves_part_two() {
-        let data = load_data();
-        assert_eq!(
-            42275090,
-            solve_part_two(data.as_slice(), DESIRED_SUM).unwrap()
-        )
+    pub fn solves() {
+        assert_eq!("part one: 751776, part two: 42275090", solve());
     }
 }

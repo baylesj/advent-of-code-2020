@@ -1,6 +1,6 @@
 [package]
 name = "advent-of-code"
-version = "0.1.0"
+version = "0.4.1"
 authors = ["Jordan Bayles <jophba@chromium.org>"]
 edition = "2018"
 
