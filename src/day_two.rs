@@ -1,5 +1,6 @@
 use crate::loadable::LoadableFromFile;
 use crate::validity::Validity;
+use lazy_static::lazy_static;
 use regex::Regex;
 use std::fs::File;
 use std::io::prelude::*;
@@ -39,8 +40,13 @@ impl FromStr for PasswordAndPolicy {
     type Err = ParseIntError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let re = Regex::new(r"^(\d+)-(\d+) ([a-z]): (.*)$").unwrap();
-        let caps = re.captures(s).unwrap();
+        lazy_static! {
+            // Cool note: compiling regex takes a LONG time, there are
+            // huge perf improvements by using a static here (100x faster).
+            static ref RE: Regex = Regex::new(r"^(\d+)-(\d+) ([a-z]): (.*)$").unwrap();
+        }
+
+        let caps = RE.captures(s).unwrap();
         Ok(PasswordAndPolicy {
             min_count: caps[1].parse().unwrap(),
             max_count: caps[2].parse().unwrap(),

@@ -1,5 +1,6 @@
 use crate::loadable::LoadableFromFile;
 use crate::validity::Validity;
+use lazy_static::lazy_static;
 use regex::Regex;
 use std::fmt;
 use std::fs::File;
@@ -189,7 +190,9 @@ impl fmt::Display for Passport {
 
 impl LoadableFromFile for Vec<Passport> {
     fn load(filename: &str) -> Vec<Passport> {
-        let re: Regex = Regex::new("([a-z]+):([a-z0-9#]+)").unwrap();
+        lazy_static! {
+            static ref RE: Regex = Regex::new("([a-z]+):([a-z0-9#]+)").unwrap();
+        }
         let file = File::open(filename).expect("Invalid filename");
 
         let mut reader = BufReader::new(file);
@@ -213,7 +216,7 @@ impl LoadableFromFile for Vec<Passport> {
                     }
 
                     // TODO: this could handle errors cleaner.
-                    for found in re.captures_iter(&line) {
+                    for found in RE.captures_iter(&line) {
                         match &found[1] {
                             "byr" => current.birth_year = found[2].parse().unwrap_or_default(),
                             "iyr" => current.issue_year = found[2].parse().unwrap_or_default(),

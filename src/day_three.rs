@@ -34,7 +34,6 @@ impl LoadableFromFile for Matrix2D<Square> {
             if let Ok(l) = line {
                 if column_count == 0 {
                     column_count = l.len() as i64;
-                    println!("setting column count to: {}", column_count);
                 }
                 row_count += 1;
                 l.as_bytes().iter().for_each(|b| {
@@ -46,12 +45,6 @@ impl LoadableFromFile for Matrix2D<Square> {
                 })
             }
         }
-        println!("row count total: {}", row_count);
-        println!(
-            "data size: {}, expected: {}",
-            data.len(),
-            row_count * column_count
-        );
 
         Matrix2D::<Square> {
             data: data,
