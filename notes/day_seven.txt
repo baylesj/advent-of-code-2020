@@ -1,0 +1,58 @@
+Part one/general notes:
+
+Naive approach for parsing: regex the whole thing:
+
+([a-z ]*) bags contain ((\d+) ([a-z ]+)bag[s, .]+)*(no other bags.)?
+
+Regex doesn't support groups like this very well, since it's repeating.
+
+String should only have "contains" one time, so split string once on:
+
+" bags contain "
+
+then left = <color>
+right = either:
+
+"no other bags." can gate on "n" even.
+
+or a separated list of bags that have regex matches:
+
+((\d+) ([a-z ]+)) bags?[., ]+
+
+On https://regexr.com/5i6s5:
+Group 2 is count, group 3 is bag identifier.
+
+Algorithm approaches: basically this is a directed graph, if we think of gold bags
+as a terminal node, we only care about other nodes that connect
+to the gold bags node.
+
+Algorithm 1:
+for bag type in bag type:
+if it connects to gold, add to list
+then for bag that doesn't "connect" yet, if it connects to a node in list
+then add to connect list.
+keep going until the size of the list doesn't change (no new connections).
+
+Worst case:
+  time: only one new one each time: n + (n - 1) + (n - 2) + ... + 1
+        n (n - 1) / 2 = O(n^2) essentially. Maybe slightly better?
+
+  memory: O(n), list of nodes not connected yet, list of connected nodes
+
+**Algorithm 2:
+
+Use a hashmap of Bag Name -> Bag Node + a digraph--each "Bag Node" has
+a reference list of children. If child is unknown, add with no children
+and populate later. Go the other way as well and add parents to the child
+nodes. If a bag doesn't hold anything we can ignore it. Once this
+digraph is constructed, we can just do a breadth (or depth) based traversal
+starting at the gold bag and count the nodes we traverse.
+
+Worst case:
+  time: O(nlog(n)): we traverse each node to populate it and add to graph,
+  then once again to count it. The hashmap will likely need nlog(n) for insertion.
+  memory: O(n): the double memory is still just relative to the size of each node.
+
+Other note: generally adventofcode forces you somewhat to have extensible solutions,
+since part two is frequently easy if your code is architected well and hard if it
+is not. Likely having a digraph here will make whatever happens in part two easier.
