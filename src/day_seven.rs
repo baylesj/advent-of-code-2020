@@ -6,6 +6,7 @@ use std::io::BufReader;
 use lazy_static::lazy_static;
 use regex::Regex;
 
+
 pub fn load(filename: &str) {
     lazy_static!{
         static ref RE: Regex = Regex::new(r"((\d+) ([a-z ]+)) bags?[., ]+").unwrap();
@@ -16,13 +17,14 @@ pub fn load(filename: &str) {
     for line in reader.lines().map(|l| l.expect("bad input")) {
         let name_or: Vec<&str> = line.splitn(2, " bags contain ").collect();
 
-        println!("'{}':", name_or[0]);
+        println!("'{}':", &name_or[0]);
         if name_or[1].starts_with("n") { // ...o other bags.
             // bag is a terminal node, we don't care.
             continue;
         } else {
             for child in RE.captures_iter(&name_or[1]) {
-                println!("\tchild: {} of {}", &child[2], &child[3]);
+                let count: i32 = child[2].parse().unwrap();
+                println!("\tchild: {} of {}", count, &child[3]);
             }
         }
     }
@@ -47,6 +49,5 @@ mod tests {
     #[test]
     pub fn test_loader() {
         load("input/day_seven_example.txt");
-        panic!();
     }
 }
