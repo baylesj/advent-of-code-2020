@@ -1,3 +1,4 @@
+use crate::loadable::LoadableFromFile;
 use lazy_static::lazy_static;
 use regex::Regex;
 use std::collections::HashMap;
@@ -16,32 +17,34 @@ pub struct Bag {
 }
 
 // TODO: not thrilled about all the Strings everywhere, but need to do more
-// research on
-pub fn load(filename: &str) -> HashMap<String, Bag> {
-    lazy_static! {
-        static ref RE: Regex = Regex::new(r"((\d+) ([a-z ]+)) bags?[., ]+").unwrap();
-    }
-    let file = File::open(filename).expect("invalid filename");
-    let reader = BufReader::new(file);
-
-    let mut bags = HashMap::<String, Bag>::new();
-    for line in reader.lines().map(|l| l.expect("bad input")) {
-        let name_or: Vec<&str> = line.splitn(2, " bags contain ").collect();
-
-        let mut bag = Bag {
-            name: name_or[0].to_owned(),
-            children: HashMap::<String, i32>::new(),
-        };
-        if !name_or[1].starts_with("n") {
-            for child in RE.captures_iter(&name_or[1]) {
-                let count: i32 = child[2].parse().unwrap();
-                bag.children.insert(child[3].to_string(), count);
-            }
+// research on lifetimes.
+impl LoadableFromFile for HashMap<String, Bag> {
+    fn load(filename: &str) -> HashMap<String, Bag> {
+        lazy_static! {
+            static ref RE: Regex = Regex::new(r"((\d+) ([a-z ]+)) bags?[., ]+").unwrap();
         }
-        bags.insert(bag.name.to_string(), bag);
-    }
+        let file = File::open(filename).expect("invalid filename");
+        let reader = BufReader::new(file);
 
-    bags
+        let mut bags = HashMap::<String, Bag>::new();
+        for line in reader.lines().map(|l| l.expect("bad input")) {
+            let name_or: Vec<&str> = line.splitn(2, " bags contain ").collect();
+
+            let mut bag = Bag {
+                name: name_or[0].to_owned(),
+                children: HashMap::<String, i32>::new(),
+            };
+            if !name_or[1].starts_with("n") {
+                for child in RE.captures_iter(&name_or[1]) {
+                    let count: i32 = child[2].parse().unwrap();
+                    bag.children.insert(child[3].to_string(), count);
+                }
+            }
+            bags.insert(bag.name.to_string(), bag);
+        }
+
+        bags
+    }
 }
 
 pub fn find_bags_that_can_hold_gold(bags: &HashMap<String, Bag>) -> i64 {
@@ -103,7 +106,7 @@ pub fn find_total_bag_count_in_gold(bags: &HashMap<String, Bag>) -> i32 {
 }
 
 pub fn solve() -> String {
-    let bags = load("input/day_seven.txt");
+    let bags = HashMap::<String, Bag>::load("input/day_seven.txt");
     format!(
         "part one: {}, part two: {}",
         find_bags_that_can_hold_gold(&bags),
@@ -122,19 +125,19 @@ mod tests {
 
     #[test]
     pub fn test_example_one() {
-        let bags = load("input/day_seven_example.txt");
+        let bags = HashMap::<String, Bag>::load("input/day_seven_example.txt");
         assert_eq!(4, find_bags_that_can_hold_gold(&bags));
     }
 
     #[test]
     pub fn test_example_two() {
-        let bags = load("input/day_seven_example_two.txt");
+        let bags = HashMap::<String, Bag>::load("input/day_seven_example_two.txt");
         assert_eq!(32, find_total_bag_count_in_gold(&bags));
     }
 
     #[test]
     pub fn test_example_three() {
-        let bags = load("input/day_seven_example_three.txt");
+        let bags = HashMap::<String, Bag>::load("input/day_seven_example_three.txt");
         assert_eq!(126, find_total_bag_count_in_gold(&bags));
     }
 }
