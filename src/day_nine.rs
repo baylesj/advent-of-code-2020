@@ -40,9 +40,38 @@ pub fn part_one(numbers: &[i64], preamble_length: usize) -> i64 {
     1
 }
 
+pub fn part_two(numbers: &[i64], weakness_number: i64) -> i64 {
+    let mut current_sum = numbers[0];
+    let mut left_index = 0;
+    let mut right_index = 0;
+
+    while current_sum != weakness_number {
+        if current_sum > weakness_number {
+            current_sum -= numbers[left_index];
+            left_index += 1;
+        } else if current_sum < weakness_number {
+            right_index += 1;
+            current_sum += numbers[right_index];
+        }
+    }
+
+    let mut min = numbers[left_index];
+    let mut max = min;
+    for i in left_index + 1..right_index + 1 {
+      min = std::cmp::min(min, numbers[i]);
+      max = std::cmp::max(max, numbers[i]);
+    }
+    min + max
+}
+
 pub fn solve() -> String {
     let numbers = Vec::<i64>::load("input/day_nine.txt");
-    format!("part one: {}, part two: 0", part_one(&numbers, 25))
+    let weakness_number = part_one(&numbers, 25);
+    format!(
+        "part one: {}, part two: {}",
+        weakness_number,
+        part_two(&numbers, weakness_number)
+    )
 }
 
 #[cfg(test)]
@@ -51,12 +80,20 @@ mod tests {
 
     #[test]
     pub fn test_solve() {
-        assert_eq!("part one: 530627549, part two: 0", solve());
+        assert_eq!("part one: 530627549, part two: 77730285", solve());
     }
 
     #[test]
     pub fn test_example() {
         let numbers = Vec::<i64>::load("input/day_nine_example.txt");
         assert_eq!(127, part_one(&numbers, 5));
+    }
+
+    #[test]
+    pub fn test_example_part_two() {
+        let numbers = Vec::<i64>::load("input/day_nine_example.txt");
+        let weakness_number = part_one(&numbers, 5);
+
+        assert_eq!(62, part_two(&numbers, weakness_number));
     }
 }
