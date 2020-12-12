@@ -58,8 +58,8 @@ pub fn part_two(numbers: &[i64], weakness_number: i64) -> i64 {
     let mut min = numbers[left_index];
     let mut max = min;
     for i in left_index + 1..right_index + 1 {
-      min = std::cmp::min(min, numbers[i]);
-      max = std::cmp::max(max, numbers[i]);
+        min = std::cmp::min(min, numbers[i]);
+        max = std::cmp::max(max, numbers[i]);
     }
     min + max
 }

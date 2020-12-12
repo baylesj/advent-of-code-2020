@@ -43,7 +43,6 @@ impl FromStr for Instruction {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let name_and_value = s.split_at(3);
-        println!("name and value: {:?}", name_and_value);
         // Rust does not approve of leading '+' on integers.
         let value: i64 = name_and_value
             .1
