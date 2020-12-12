@@ -56,3 +56,8 @@ Worst case:
 Other note: generally adventofcode forces you somewhat to have extensible solutions,
 since part two is frequently easy if your code is architected well and hard if it
 is not. Likely having a digraph here will make whatever happens in part two easier.
+
+Part two:
+We did it! Yay. But lazy solution.
+
+Taking a step back, this is a weighted, directed graph.
