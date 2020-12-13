@@ -1,68 +1,15 @@
 use crate::loadable::LoadableFromFile;
-use std::fmt;
-use std::fs::File;
-use std::io::prelude::*;
-use std::io::BufReader;
-
-#[path = "yet_another_geometry_mod.rs"]
-mod yet_another_geometry_mod;
-use yet_another_geometry_mod::{Matrix2D, Matrix2DLike, Point2D};
+use crate::yet_another_geometry_mod::*;
 
 const INPUT_FILENAME: &'static str = "input/day_three.txt";
 
-#[derive(PartialEq, Eq, Clone, Copy)]
-pub enum Square {
-    Blocked,
-    Free,
-}
-
-impl fmt::Display for Square {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", if *self == Square::Blocked { '#' } else { ' ' })
-    }
-}
-
-impl LoadableFromFile for Matrix2D<Square> {
-    fn load(filename: &str) -> Matrix2D<Square> {
-        let file = File::open(filename).expect("Invalid filename");
-        let reader = BufReader::new(file);
-
-        let mut row_count: i64 = 0;
-        let mut column_count: i64 = 0;
-        let mut data = Vec::new();
-        for line in reader.lines() {
-            if let Ok(l) = line {
-                if column_count == 0 {
-                    column_count = l.len() as i64;
-                }
-                row_count += 1;
-                l.as_bytes().iter().for_each(|b| {
-                    data.push(if *b == ('#' as u8) {
-                        Square::Blocked
-                    } else {
-                        Square::Free
-                    })
-                })
-            }
-        }
-
-        Matrix2D::<Square> {
-            data: data,
-            size: Point2D {
-                x: column_count,
-                y: row_count,
-            },
-        }
-    }
-}
-
-pub fn part_one(map: &Matrix2D<Square>, slope: &Point2D) -> i64 {
+pub fn part_one(map: &Matrix2D<char>, slope: &Point2D) -> i64 {
     let mut tree_count: i64 = 0;
     let mut current = Point2D { x: 0, y: 0 };
     while current.y < map.size.y {
         // The map is infinite in a repeating pattern, but only in the X direction.
         current.x = current.x % map.size.x;
-        if map.get(&current) == Square::Blocked {
+        if map.get(&current) == '#' {
             tree_count += 1;
         }
         current += *slope;
@@ -70,7 +17,7 @@ pub fn part_one(map: &Matrix2D<Square>, slope: &Point2D) -> i64 {
     tree_count
 }
 
-pub fn part_two(map: &Matrix2D<Square>) -> i64 {
+pub fn part_two(map: &Matrix2D<char>) -> i64 {
     static SLOPES: &'static [Point2D] = &[
         Point2D { x: 1, y: 1 },
         Point2D { x: 3, y: 1 },
@@ -87,7 +34,7 @@ pub fn part_two(map: &Matrix2D<Square>) -> i64 {
 }
 
 pub fn solve() -> String {
-    let map = Matrix2D::<Square>::load(INPUT_FILENAME);
+    let map = Matrix2D::<char>::load(INPUT_FILENAME);
     format!(
         "part one: {}, part two: {}",
         part_one(&map, &Point2D { x: 3, y: 1 }),
@@ -101,9 +48,8 @@ mod tests {
 
     #[test]
     pub fn solves_part_one_example() {
-        const INPUT_FILENAME: &'static str = "input/day_three_part_one_example.txt";
         const SLOPE: Point2D = Point2D { x: 3, y: 1 };
-        let map = Matrix2D::<Square>::load(INPUT_FILENAME);
+        let map = Matrix2D::<char>::load("input/day_three_part_one_example.txt");
         assert_eq!(7, part_one(&map, &SLOPE));
     }
 
