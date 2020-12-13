@@ -185,7 +185,7 @@ mod tests {
 
     #[test]
     pub fn test_solve() {
-        assert_eq!("part one: 0, part two: 0", solve());
+        assert_eq!("part one: 2438, part two: 0", solve());
     }
 
     #[test]
