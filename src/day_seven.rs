@@ -56,8 +56,8 @@ pub fn find_bags_that_can_hold_gold(bags: &HashMap<String, Bag>) -> i64 {
     loop {
         let mut next_round = vec![];
         unknown.retain(|bag| {
-            for bag_name in &can_carry {
-                if bag.children.contains_key(&bag_name[..]) {
+            for child in bag.children.iter() {
+                if can_carry.contains(child.0) {
                     next_round.push(bag.name.to_owned());
                     return false;
                 }
