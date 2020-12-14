@@ -1,7 +1,7 @@
 # What is this
 
-My personal solutions repository for [Advent of Code](https://adventofcode.com).
+My personal solutions repository for [Advent of Code 2020](https://adventofcode.com/2020).
 
 ## Goals
 
-Performant solutions not using a strictly naive approach, with modern Rust features and good design patterns and testing.
+Performant solutions using a well thought out approach, with modern Rust features and good design patterns and testing.
