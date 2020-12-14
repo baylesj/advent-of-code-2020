@@ -18,10 +18,18 @@ pub trait ArrayLike {
 
 pub trait Scalable {
     fn scale(&mut self, factor: i64);
+    fn scale_copy(&self, factor: i64) -> Self;
 }
 
-pub trait Inverse {
+pub trait Inversable {
     fn inverse(&self) -> Self;
+}
+
+pub trait Rotatable {
+    // TODO: fancier version.
+    fn rotate_90_deg_left(&mut self);
+    fn rotate_90_deg_right(&mut self);
+    fn rotate_180_deg(&mut self);
 }
 
 pub trait Matrix2DLike<T> {
@@ -70,7 +78,7 @@ impl Default for Direction {
     }
 }
 
-impl Inverse for Direction {
+impl Inversable for Direction {
     fn inverse(&self) -> Self {
         match self {
             Direction::Left => Direction::Right,
@@ -193,6 +201,35 @@ impl Scalable for Point2D {
         self.x *= factor;
         self.y *= factor;
     }
+
+    fn scale_copy(&self, factor: i64) -> Self {
+        Self {
+            x: self.x * factor,
+            y: self.y * factor,
+        }
+    }
+}
+
+impl Rotatable for Point2D {
+    fn rotate_90_deg_left(&mut self) {
+        // Example: (-10, 4) rotated left/ccw -3, 2
+        let tmp = self.y;
+        self.y = self.x;
+        self.x = -tmp;
+    }
+
+    fn rotate_90_deg_right(&mut self) {
+        // Example: (-10, 4) rotated right/cw = (4, 10)
+        let tmp = self.y;
+        self.y = -1 * self.x;
+        self.x = tmp;
+    }
+
+    fn rotate_180_deg(&mut self) {
+        // Example: (2, 3) rotated right/cw = (-2, -3)
+        self.x *= -1;
+        self.y *= -1;
+    }
 }
 
 impl fmt::Display for Point3D {
@@ -300,7 +337,7 @@ mod tests {
     use super::*;
 
     #[test]
-    pub fn advance_in_place() {
+    pub fn test_advance_in_place() {
         let mut point = Point2D { x: 0, y: 0 };
         point.advance(Direction::Left);
         assert_eq!(Point2D { x: -1, y: 0 }, point);
@@ -314,7 +351,7 @@ mod tests {
     }
 
     #[test]
-    pub fn advance_multiple_in_place() {
+    pub fn test_advance_multiple_in_place() {
         let mut point = Point2D { x: 0, y: 0 };
         point.advance_mult(Direction::Left, 3);
         assert_eq!(Point2D { x: -3, y: 0 }, point);
@@ -327,7 +364,7 @@ mod tests {
     }
 
     #[test]
-    pub fn advance_a_copy() {
+    pub fn test_advance_a_copy() {
         let point = Point2D { x: 0, y: 0 };
 
         let copy_left = point.advance_copy(Direction::Left);
@@ -341,5 +378,28 @@ mod tests {
 
         let copy_up = point.advance_copy(Direction::Up);
         assert_eq!(Point2D { x: 0, y: -1 }, copy_up);
+    }
+
+    #[test]
+    pub fn test_rotation() {
+        let mut point = Point2D { x: 10, y: 4};
+        point.rotate_90_deg_right();
+        assert_eq!(Point2D{ x: 4, y: -10}, point);
+        point.rotate_180_deg();
+        assert_eq!(Point2D{ x: -4, y: 10}, point);
+        point.rotate_90_deg_left();
+        assert_eq!(Point2D{ x: -10, y: -4}, point);
+    }
+
+    #[test]
+    pub fn test_scaling() {
+        let mut point = Point2D{ x: 5, y: 15};
+        point.scale(3);
+        assert_eq!(Point2D{x: 15, y: 45}, point);
+        let copy = point.scale_copy(2);
+        assert_eq!(Point2D{x: 30, y: 90}, copy);
+        assert_eq!(Point2D{x: 15, y: 45}, point);
+        point.scale(0);
+        assert_eq!(Point2D{x: 0, y: 0}, point);
     }
 }
