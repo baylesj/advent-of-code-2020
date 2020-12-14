@@ -9,6 +9,7 @@ pub mod day_six;
 pub mod day_template;
 pub mod day_ten;
 pub mod day_three;
+pub mod day_twelve;
 pub mod day_two;
 pub mod loadable;
 pub mod validity;
