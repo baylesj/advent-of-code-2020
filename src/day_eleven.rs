@@ -1,6 +1,5 @@
 use crate::loadable::LoadableFromFile;
 use crate::yet_another_geometry_mod::*;
-use std::convert::TryInto;
 
 /*
 If a seat is empty (L) and there are no occupied seats adjacent to it, the seat becomes occupied.
@@ -31,17 +30,23 @@ fn in_bounds(point: &Point2D, matrix: &Matrix2D<char>) -> bool {
     0 <= point.x && point.x < matrix.size.x && 0 <= point.y && point.y < matrix.size.y
 }
 
-fn full_neighbors(matrix: &Matrix2D<char>, point: &Point2D) -> i8 {
-    NEIGHBORING_UNIT_INDICES
-        .iter()
-        .map(|i| *point + *i)
-        .filter(|n| in_bounds(n, matrix) && matrix.get(n) == FULL_SEAT)
-        .count()
-        .try_into()
-        .unwrap()
+fn neighbors_met(matrix: &Matrix2D<char>, point: &Point2D, threshold: i64) -> bool {
+    let mut count = 0;
+    let mut current;
+    for index in NEIGHBORING_UNIT_INDICES.iter() {
+        current = *point + *index;
+        if in_bounds(&current, matrix) && matrix.get(&current) == FULL_SEAT {
+            count += 1;
+            if threshold > 0 && count == threshold {
+                return true;
+            }
+        }
+    }
+    // True IFF threshold is zero.
+    count == threshold
 }
 
-fn full_visibles(matrix: &Matrix2D<char>, point: &Point2D) -> i8 {
+fn visible_met(matrix: &Matrix2D<char>, point: &Point2D, threshold: i64) -> bool {
     let mut count = 0;
     let mut current;
     for index in NEIGHBORING_UNIT_INDICES.iter() {
@@ -52,9 +57,13 @@ fn full_visibles(matrix: &Matrix2D<char>, point: &Point2D) -> i8 {
         }
         if in_bounds(&current, matrix) && matrix.get(&current) == FULL_SEAT {
             count += 1;
+            if threshold > 0 && count == threshold {
+                return true;
+            }
         }
     }
-    count
+    // True IFF threshold is zero.
+    count == threshold
 }
 
 fn prep(matrix: &mut Matrix2D<char>) {
@@ -78,27 +87,26 @@ fn swap_if_should(
         return false;
     }
 
-    let neighbor_count;
-    if only_immediate {
-        neighbor_count = full_neighbors(matrix, index);
+    let empty = seat == EMPTY_SEAT;
+    let threshold = if empty {
+        0
     } else {
-        neighbor_count = full_visibles(matrix, index);
+        if only_immediate {
+            4
+        } else {
+            5
+        }
+    };
+    let met = if only_immediate {
+        neighbors_met(matrix, index, threshold)
+    } else {
+        visible_met(matrix, index, threshold)
+    };
+    if met {
+        next.set(index, if empty { FULL_SEAT } else { EMPTY_SEAT });
     }
 
-    if seat == EMPTY_SEAT {
-        if neighbor_count == 0 {
-            next.set(index, FULL_SEAT);
-            return true;
-        }
-    } else if seat == FULL_SEAT {
-        // TODO: refactor parts one and two into more elegant solution.
-        let required = if only_immediate { 4 } else { 5 };
-        if neighbor_count >= required {
-            next.set(index, EMPTY_SEAT);
-            return true;
-        }
-    }
-    false
+    met
 }
 
 fn run_iter(matrix: &Matrix2D<char>, next: &mut Matrix2D<char>, only_immediate: bool) -> bool {
