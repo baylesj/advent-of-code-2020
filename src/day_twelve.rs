@@ -47,8 +47,8 @@ fn apply_action(action: &MoveAction, point: &mut Point2D, direction: &mut Direct
     match action {
         MoveAction::North(value) => point.y += *value,
         MoveAction::South(value) => point.y -= *value,
-        MoveAction::East(value) => point.x += *value,
-        MoveAction::West(value) => point.x -= *value,
+        MoveAction::East(value) => point.x -= *value,
+        MoveAction::West(value) => point.x += *value,
         MoveAction::Left(value) => {
             *direction = match value {
                 90 => direction.to_left(),
@@ -93,7 +93,9 @@ fn apply_action_with_waypoint(action: &MoveAction, ship: &mut Point2D, waypoint:
 
 pub fn part_one(actions: &[MoveAction]) -> i64 {
     let mut point = Point2D::default();
-    // Start facing "east".
+    // TODO: change direction to make sure East == Right. Right now East is
+    // Right in part two, but Left in part one. The code works fine since the
+    // answer is the manhattan distance anyway.
     let mut direction = Direction::Left;
 
     for action in actions {
@@ -110,9 +112,6 @@ pub fn part_two(actions: &[MoveAction]) -> i64 {
     for action in actions {
         apply_action_with_waypoint(action, &mut ship, &mut waypoint);
     }
-
-    // TODO: point.magnitude?
-    println!("ship: {:?}, waypoint: {:?}", ship, waypoint);
     ship.x.abs() + ship.y.abs()
 }
 

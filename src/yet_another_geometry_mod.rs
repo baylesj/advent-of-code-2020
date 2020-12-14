@@ -382,24 +382,24 @@ mod tests {
 
     #[test]
     pub fn test_rotation() {
-        let mut point = Point2D { x: 10, y: 4};
+        let mut point = Point2D { x: 10, y: 4 };
         point.rotate_90_deg_right();
-        assert_eq!(Point2D{ x: 4, y: -10}, point);
+        assert_eq!(Point2D { x: 4, y: -10 }, point);
         point.rotate_180_deg();
-        assert_eq!(Point2D{ x: -4, y: 10}, point);
+        assert_eq!(Point2D { x: -4, y: 10 }, point);
         point.rotate_90_deg_left();
-        assert_eq!(Point2D{ x: -10, y: -4}, point);
+        assert_eq!(Point2D { x: -10, y: -4 }, point);
     }
 
     #[test]
     pub fn test_scaling() {
-        let mut point = Point2D{ x: 5, y: 15};
+        let mut point = Point2D { x: 5, y: 15 };
         point.scale(3);
-        assert_eq!(Point2D{x: 15, y: 45}, point);
+        assert_eq!(Point2D { x: 15, y: 45 }, point);
         let copy = point.scale_copy(2);
-        assert_eq!(Point2D{x: 30, y: 90}, copy);
-        assert_eq!(Point2D{x: 15, y: 45}, point);
+        assert_eq!(Point2D { x: 30, y: 90 }, copy);
+        assert_eq!(Point2D { x: 15, y: 45 }, point);
         point.scale(0);
-        assert_eq!(Point2D{x: 0, y: 0}, point);
+        assert_eq!(Point2D { x: 0, y: 0 }, point);
     }
 }
