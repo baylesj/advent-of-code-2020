@@ -16,6 +16,10 @@ pub trait ArrayLike {
     fn set(&mut self, i: usize, v: i64);
 }
 
+pub trait Scalable {
+    fn scale(&mut self, factor: i64);
+}
+
 pub trait Inverse {
     fn inverse(&self) -> Self;
 }
@@ -181,6 +185,13 @@ impl AddAssign for Point2D {
             x: self.x + other.x,
             y: self.y + other.y,
         };
+    }
+}
+
+impl Scalable for Point2D {
+    fn scale(&mut self, factor: i64) {
+        self.x *= factor;
+        self.y *= factor;
     }
 }
 
