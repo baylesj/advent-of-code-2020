@@ -1,25 +1,26 @@
 use crate::loadable::LoadableFromFile;
-use std::collections::HashMap;
+
+// The maximum spoken number was found experimentally by running
+// part two and checking the largest spoken number.  In production
+// this would probably be better as i32::MAX or similar.
+const MAXIMUM_SPOKEN_NUMBER: usize = 29473358;
 
 fn part_one(starting_numbers: &[i64], limit: usize) -> i64 {
-    println!("starting numbers are: {:?}", starting_numbers);
-    let mut last_log = (0, 0);
-    let mut last_spoken = 0;
-    let mut spoken_log = HashMap::<i64, (i64, i64)>::new();
+    let mut last_spoken_cache = vec![-1; MAXIMUM_SPOKEN_NUMBER + 1];
     for i in 0..starting_numbers.len() {
-        last_spoken = starting_numbers[i];
-        last_log = (i as i64, -1);
-        spoken_log.insert(last_spoken, last_log.clone());
+        last_spoken_cache[starting_numbers[i] as usize] = i as i64;
     }
 
-    for i in starting_numbers.len()..limit {
-        if last_log.1 == -1 {
-            last_spoken = 0;
+    let mut last_spoken = 0;
+    for i in starting_numbers.len()..limit - 1 {
+        let last = last_spoken_cache[last_spoken as usize];
+        let been_spoken_before = last != -1;
+        last_spoken_cache[last_spoken as usize] = i as i64;
+        last_spoken = if been_spoken_before {
+            i as i64 - last
         } else {
-            last_spoken = last_log.0 - last_log.1;
-        }
-        last_log = (i as i64, spoken_log.get(&last_spoken).unwrap_or(&(-1, 0)).0);
-        spoken_log.insert(last_spoken, last_log);
+            0
+        };
     }
     last_spoken
 }
@@ -29,8 +30,10 @@ pub fn solve() -> String {
     format!(
         "part one: {}, part two: {}",
         part_one(&numbers, 2020),
-        // TODO: part two trick is performance. This naive approach takes
-        // 30 seconds, which is approximately 300 times too slow.
+        // Turns out the sequence has no cycles or patterns in variances after manual
+        // inspection. Some digging shows that this sequence is actually Van Eck's,
+        // which does not have a closed form. Performance comes from optimizations,
+        // not reducing algorithmic complexity.
         part_one(&numbers, 30000000)
     )
 }
