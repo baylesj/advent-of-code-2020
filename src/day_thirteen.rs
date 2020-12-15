@@ -46,7 +46,6 @@ fn part_one(notes: &BusNotes) -> i64 {
             best_bus = bus;
         }
     }
-    println!("bus {} is best at {} minutes.", best_bus.1, best_val);
     best_bus.1 * best_val
 }
 
@@ -55,6 +54,8 @@ fn part_one(notes: &BusNotes) -> i64 {
 // Assumes everything is coprime, which makes sense otherwise one bus is
 // strictly a child of another bus.
 fn part_two(buses: &[(usize, i64)]) -> i64 {
+    // Note: the modulo equation first is negative for ease of
+    // calculating the Bezout identity.
     let modulo_equations: Vec<(i64, i64)> =
         buses.iter().map(|b| (-(b.0 as i64) % b.1, b.1)).collect();
     // |r|emainder and |c|oefficient.
@@ -62,7 +63,12 @@ fn part_two(buses: &[(usize, i64)]) -> i64 {
     for eq in &modulo_equations {
         let coefficient = rc.1;
         for k in 1..eq.1 {
+            // If this k value satisfies the condition that means we are
+            // on the Bezout pair.
+            // https://en.wikipedia.org/wiki/B%C3%A9zout%27s_identity
             if (coefficient * k) % eq.1 == 1 {
+                // Since we have the Bezout identity pair,
+                // we can now use the existence construction.
                 rc = ((((eq.0 - rc.0) * k) % eq.1) * rc.1 + rc.0, rc.1 * eq.1);
             }
         }
