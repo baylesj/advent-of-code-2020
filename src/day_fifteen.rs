@@ -1,7 +1,7 @@
 use crate::loadable::LoadableFromFile;
 use std::collections::HashMap;
 
-fn part_one(starting_numbers: &[i64]) -> i64 {
+fn part_one(starting_numbers: &[i64], limit: usize) -> i64 {
     println!("starting numbers are: {:?}", starting_numbers);
     let mut last_log = (0, 0);
     let mut last_spoken = 0;
@@ -12,7 +12,7 @@ fn part_one(starting_numbers: &[i64]) -> i64 {
         spoken_log.insert(last_spoken, last_log.clone());
     }
 
-    for i in starting_numbers.len()..2020 {
+    for i in starting_numbers.len()..limit {
         if last_log.1 == -1 {
             last_spoken = 0;
         } else {
@@ -24,13 +24,15 @@ fn part_one(starting_numbers: &[i64]) -> i64 {
     last_spoken
 }
 
-fn part_two() -> i64 {
-    0
-}
-
 pub fn solve() -> String {
     let numbers = Vec::<i64>::load("input/day_fifteen.txt");
-    format!("part one: {}, part two: {}", part_one(&numbers), part_two())
+    format!(
+        "part one: {}, part two: {}",
+        part_one(&numbers, 2020),
+        // TODO: part two trick is performance. This naive approach takes
+        // 30 seconds, which is approximately 300 times too slow.
+        part_one(&numbers, 30000000)
+    )
 }
 
 #[cfg(test)]
@@ -39,12 +41,12 @@ mod tests {
 
     #[test]
     fn test_solve() {
-        assert_eq!("part one: 203, part two: 0", solve());
+        assert_eq!("part one: 203, part two: 9007186", solve());
     }
 
     #[test]
     fn test_example() {
         let numbers = Vec::<i64>::load("input/day_fifteen_example.txt");
-        assert_eq!(436, part_one(&numbers));
+        assert_eq!(436, part_one(&numbers, 2020));
     }
 }
