@@ -122,7 +122,7 @@ fn run_iter(matrix: &Matrix2D<char>, next: &mut Matrix2D<char>, only_immediate: 
     something_changed
 }
 
-pub fn run_until_halted(matrix: &mut Matrix2D<char>, only_immediate: bool) {
+fn run_until_halted(matrix: &mut Matrix2D<char>, only_immediate: bool) {
     prep(matrix);
     let mut next = matrix.clone();
     while run_iter(matrix, &mut next, only_immediate) {
@@ -130,13 +130,13 @@ pub fn run_until_halted(matrix: &mut Matrix2D<char>, only_immediate: bool) {
     }
 }
 
-pub fn part_one(matrix: &Matrix2D<char>) -> i64 {
+fn part_one(matrix: &Matrix2D<char>) -> i64 {
     let mut m = matrix.clone();
     run_until_halted(&mut m, true);
     count_full(&m) as i64
 }
 
-pub fn part_two(matrix: &Matrix2D<char>) -> i64 {
+fn part_two(matrix: &Matrix2D<char>) -> i64 {
     let mut m = matrix.clone();
     run_until_halted(&mut m, false);
     count_full(&m) as i64
@@ -156,18 +156,18 @@ mod tests {
     use super::*;
 
     #[test]
-    pub fn test_solve() {
+    fn test_solve() {
         assert_eq!("part one: 2438, part two: 2174", solve());
     }
 
     #[test]
-    pub fn test_example() {
+    fn test_example() {
         let matrix = Matrix2D::<char>::load("input/day_eleven_example.txt");
         assert_eq!(37, part_one(&matrix));
     }
 
     #[test]
-    pub fn test_example_part_two() {
+    fn test_example_part_two() {
         let matrix = Matrix2D::<char>::load("input/day_eleven_example.txt");
         assert_eq!(26, part_two(&matrix));
     }

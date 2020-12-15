@@ -1,7 +1,7 @@
 use crate::loadable::LoadableFromFile;
 use std::collections::HashSet;
 
-pub fn part_one(numbers: &[i64], preamble_length: usize) -> i64 {
+fn part_one(numbers: &[i64], preamble_length: usize) -> i64 {
     let mut set: HashSet<i64> = HashSet::new();
     set.extend(numbers[0..preamble_length].into_iter());
 
@@ -25,7 +25,7 @@ pub fn part_one(numbers: &[i64], preamble_length: usize) -> i64 {
     1
 }
 
-pub fn part_two(numbers: &[i64], weakness_number: i64) -> i64 {
+fn part_two(numbers: &[i64], weakness_number: i64) -> i64 {
     let mut current_sum = numbers[0];
     let mut left_index = 0;
     let mut right_index = 0;
@@ -64,18 +64,18 @@ mod tests {
     use super::*;
 
     #[test]
-    pub fn test_solve() {
+    fn test_solve() {
         assert_eq!("part one: 530627549, part two: 77730285", solve());
     }
 
     #[test]
-    pub fn test_example() {
+    fn test_example() {
         let numbers = Vec::<i64>::load("input/day_nine_example.txt");
         assert_eq!(127, part_one(&numbers, 5));
     }
 
     #[test]
-    pub fn test_example_part_two() {
+    fn test_example_part_two() {
         let numbers = Vec::<i64>::load("input/day_nine_example.txt");
         let weakness_number = part_one(&numbers, 5);
 

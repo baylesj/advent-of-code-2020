@@ -43,7 +43,7 @@ pub fn solve_part_two(data: &[i32], desired_sum: i32) -> Option<i32> {
     part_two_answer
 }
 
-pub fn load_data() -> Vec<i32> {
+fn load_data() -> Vec<i32> {
     let file = File::open(INPUT_FILENAME).expect("Invalid filename");
     let reader = BufReader::new(file);
 

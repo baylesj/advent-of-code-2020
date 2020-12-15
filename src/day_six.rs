@@ -92,18 +92,18 @@ mod tests {
     use super::*;
 
     #[test]
-    pub fn test_solve() {
+    fn test_solve() {
         assert_eq!("part one: 6549, part two: 3466", solve());
     }
 
     #[test]
-    pub fn test_part_one_example() {
+    fn test_part_one_example() {
         let groups = Vec::<Group>::load("input/day_six_example.txt");
         assert_eq!(11, part_one(&groups));
     }
 
     #[test]
-    pub fn test_part_two_example() {
+    fn test_part_two_example() {
         let groups = Vec::<Group>::load("input/day_six_example.txt");
         assert_eq!(6, part_two(&groups));
     }

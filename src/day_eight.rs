@@ -118,12 +118,12 @@ impl Resettable for Program {
     }
 }
 
-pub fn part_one(program: &mut Program) -> i64 {
+fn part_one(program: &mut Program) -> i64 {
     program.advance_while_true();
     program.accumulator
 }
 
-pub fn part_two(program: &mut Program) -> i64 {
+fn part_two(program: &mut Program) -> i64 {
     for enumerable in program.instructions.clone().iter().enumerate() {
         let original = *enumerable.1;
         let next;
@@ -161,12 +161,12 @@ mod tests {
     use super::*;
 
     #[test]
-    pub fn test_solve() {
+    fn test_solve() {
         assert_eq!("part one: 1814, part two: 1056", solve());
     }
 
     #[test]
-    pub fn test_example() {
+    fn test_example() {
         let mut program = Program::load("input/day_eight_example.txt");
         assert_eq!(5, part_one(&mut program));
     }

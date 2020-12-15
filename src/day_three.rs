@@ -3,7 +3,7 @@ use crate::yet_another_geometry_mod::*;
 
 const INPUT_FILENAME: &'static str = "input/day_three.txt";
 
-pub fn part_one(map: &Matrix2D<char>, slope: &Point2D) -> i64 {
+fn part_one(map: &Matrix2D<char>, slope: &Point2D) -> i64 {
     let mut tree_count: i64 = 0;
     let mut current = Point2D { x: 0, y: 0 };
     while current.y < map.size.y {
@@ -17,7 +17,7 @@ pub fn part_one(map: &Matrix2D<char>, slope: &Point2D) -> i64 {
     tree_count
 }
 
-pub fn part_two(map: &Matrix2D<char>) -> i64 {
+fn part_two(map: &Matrix2D<char>) -> i64 {
     static SLOPES: &'static [Point2D] = &[
         Point2D { x: 1, y: 1 },
         Point2D { x: 3, y: 1 },

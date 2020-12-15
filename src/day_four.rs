@@ -250,12 +250,12 @@ impl LoadableFromFile for Vec<Passport> {
     }
 }
 
-pub fn part_one(_passports: &Vec<Passport>) -> i64 {
+fn part_one(_passports: &Vec<Passport>) -> i64 {
     // TODO: refactor to re-enable part one.
     202
 }
 
-pub fn part_two(passports: &Vec<Passport>) -> i64 {
+fn part_two(passports: &Vec<Passport>) -> i64 {
     passports.len() as i64
 }
 

@@ -123,12 +123,12 @@ mod tests {
     use super::*;
 
     #[test]
-    pub fn test_solve() {
+    fn test_solve() {
         assert_eq!("part one: 892, part two: 625", solve());
     }
 
     #[test]
-    pub fn test_ranges() {
+    fn test_ranges() {
         let mut range = Range {
             left: 0,
             right: 127,
@@ -186,7 +186,7 @@ mod tests {
     }
 
     #[test]
-    pub fn check_boarding_pass_examples() {
+    fn check_boarding_pass_examples() {
         assert_eq!(
             BoardingPass {
                 row: 70,

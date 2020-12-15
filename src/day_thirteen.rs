@@ -90,18 +90,18 @@ mod tests {
     use super::*;
 
     #[test]
-    pub fn test_solve() {
+    fn test_solve() {
         assert_eq!("part one: 3966, part two: 800177252346225", solve());
     }
 
     #[test]
-    pub fn test_example() {
+    fn test_example() {
         let notes = BusNotes::load("input/day_thirteen_example.txt");
         assert_eq!(295, part_one(&notes));
     }
 
     #[test]
-    pub fn test_example_two() {
+    fn test_example_two() {
         let notes = BusNotes::load("input/day_thirteen_example.txt");
         assert_eq!(1068781, part_two(&notes.buses_in_service));
     }

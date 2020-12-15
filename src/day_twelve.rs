@@ -91,7 +91,7 @@ fn apply_action_with_waypoint(action: &MoveAction, ship: &mut Point2D, waypoint:
     }
 }
 
-pub fn part_one(actions: &[MoveAction]) -> i64 {
+fn part_one(actions: &[MoveAction]) -> i64 {
     let mut point = Point2D::default();
     // TODO: change direction to make sure East == Right. Right now East is
     // Right in part two, but Left in part one. The code works fine since the
@@ -106,7 +106,7 @@ pub fn part_one(actions: &[MoveAction]) -> i64 {
     point.x.abs() + point.y.abs()
 }
 
-pub fn part_two(actions: &[MoveAction]) -> i64 {
+fn part_two(actions: &[MoveAction]) -> i64 {
     let mut ship = Point2D::default();
     let mut waypoint = Point2D { x: 10, y: 1 };
     for action in actions {
@@ -129,18 +129,18 @@ mod tests {
     use super::*;
 
     #[test]
-    pub fn test_solve() {
+    fn test_solve() {
         assert_eq!("part one: 1424, part two: 63447", solve());
     }
 
     #[test]
-    pub fn test_example() {
+    fn test_example() {
         let matrix = Vec::<MoveAction>::load("input/day_twelve_example.txt");
         assert_eq!(25, part_one(&matrix));
     }
 
     #[test]
-    pub fn test_example_part_two() {
+    fn test_example_part_two() {
         let matrix = Vec::<MoveAction>::load("input/day_twelve_example.txt");
         assert_eq!(286, part_two(&matrix));
     }

@@ -47,7 +47,7 @@ impl LoadableFromFile for HashMap<String, Bag> {
     }
 }
 
-pub fn find_bags_that_can_hold_gold(bags: &HashMap<String, Bag>) -> i64 {
+fn find_bags_that_can_hold_gold(bags: &HashMap<String, Bag>) -> i64 {
     let mut unknown: Vec<Bag> = bags.values().cloned().collect();
     let mut can_carry = HashSet::new();
     can_carry.insert(SPECIAL_BAG_NAME.to_owned());
@@ -75,7 +75,7 @@ pub fn find_bags_that_can_hold_gold(bags: &HashMap<String, Bag>) -> i64 {
     can_carry.len() as i64 - 1
 }
 
-pub fn find_total_bag_count(
+fn find_total_bag_count(
     name: &str,
     bags: &HashMap<String, Bag>,
     memo: &mut HashMap<String, i32>,
@@ -98,7 +98,7 @@ pub fn find_total_bag_count(
     child_count + 1
 }
 
-pub fn find_total_bag_count_in_gold(bags: &HashMap<String, Bag>) -> i32 {
+fn find_total_bag_count_in_gold(bags: &HashMap<String, Bag>) -> i32 {
     let mut memo = HashMap::new();
 
     // Minus one because we don't contain the gold bag in the answer.
@@ -119,24 +119,24 @@ mod tests {
     use super::*;
 
     #[test]
-    pub fn test_solve() {
+    fn test_solve() {
         assert_eq!("part one: 222, part two: 13264", solve());
     }
 
     #[test]
-    pub fn test_example_one() {
+    fn test_example_one() {
         let bags = HashMap::<String, Bag>::load("input/day_seven_example.txt");
         assert_eq!(4, find_bags_that_can_hold_gold(&bags));
     }
 
     #[test]
-    pub fn test_example_two() {
+    fn test_example_two() {
         let bags = HashMap::<String, Bag>::load("input/day_seven_example_two.txt");
         assert_eq!(32, find_total_bag_count_in_gold(&bags));
     }
 
     #[test]
-    pub fn test_example_three() {
+    fn test_example_three() {
         let bags = HashMap::<String, Bag>::load("input/day_seven_example_three.txt");
         assert_eq!(126, find_total_bag_count_in_gold(&bags));
     }
