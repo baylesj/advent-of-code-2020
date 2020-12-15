@@ -1,9 +1,9 @@
 use crate::yet_another_geometry_mod::*;
+use std::fs;
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::BufReader;
 use std::str::FromStr;
-use std::fs;
 
 pub trait LoadableFromFile {
     fn load(filename: &str) -> Self;
@@ -12,7 +12,11 @@ pub trait LoadableFromFile {
 impl LoadableFromFile for Vec<i64> {
     fn load(filename: &str) -> Vec<i64> {
         let contents = fs::read_to_string(filename).unwrap();
-        contents.lines().map(|l| l.split(',').map(|s| i64::from_str(&s).unwrap())).flatten().collect()
+        contents
+            .lines()
+            .map(|l| l.split(',').map(|s| i64::from_str(&s).unwrap()))
+            .flatten()
+            .collect()
     }
 }
 
