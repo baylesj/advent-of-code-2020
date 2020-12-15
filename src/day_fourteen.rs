@@ -1,11 +1,11 @@
 use crate::loadable::LoadableFromFile;
 use lazy_static::lazy_static;
 use regex::Regex;
+use std::fmt;
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::BufReader;
 use std::str::FromStr;
-use std::fmt;
 
 // Program addresses are 16-bit.
 const MAX_PROGRAM_ADDRESS: usize = 2usize.pow(16);
@@ -22,7 +22,11 @@ struct Mask {
 }
 impl fmt::Binary for Mask {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{{ positive: {:b}, negative: {:b} }}", self.positive_mask, self.negative_mask)
+        write!(
+            f,
+            "{{ positive: {:b}, negative: {:b} }}",
+            self.positive_mask, self.negative_mask
+        )
     }
 }
 
@@ -70,8 +74,13 @@ impl From<&str> for Instruction {
             }
             let m = RE.captures(s).unwrap();
             Instruction::SetMemory(
-                m.get(1).map(|x| usize::from_str(x.as_str()).unwrap()).unwrap(),
-                m.get(2).map(|x| i64::from_str(x.as_str()).unwrap()).unwrap())
+                m.get(1)
+                    .map(|x| usize::from_str(x.as_str()).unwrap())
+                    .unwrap(),
+                m.get(2)
+                    .map(|x| i64::from_str(x.as_str()).unwrap())
+                    .unwrap(),
+            )
         }
     }
 }
@@ -81,7 +90,7 @@ struct Program {
     instructions: Vec<Instruction>,
     memory: [i64; MAX_PROGRAM_ADDRESS],
     index: usize,
-    mask: Mask
+    mask: Mask,
 }
 
 impl LoadableFromFile for Program {
@@ -96,31 +105,36 @@ impl LoadableFromFile for Program {
                 .collect(),
             memory: [0; MAX_PROGRAM_ADDRESS],
             index: 0,
-            mask: Mask::default()
+            mask: Mask::default(),
         }
     }
 }
 
+// TODO: can definitely clean up uses of traits.
+trait Advanceable {
+    fn advance(&mut self);
+}
+
 // TODO: turn into trait
-fn advance(program: &mut Program) {
-    match program.instructions[program.index] {
-        Instruction::SetMask(mask) => {
-            program.mask = mask;
-        },
-        Instruction::SetMemory(address, value) => {
-            let result_value = (value & program.mask.negative_mask)
-            | program.mask.positive_mask;
-            println!("result value: {} for value: {} and mask: {:b}", result_value, value, program.mask);
-            program.memory[address] = result_value;
+impl Advanceable for Program {
+    fn advance(&mut self) {
+        match self.instructions[self.index] {
+            Instruction::SetMask(mask) => {
+                self.mask = mask;
+            }
+            Instruction::SetMemory(address, value) => {
+                let result_value = (value & self.mask.negative_mask) | self.mask.positive_mask;
+                self.memory[address] = result_value;
+            }
         }
+        self.index += 1;
     }
-    program.index += 1;
 }
 
 fn part_one(program: &Program) -> i64 {
     let mut p = program.clone();
     while p.index < p.instructions.len() {
-        advance(&mut p);
+        p.advance();
     }
     p.memory.iter().sum()
 }
@@ -146,7 +160,6 @@ mod tests {
     #[test]
     fn test_example() {
         let program = Program::load("input/day_fourteen_example.txt");
-        println!("loaded program: {:?}", program.instructions);
         assert_eq!(165, part_one(&program));
     }
 }
