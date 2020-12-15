@@ -3,6 +3,7 @@ use std::fs::File;
 use std::io::prelude::*;
 use std::io::BufReader;
 use std::str::FromStr;
+use std::fs;
 
 pub trait LoadableFromFile {
     fn load(filename: &str) -> Self;
@@ -10,12 +11,8 @@ pub trait LoadableFromFile {
 
 impl LoadableFromFile for Vec<i64> {
     fn load(filename: &str) -> Vec<i64> {
-        let file = File::open(filename).expect("invalid filename");
-        let reader = BufReader::new(file);
-        reader
-            .lines()
-            .map(|l| i64::from_str(&l.unwrap()).unwrap())
-            .collect()
+        let contents = fs::read_to_string(filename).unwrap();
+        contents.lines().map(|l| l.split(',').map(|s| i64::from_str(&s).unwrap())).flatten().collect()
     }
 }
 
