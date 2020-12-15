@@ -8,7 +8,7 @@ use std::io::BufReader;
 use std::str::FromStr;
 
 // Program addresses are 16-bit.
-const MAX_PROGRAM_ADDRESS: usize = 2usize.pow(16);
+const MAX_PROGRAM_ADDRESS: usize = usize::pow(2, 16);
 
 #[derive(Default, Debug, Copy, Clone, PartialEq, Eq)]
 struct Mask {
