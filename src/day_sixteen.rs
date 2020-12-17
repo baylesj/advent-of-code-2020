@@ -1,5 +1,4 @@
 use crate::loadable::LoadableFromFile;
-use bitvec::prelude::*;
 use lazy_static::lazy_static;
 use regex::Regex;
 use std::fs::File;
@@ -108,28 +107,42 @@ impl LoadableFromFile for Ticketing {
     }
 }
 
-fn part_one(ticketing: &Ticketing) -> i64 {
+#[derive(Debug, Clone, Default)]
+struct SplitResult {
+    good_tickets: Vec<Ticket>,
+    bad_tickets: Vec<Ticket>,
+    error_rate: i64
+}
+
+fn split_good_and_bad(ticketing: &Ticketing) -> SplitResult {
+
     const MAX_INDEX: usize = 1000;
-    let mut valid_set = bitvec![0; MAX_INDEX];
-    for t in &ticketing.types {
-        for r in &t.valid_ranges {
+    let mut valid_set = vec![0; MAX_INDEX];
+    for t in ticketing.types.iter().enumerate() {
+        for r in t.1.valid_ranges.iter() {
             for i in r.start..r.end+1 {
-                valid_set.set(i, true);
+                valid_set[i] = t.0 + 1;
             }
         }
     }
 
-    let mut error_types = Vec::new();
-    for n in &ticketing.nearby_tickets {
+    let mut result = SplitResult::default();
+    for n in ticketing.nearby_tickets.iter() {
+        let mut in_bad_list = false;
         for t in n {
-            if *valid_set.get(*t).unwrap() == false {
-                error_types.push(*t);
+            if valid_set[*t] == 0 {
+                if !in_bad_list {
+                    result.bad_tickets.push(n.clone());
+                }
+                in_bad_list = true;
+                result.error_rate += *t as i64;
             }
         }
+        if !in_bad_list {
+            result.good_tickets.push(n.clone());
+        }
     }
-    println!("error types: {:?}", error_types);
-    let sum: usize = error_types.iter().sum();
-    sum as i64
+    result
 }
 
 fn part_two() -> i64 {
@@ -138,9 +151,10 @@ fn part_two() -> i64 {
 
 pub fn solve() -> String {
     let ticketing = Ticketing::load("input/day_sixteen.txt");
+    let split_tickets = split_good_and_bad(&ticketing);
     format!(
         "part one: {}, part two: {}",
-        part_one(&ticketing),
+        split_tickets.error_rate,
         part_two()
     )
 }
@@ -157,6 +171,7 @@ mod tests {
     #[test]
     fn test_example() {
         let tickets = Ticketing::load("input/day_sixteen_example.txt");
-        assert_eq!(71, part_one(&tickets));
+        let split_tickets = split_good_and_bad(&tickets);
+        assert_eq!(71, split_tickets.error_rate);
     }
 }
