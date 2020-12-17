@@ -130,6 +130,12 @@ fn split_good_and_bad(ticketing: &Ticketing) -> SplitResult {
     const MAX_INDEX: usize = 1000;
     let mut result = SplitResult::default();
     result.ticket_domain = vec![HashSet::<usize>::new(); MAX_INDEX];
+
+    // Building the ticket domain is pretty costly, at O(|F|*|R|*|R_L|).
+    //      |F| = number of fields on each ticket
+    //      |T| = number of tickets.
+    //      |R| = integer range of potential ticket field values
+    //      |R_L| = number of integer ranges (currently fixed at 2).
     for t in ticketing.fields.iter().enumerate() {
         for r in t.1.valid_ranges.iter() {
             for i in r.start..r.end + 1 {
@@ -138,30 +144,36 @@ fn split_good_and_bad(ticketing: &Ticketing) -> SplitResult {
         }
     }
 
-    for n in ticketing.nearby_tickets.iter() {
+    // Now that we have a valid ticket domain, we need to filter tickets by
+    // whether they are valid, meaning that each ticket entry has a value
+    // from a valid ticket field. This part is O(|T|*|F|) worst case.
+    for nearby_ticket in ticketing.nearby_tickets.iter() {
         let mut in_bad_list = false;
-        for t in n {
-            if result.ticket_domain[*t].is_empty() {
+        for field_value in nearby_ticket {
+            if result.ticket_domain[*field_value].is_empty() {
                 if !in_bad_list {
-                    result.bad_tickets.push(n.clone());
+                    result.bad_tickets.push(nearby_ticket.clone());
                 }
                 in_bad_list = true;
-                result.error_rate += *t as i64;
+                result.error_rate += *field_value as i64;
             }
         }
         if !in_bad_list {
-            result.good_tickets.push(n.clone());
+            result.good_tickets.push(nearby_ticket.clone());
         }
     }
+    assert_eq!(
+        ticketing.nearby_tickets.len(),
+        result.good_tickets.len() + result.bad_tickets.len()
+    );
     result
 }
 
 fn part_two(ticketing: &Ticketing, split: &SplitResult) -> i64 {
     // First we have to determine what TicketField values occupy each
     // spot on the ticket. This part of the algorithm is O(|F|*|T|*|F|) worst
-    // case.
-    //      |F| = number of fields on each ticket,
-    //      |T| = number of tickets.
+    // case. Since at the very beginning of this algorithm any field could
+    // occupy any spot on the ticket, I think this is best case for CPU usage.
     let mut candidate_fields = vec![HashSet::new(); ticketing.your_ticket.len()];
     for i in 0..ticketing.your_ticket.len() {
         let mut candidates = split.ticket_domain[split.good_tickets[0][i]].clone();
@@ -209,6 +221,13 @@ fn part_two(ticketing: &Ticketing, split: &SplitResult) -> i64 {
         }
     }
 
+    // Taking a step back, we obviously have to check every ticket value,
+    // and we have to keep track of what ticket fields support what ranges.
+    // so the hypothetical minimum for CPU runtime would be O(|F|*|T|) if we could
+    // get constant lookup for ticket fields, which I don't think we can in the
+    // best case.
+    // Since |T| >(>?) than |F|, we really want to minimize |T| traversals where
+    // possible.
     let mut result = 1;
     for i in 0..ticketing.your_ticket.len() {
         assert_eq!(1, candidate_fields[i].len());
