@@ -6,7 +6,7 @@ use std::time::Instant;
 
 use advent_of_code;
 
-const DAYS: [&dyn Fn() -> String; 15] = [
+const DAYS: [&dyn Fn() -> String; 16] = [
     &advent_of_code::day_one::solve,
     &advent_of_code::day_two::solve,
     &advent_of_code::day_three::solve,
@@ -22,6 +22,7 @@ const DAYS: [&dyn Fn() -> String; 15] = [
     &advent_of_code::day_thirteen::solve,
     &advent_of_code::day_fourteen::solve,
     &advent_of_code::day_fifteen::solve,
+    &advent_of_code::day_sixteen::solve,
 ];
 
 fn log_elapsed(last: &mut Instant, day: usize) {
