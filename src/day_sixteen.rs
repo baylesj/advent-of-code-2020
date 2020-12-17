@@ -1,18 +1,29 @@
 use crate::loadable::LoadableFromFile;
 use lazy_static::lazy_static;
 use regex::Regex;
+use std::collections::HashSet;
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::BufReader;
 use std::ops::Range;
 use std::str::FromStr;
 
-struct TicketType {
-    _name: String,
+#[derive(Debug)]
+struct TicketField {
+    name: String,
     valid_ranges: Vec<Range<usize>>,
 }
 
-impl FromStr for TicketType {
+fn contains(t: &TicketField, i: usize) -> bool {
+    for r in t.valid_ranges.iter() {
+        if r.start <= i && i <= r.end {
+            return true;
+        }
+    }
+    false
+}
+
+impl FromStr for TicketField {
     type Err = &'static str;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         lazy_static! {
@@ -27,8 +38,8 @@ impl FromStr for TicketType {
         fn as_usize(captures: &regex::Captures, index: usize) -> usize {
             usize::from_str(captures.get(index).unwrap().as_str()).unwrap()
         }
-        Ok(TicketType {
-            _name: unwrapped.get(1).unwrap().as_str().to_string(),
+        Ok(TicketField {
+            name: unwrapped.get(1).unwrap().as_str().to_string(),
             valid_ranges: vec![
                 as_usize(&unwrapped, 2)..as_usize(&unwrapped, 3),
                 as_usize(&unwrapped, 4)..as_usize(&unwrapped, 5),
@@ -52,8 +63,8 @@ fn ticket_from_str(s: &str) -> Result<Ticket, &'static str> {
 }
 
 struct Ticketing {
-    types: Vec<TicketType>,
-    _your_ticket: Ticket,
+    fields: Vec<TicketField>,
+    your_ticket: Ticket,
     nearby_tickets: Vec<Ticket>,
 }
 
@@ -66,7 +77,7 @@ impl LoadableFromFile for Ticketing {
         let mut buf = String::new();
         loop {
             reader.read_line(&mut buf).expect("read");
-            let t = TicketType::from_str(&buf);
+            let t = TicketField::from_str(&buf);
             if t.is_err() {
                 break;
             }
@@ -100,8 +111,8 @@ impl LoadableFromFile for Ticketing {
         }
 
         Ticketing {
-            types: types,
-            _your_ticket: your_ticket,
+            fields: types,
+            your_ticket: your_ticket,
             nearby_tickets: tickets,
         }
     }
@@ -111,26 +122,26 @@ impl LoadableFromFile for Ticketing {
 struct SplitResult {
     good_tickets: Vec<Ticket>,
     bad_tickets: Vec<Ticket>,
-    error_rate: i64
+    error_rate: i64,
+    ticket_domain: Vec<HashSet<usize>>,
 }
 
 fn split_good_and_bad(ticketing: &Ticketing) -> SplitResult {
-
     const MAX_INDEX: usize = 1000;
-    let mut valid_set = vec![0; MAX_INDEX];
-    for t in ticketing.types.iter().enumerate() {
+    let mut result = SplitResult::default();
+    result.ticket_domain = vec![HashSet::<usize>::new(); MAX_INDEX];
+    for t in ticketing.fields.iter().enumerate() {
         for r in t.1.valid_ranges.iter() {
-            for i in r.start..r.end+1 {
-                valid_set[i] = t.0 + 1;
+            for i in r.start..r.end + 1 {
+                result.ticket_domain[i].insert(t.0);
             }
         }
     }
 
-    let mut result = SplitResult::default();
     for n in ticketing.nearby_tickets.iter() {
         let mut in_bad_list = false;
         for t in n {
-            if valid_set[*t] == 0 {
+            if result.ticket_domain[*t].is_empty() {
                 if !in_bad_list {
                     result.bad_tickets.push(n.clone());
                 }
@@ -145,8 +156,70 @@ fn split_good_and_bad(ticketing: &Ticketing) -> SplitResult {
     result
 }
 
-fn part_two() -> i64 {
-    0
+fn part_two(ticketing: &Ticketing, split: &SplitResult) -> i64 {
+    // First we have to determine what TicketField values occupy each
+    // spot on the ticket. This part of the algorithm is O(|F|*|T|*|F|) worst
+    // case.
+    //      |F| = number of fields on each ticket,
+    //      |T| = number of tickets.
+    let mut candidate_fields = vec![HashSet::new(); ticketing.your_ticket.len()];
+    for i in 0..ticketing.your_ticket.len() {
+        let mut candidates = split.ticket_domain[split.good_tickets[0][i]].clone();
+        for ticket in split.good_tickets.iter() {
+            for candidate in candidates.clone().iter() {
+                let candidate_type = &ticketing.fields[*candidate];
+                if !contains(&candidate_type, ticket[i]) {
+                    candidates.remove(candidate);
+                }
+            }
+        }
+        candidate_fields[i] = candidates;
+    }
+
+    // NOTE: at least one of the ticket fields must be known in order to
+    // perform a reduction.
+    let mut known_fields = HashSet::new();
+    for t in candidate_fields.iter() {
+        if t.len() == 1 {
+            known_fields.insert(*t.iter().next().unwrap());
+        }
+    }
+
+    // Now we have to loop through all of the candidates to reduce known
+    // fields. Worst case here is O(|F|*|F|*|F|), which is not awesome.
+    // Note that |F| is relatively small in comparison to |T| in our data set.
+    loop {
+        let mut changed_something = false;
+        for i in 0..candidate_fields.len() {
+            if candidate_fields[i].len() > 1 {
+                changed_something = true;
+                for candidate in candidate_fields[i].clone() {
+                    if candidate_fields[i].len() > 1 && known_fields.contains(&candidate) {
+                        candidate_fields[i].remove(&candidate);
+                        if candidate_fields[i].len() == 1 {
+                            known_fields.insert(*candidate_fields[i].iter().next().unwrap());
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        if !changed_something {
+            break;
+        }
+    }
+
+    let mut result = 1;
+    for i in 0..ticketing.your_ticket.len() {
+        assert_eq!(1, candidate_fields[i].len());
+        if ticketing.fields[*candidate_fields[i].iter().next().unwrap()]
+            .name
+            .starts_with("departure")
+        {
+            result *= ticketing.your_ticket[i] as i64;
+        }
+    }
+    result
 }
 
 pub fn solve() -> String {
@@ -155,7 +228,7 @@ pub fn solve() -> String {
     format!(
         "part one: {}, part two: {}",
         split_tickets.error_rate,
-        part_two()
+        part_two(&ticketing, &split_tickets)
     )
 }
 
@@ -165,7 +238,7 @@ mod tests {
 
     #[test]
     fn test_solve() {
-        assert_eq!("part one: 21996, part two: 0", solve());
+        assert_eq!("part one: 21996, part two: 650080463519", solve());
     }
 
     #[test]
