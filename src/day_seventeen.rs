@@ -1,56 +1,30 @@
 use crate::loadable::LoadableFromFile;
-use crate::yet_another_geometry_mod::{Matrix2D, Matrix2DLike, Point3D};
-use lazy_static::lazy_static;
+use crate::yet_another_geometry_mod::{Matrix2D, Matrix2DLike, Point2D, Point3D, Point4D};
+use std::cmp::{Eq, PartialEq};
 use std::collections::HashMap;
 use std::collections::HashSet;
+use std::hash::Hash;
+use std::ops::Add;
 
-// During a cycle, all cubes simultaneously change their state according to the following rules:
-
-//     If a cube is active and exactly 2 or 3 of its neighbors are also active,
-//         the cube remains active. Otherwise, the cube becomes inactive.
-//     If a cube is inactive but exactly 3 of its neighbors are active,
-//         the cube becomes active. Otherwise, the cube remains inactive.
-//
-// Strategy: load the original map as Matrix2D of char.
-// Option 1: load into a 3D matrix. Then each iteration is O(N), since we just
-// have to each field against its neighbors. Growing is a pain this way though.
-// I could write a fancy growable matrix but that has its own problems.
-//
-// Option 2: Keep each "life form" as a Point3D in a list. For each life-form,
-// iterate through every other life-form and figure out how many are neighbors.
-// Easily infinitely growable, but O(N^2) for each iteration. Since there are
-// only six in part one maybe that's okay. Obvious optimizations:
-//   1. Can't exit early if we find three neighbors due to "exactly" clause.
-//   2. If we kept points sorted on one dimension, then we would know that
-//      as soon as that dimension is two away then they aren't neighbors.
-//      Worst cast is still O(N^2) if all points are at the same point on
-//      that axis, but likely to be faster.
-//
-// Option 3: Use a hashset of life forms. For each life form, just ask the
-// list if each of its neighbors are there--O(N). For generating the iteration,
-// hashmap points to number of neighbors, every time we ask about neighbors
-// increase value by 1, then reduce based on state rules. Similar memory
-// usage to Option 2 due to need for iteration arrays. Obvious choice.
-fn get_point_from_index(index: usize, x_width: i64) -> Point3D {
-    Point3D {
+fn get_as_point(index: usize, x_width: i64) -> Point2D {
+    Point2D {
         x: index as i64 % x_width,
         y: index as i64 / x_width,
-        z: 0,
     }
 }
 
 const OFFSETS: [i64; 3] = [-1, 0, 1];
 
-fn get_neighbor_offsets() -> Vec<Point3D> {
-    let mut offsets = Vec::with_capacity(OFFSETS.len().pow(3) - 1);
-    for x in OFFSETS.iter() {
-        for y in OFFSETS.iter() {
-            for z in OFFSETS.iter() {
-                if !(*x == 0 && *y == 0 && *z == 0) {
+fn get_neighbor_offsets_3d() -> Vec<Point3D> {
+    let mut offsets = Vec::with_capacity(OFFSETS.len().pow(3));
+    for xn in OFFSETS.iter() {
+        for yn in OFFSETS.iter() {
+            for zn in OFFSETS.iter() {
+                if *xn != 0 || *yn != 0 || *zn != 0 {
                     offsets.push(Point3D {
-                        x: *x,
-                        y: *y,
-                        z: *z,
+                        x: *xn,
+                        y: *yn,
+                        z: *zn,
                     });
                 }
             }
@@ -59,15 +33,38 @@ fn get_neighbor_offsets() -> Vec<Point3D> {
     offsets
 }
 
-lazy_static! {
-    static ref NEIGHBOR_OFFSETS: Vec<Point3D> = get_neighbor_offsets();
+fn get_neighbor_offsets_4d() -> Vec<Point4D> {
+    let mut offsets = Vec::with_capacity(OFFSETS.len().pow(3));
+    for xn in OFFSETS.iter() {
+        for yn in OFFSETS.iter() {
+            for zn in OFFSETS.iter() {
+                for wn in OFFSETS.iter() {
+                    if *xn != 0 || *yn != 0 || *zn != 0 || *wn != 0 {
+                        offsets.push(Point4D {
+                            x: *xn,
+                            y: *yn,
+                            z: *zn,
+                            w: *wn,
+                        });
+                    }
+                }
+            }
+        }
+    }
+    offsets
 }
 
-fn run_iteration(lifeforms: &HashSet<Point3D>) -> HashSet<Point3D> {
-    let mut possible_life = HashMap::<Point3D, usize>::new();
+fn run_iteration<P: PartialEq + Eq + Hash + Add + Copy>(
+    lifeforms: &HashSet<P>,
+    neighbor_offsets: &Vec<P>,
+) -> HashSet<P>
+where
+    P: Add<Output = P>,
+{
+    let mut possible_life = HashMap::<P, usize>::new();
     for l in lifeforms.iter() {
-        for o in NEIGHBOR_OFFSETS.iter() {
-            let point = *l + *o;
+        for o in neighbor_offsets.iter() {
+            let point: P = *l + *o;
 
             let entry;
             if lifeforms.contains(&point) {
@@ -93,22 +90,45 @@ fn run_iteration(lifeforms: &HashSet<Point3D>) -> HashSet<Point3D> {
 fn part_one(starting_lifeforms: &Matrix2D<char>) -> i64 {
     let mut lifeforms = HashSet::<Point3D>::new();
 
-    println!("starting lifeforms: {}", starting_lifeforms);
     for s in starting_lifeforms.data.iter().enumerate() {
         if *s.1 == '#' {
-            lifeforms.insert(get_point_from_index(s.0, starting_lifeforms.size().x));
+            let p = get_as_point(s.0, starting_lifeforms.size().x);
+            lifeforms.insert(Point3D {
+                x: p.x,
+                y: p.y,
+                z: 0,
+            });
         }
     }
 
+    let offsets = get_neighbor_offsets_3d();
     for _ in 0..6 {
-        lifeforms = run_iteration(&lifeforms);
-        println!("after iteration: {:?}\n", lifeforms);
+        lifeforms = run_iteration(&lifeforms, &offsets);
     }
     lifeforms.len() as i64
 }
 
-fn part_two() -> i64 {
-    0
+// Part two is the same as part one, except four dimensional.
+fn part_two(starting_lifeforms: &Matrix2D<char>) -> i64 {
+    let mut lifeforms = HashSet::<Point4D>::new();
+
+    for s in starting_lifeforms.data.iter().enumerate() {
+        if *s.1 == '#' {
+            let p = get_as_point(s.0, starting_lifeforms.size().x);
+            lifeforms.insert(Point4D {
+                x: p.x,
+                y: p.y,
+                z: 0,
+                w: 0,
+            });
+        }
+    }
+
+    let offsets = get_neighbor_offsets_4d();
+    for _ in 0..6 {
+        lifeforms = run_iteration(&lifeforms, &offsets);
+    }
+    lifeforms.len() as i64
 }
 
 pub fn solve() -> String {
@@ -116,7 +136,7 @@ pub fn solve() -> String {
     format!(
         "part one: {}, part two: {}",
         part_one(&starting_lifeforms),
-        part_two()
+        part_two(&starting_lifeforms)
     )
 }
 
@@ -126,12 +146,18 @@ mod tests {
 
     #[test]
     fn test_solve() {
-        assert_eq!("part one: 252, part two: 0", solve());
+        assert_eq!("part one: 252, part two: 2160", solve());
     }
 
     #[test]
     fn test_example() {
         let starting_lifeforms = Matrix2D::<char>::load("input/day_seventeen_example.txt");
         assert_eq!(112, part_one(&starting_lifeforms));
+    }
+
+    #[test]
+    fn test_example_part_two() {
+        let starting_lifeforms = Matrix2D::<char>::load("input/day_seventeen_example.txt");
+        assert_eq!(848, part_two(&starting_lifeforms));
     }
 }

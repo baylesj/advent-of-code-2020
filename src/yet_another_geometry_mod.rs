@@ -66,6 +66,14 @@ pub struct Point3D {
     pub z: i64,
 }
 
+#[derive(Debug, PartialEq, Eq, Default, Hash, Copy, Clone)]
+pub struct Point4D {
+    pub x: i64,
+    pub y: i64,
+    pub z: i64,
+    pub w: i64,
+}
+
 #[derive(Debug, PartialEq, Eq, Default, Hash, Clone)]
 pub struct Matrix2D<T> {
     pub data: Vec<T>,
@@ -189,10 +197,8 @@ impl Add for Point2D {
 
 impl AddAssign for Point2D {
     fn add_assign(&mut self, other: Self) {
-        *self = Self {
-            x: self.x + other.x,
-            y: self.y + other.y,
-        };
+        self.x += other.x;
+        self.y += other.y;
     }
 }
 
@@ -275,11 +281,30 @@ impl Add for Point3D {
 
 impl AddAssign for Point3D {
     fn add_assign(&mut self, other: Self) {
-        *self = Self {
+        self.x += other.x;
+        self.y += other.y;
+        self.z += other.z;
+    }
+}
+
+impl Add for Point4D {
+    type Output = Self;
+    fn add(self, other: Self) -> Self {
+        Self {
             x: self.x + other.x,
             y: self.y + other.y,
             z: self.z + other.z,
-        };
+            w: self.w + other.w,
+        }
+    }
+}
+
+impl AddAssign for Point4D {
+    fn add_assign(&mut self, other: Self) {
+        self.x += other.x;
+        self.y += other.y;
+        self.z += other.z;
+        self.w += other.w;
     }
 }
 
