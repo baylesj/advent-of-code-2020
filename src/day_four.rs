@@ -1,6 +1,5 @@
 use crate::loadable::LoadableFromFile;
 use crate::validity::Validity;
-use lazy_static::lazy_static;
 use regex::Regex;
 use std::fmt;
 use std::fs::File;
@@ -8,17 +7,17 @@ use std::io::prelude::*;
 use std::io::BufReader;
 use std::str::FromStr;
 
-const INPUT_FILENAME: &'static str = "input/day_four.txt";
-
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum Height {
+    Unknown,
+    Invalid,
     Inches(i64),
     Centimeters(i64),
 }
 
 impl Default for Height {
     fn default() -> Self {
-        Height::Inches(0)
+        Height::Unknown
     }
 }
 
@@ -44,6 +43,7 @@ impl Validity for Height {
         match self {
             Height::Inches(i) => (59..77).contains(i),
             Height::Centimeters(cm) => (150..194).contains(cm),
+            _ => false,
         }
     }
 }
@@ -58,11 +58,12 @@ pub enum EyeColor {
     Hazel,
     Other,
     Unknown,
+    Invalid,
 }
 
 impl Default for EyeColor {
     fn default() -> Self {
-        EyeColor::Unknown
+        EyeColor::Invalid
     }
 }
 
@@ -85,7 +86,7 @@ impl FromStr for EyeColor {
 
 impl Validity for EyeColor {
     fn is_valid(&self) -> bool {
-        *self != EyeColor::Unknown
+        *self != EyeColor::Unknown && *self != EyeColor::Invalid
     }
 }
 
@@ -188,16 +189,37 @@ impl fmt::Display for Passport {
     }
 }
 
-impl LoadableFromFile for Vec<Passport> {
-    fn load(filename: &str) -> Vec<Passport> {
-        lazy_static! {
-            static ref RE: Regex = Regex::new("([a-z]+):([a-z0-9#]+)").unwrap();
-        }
+trait Initialized {
+    fn was_initialized(&self) -> bool;
+}
+
+impl Initialized for Passport {
+    // TODO: refactor to be cleaner.
+    fn was_initialized(&self) -> bool {
+        self.birth_year > 0
+            && self.issue_year > 0
+            && self.expiration_year > 0
+            && self.height != Height::default()
+            && self.hair_color != RgbColor::default()
+            && self.eye_color != EyeColor::default()
+            && self.id != Identifier::default()
+    }
+}
+
+struct Passports {
+    contains_invalid_fields: Vec<Passport>,
+    valid: Vec<Passport>,
+}
+
+impl LoadableFromFile for Passports {
+    fn load(filename: &str) -> Passports {
+        let re: Regex = Regex::new("([a-z]+):([a-z0-9#]+)").unwrap();
         let file = File::open(filename).expect("Invalid filename");
 
         let mut reader = BufReader::new(file);
         let mut line = String::new();
         let mut passports: Vec<Passport> = Vec::new();
+        let mut passports_with_invalid_fields: Vec<Passport> = Vec::new();
         let mut current = Passport::default();
         loop {
             match reader.read_line(&mut line) {
@@ -206,6 +228,8 @@ impl LoadableFromFile for Vec<Passport> {
                     if line.trim().is_empty() {
                         if current.is_valid() {
                             passports.push(current);
+                        } else if current.was_initialized() {
+                            passports_with_invalid_fields.push(current);
                         }
                         if bytes_read == 0 {
                             break;
@@ -214,26 +238,30 @@ impl LoadableFromFile for Vec<Passport> {
                             current = Passport::default();
                         }
                     }
-
-                    // TODO: this could handle errors cleaner.
-                    for found in RE.captures_iter(&line) {
+                    for found in re.captures_iter(&line) {
                         match &found[1] {
-                            "byr" => current.birth_year = found[2].parse().unwrap_or_default(),
-                            "iyr" => current.issue_year = found[2].parse().unwrap_or_default(),
-                            "eyr" => current.expiration_year = found[2].parse().unwrap_or_default(),
+                            "byr" => current.birth_year = found[2].parse().unwrap_or(-1),
+                            "iyr" => current.issue_year = found[2].parse().unwrap_or(-1),
+                            "eyr" => current.expiration_year = found[2].parse().unwrap_or(-1),
                             "hgt" => {
-                                current.height = Height::from_str(&found[2]).unwrap_or_default()
+                                current.height =
+                                    Height::from_str(&found[2]).unwrap_or(Height::Invalid)
                             }
                             "hcl" => {
                                 current.hair_color =
-                                    RgbColor::from_str(&found[2]).unwrap_or_default()
+                                    RgbColor::from_str(&found[2]).unwrap_or(RgbColor {
+                                        red: 0,
+                                        green: 0,
+                                        blue: -1,
+                                    })
                             }
                             "ecl" => {
                                 current.eye_color =
-                                    EyeColor::from_str(&found[2]).unwrap_or_default()
+                                    EyeColor::from_str(&found[2]).unwrap_or(EyeColor::Invalid)
                             }
                             "pid" => {
-                                current.id = Identifier::from_str(&found[2]).unwrap_or_default()
+                                current.id = Identifier::from_str(&found[2])
+                                    .unwrap_or(Identifier { value: -1 })
                             }
                             "cid" => current.country_id = found[2].to_owned(),
                             _ => panic!(),
@@ -246,21 +274,23 @@ impl LoadableFromFile for Vec<Passport> {
             }
             line.clear();
         }
-        passports
+        Passports {
+            contains_invalid_fields: passports_with_invalid_fields,
+            valid: passports,
+        }
     }
 }
 
-fn part_one(_passports: &Vec<Passport>) -> i64 {
-    // TODO: refactor to re-enable part one.
-    202
+fn part_one(passports: &Passports) -> i64 {
+    passports.contains_invalid_fields.len() as i64 + passports.valid.len() as i64
 }
 
-fn part_two(passports: &Vec<Passport>) -> i64 {
-    passports.len() as i64
+fn part_two(passports: &Passports) -> i64 {
+    passports.valid.len() as i64
 }
 
 pub fn solve() -> String {
-    let passports = Vec::<Passport>::load(INPUT_FILENAME);
+    let passports = Passports::load("input/day_four.txt");
     format!(
         "part one: {}, part two: {}",
         part_one(&passports),
@@ -273,14 +303,13 @@ mod tests {
     use super::*;
 
     #[test]
-    pub fn solves_part_one_example() {
-        const INPUT_FILENAME: &'static str = "input/day_four_part_one_example.txt";
-        let passports = Vec::<Passport>::load(INPUT_FILENAME);
-        assert_eq!(2, passports.len());
+    fn solves_part_one_example() {
+        let passports = Passports::load("input/day_four_part_one_example.txt");
+        assert_eq!(2, part_one(&passports));
     }
 
     #[test]
-    pub fn solves() {
-        //assert_eq!("part one: 176, part two: 5872458240", solve());
+    fn solves() {
+        assert_eq!("part one: 176, part two: 137", solve());
     }
 }
