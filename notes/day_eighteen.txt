@@ -1,0 +1,12 @@
+Rules: has to support basic arithmetic operators (+, -, *, /)
+as well as parenthesis.
+Option 1: use a tree, all integer values are leaf nodes and
+operators are intermediate nodes. Doesn"t really make sense for
+this because unlike traditional math, evaluations are done
+strictly left to right and multiplication/division doesn"t have
+higher priority than addition, which leads to...
+
+Option 2: just use a stack, evaluate as we go. when we encounter
+a left paren, push the current state onto the stack, evaluate the contents
+of the parens, then when we encounter left paren, reduce, then evaluate what
+we put on the stack.

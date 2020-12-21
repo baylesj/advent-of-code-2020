@@ -20,6 +20,13 @@ impl LoadableFromFile for Vec<i64> {
     }
 }
 
+impl LoadableFromFile for Vec<String> {
+    fn load(filename: &str) -> Vec<String> {
+        let contents = fs::read_to_string(filename).unwrap();
+        contents.lines().map(|l| l.to_owned()).collect()
+    }
+}
+
 impl LoadableFromFile for Matrix2D<char> {
     fn load(filename: &str) -> Matrix2D<char> {
         let file = File::open(filename).expect("Invalid filename");
