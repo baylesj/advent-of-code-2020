@@ -200,7 +200,10 @@ mod tests {
 
     #[test]
     fn test_solve() {
-        assert_eq!("part one: 50956598240016, part two: 535809575344339", solve());
+        assert_eq!(
+            "part one: 50956598240016, part two: 535809575344339",
+            solve()
+        );
     }
 
     #[test]
