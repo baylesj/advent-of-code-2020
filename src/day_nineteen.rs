@@ -124,17 +124,34 @@ fn part_one(messages: &Messages) -> i64 {
 pub fn solve() -> String {
     let mut messages = Messages::load("input/day_nineteen.txt");
     let part_one_answer = part_one(&messages);
-    messages
-        .rules
-        .insert(8, Rule::Referential(vec![vec![42], vec![42, 8]]));
-    messages
-        .rules
-        .insert(11, Rule::Referential(vec![vec![42, 31], vec![42, 11, 31]]));
+
+    // Both 8 and 11 are special, self referencing rules that create cycles.
+    // We can break the cycle at the beginning by using a recurse limit to
+    // set an approximate series for these rules that will match every length
+    // rule we have.
+    // NOTE: the recurse limit is chosen manually by increasing until the
+    // part two solution does not change:
+    // 1: 213 matches, 2: 273 matches, 3: 308 matches, 4: 322 matches,
+    // 5: 325 matches, **6**: 325 matches.
+    const RECURSE_LIMIT: usize = 6;
+    let mut eight = vec![];
+    for i in 1..RECURSE_LIMIT + 1 {
+        eight.push(vec![42; i]);
+    }
+    messages.rules.insert(8, Rule::Referential(eight));
+
+    let mut eleven = vec![];
+    for i in 1..RECURSE_LIMIT + 1 {
+        let mut v = vec![42; i];
+        v.append(&mut vec![31; i]);
+        eleven.push(v);
+    }
+    messages.rules.insert(11, Rule::Referential(eleven));
 
     format!(
         "part one: {}, part two: {}",
         part_one_answer,
-        0 // TODO: fix stack overflow: part_one(&messages)
+        part_one(&messages)
     )
 }
 
@@ -186,6 +203,6 @@ mod tests {
 
     #[test]
     fn test_solve() {
-        assert_eq!("part one: 213, part two: 0", solve());
+        assert_eq!("part one: 213, part two: 325", solve());
     }
 }
