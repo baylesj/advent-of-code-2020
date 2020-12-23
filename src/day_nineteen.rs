@@ -1,4 +1,5 @@
 use crate::loadable::LoadableFromFile;
+use regex::Regex;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::prelude::*;
@@ -74,53 +75,37 @@ impl LoadableFromFile for Messages {
     }
 }
 
-fn meets_rule(s: &str, r: usize, rules: &HashMap<usize, Rule>) -> bool {
+fn build_regex(r: usize, rules: &HashMap<usize, Rule>) -> String {
     match rules.get(&r).unwrap() {
         // Base case, string should be of length 1.
-        Rule::Single(c) => {
-            if s.len() == 1 {
-                *s.as_bytes().first().unwrap() as char == *c
-            } else {
-                false
-            }
-        }
+        Rule::Single(c) => c.to_string(),
 
         Rule::Referential(rs) => {
-            // string should always be an even length, e.g. 2, 4, 8.
-            // If string length is 8, want [0 .. 3], [4 .. 7]
-            for rules_list in rs {
-                if rules_list.len() == 1 {
-                    return meets_rule(s, rules_list[0], &rules);
+            let mut regex = String::from("(");
+            for rules_list in rs.iter().enumerate() {
+                if rules_list.0 > 0 {
+                    regex.push('|');
                 }
-                assert!(rules_list.len() == 2);
-                // TODO: we should really have a smarter way of knowing where
-                // to split the string.
-                for i in 1..s.len() - 1 {
-                    let lr = s.split_at(i);
-                    if meets_rule(lr.0, rules_list[0], &rules)
-                        && meets_rule(lr.1, rules_list[1], &rules)
-                    {
-                        return true;
-                    }
+
+                regex.push('(');
+                for rule in rules_list.1.iter().enumerate() {
+                    regex += &build_regex(*rule.1, rules);
                 }
+                regex.push(')');
             }
-            false
+            regex.push(')');
+            regex
         }
     }
 }
 
-// TODO: memoization?
-fn meets_the_rules(message: &str, rules: &HashMap<usize, Rule>) -> bool {
-    println!("testing \"{}\"", message);
-    meets_rule(message, 0, &rules)
-}
-
 fn part_one(messages: &Messages) -> i64 {
-    messages
-        .messages
-        .iter()
-        .filter(|m| meets_the_rules(&m, &messages.rules))
-        .count() as i64
+    let mut raw_regex = String::from("^");
+    raw_regex += &build_regex(0, &messages.rules);
+    raw_regex += "$";
+    let re = Regex::from_str(&raw_regex).unwrap();
+
+    messages.messages.iter().filter(|m| re.is_match(m)).count() as i64
 }
 
 fn part_two() -> i64 {
@@ -184,6 +169,6 @@ mod tests {
 
     #[test]
     fn test_solve() {
-        assert_eq!("part one: 0, part two: 0", solve());
+        assert_eq!("part one: 213, part two: 0", solve());
     }
 }
