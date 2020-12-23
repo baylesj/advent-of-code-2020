@@ -133,6 +133,8 @@ pub fn solve() -> String {
     // part two solution does not change:
     // 1: 213 matches, 2: 273 matches, 3: 308 matches, 4: 322 matches,
     // 5: 325 matches, **6**: 325 matches.
+    // TODO: rule 0 is the only one that references rules 8 and 11, could
+    // update to use this and probably be slightly faster.
     const RECURSE_LIMIT: usize = 6;
     let mut eight = vec![];
     for i in 1..RECURSE_LIMIT + 1 {
