@@ -75,10 +75,19 @@ impl LoadableFromFile for Messages {
     }
 }
 
-fn build_regex(r: usize, rules: &HashMap<usize, Rule>) -> String {
+fn build_regex(
+    r: usize,
+    rules: &HashMap<usize, Rule>,
+    memo: &mut HashMap<usize, String>,
+) -> String {
+    if let Some(value) = memo.get(&r) {
+        return value.to_string();
+    }
+
+    let fragment;
     match rules.get(&r).unwrap() {
         // Base case, string should be of length 1.
-        Rule::Single(c) => c.to_string(),
+        Rule::Single(c) => fragment = c.to_string(),
 
         Rule::Referential(rs) => {
             let mut regex = String::from("(");
@@ -89,35 +98,43 @@ fn build_regex(r: usize, rules: &HashMap<usize, Rule>) -> String {
 
                 regex.push('(');
                 for rule in rules_list.1.iter().enumerate() {
-                    regex += &build_regex(*rule.1, rules);
+                    regex += &build_regex(*rule.1, rules, memo);
                 }
                 regex.push(')');
             }
             regex.push(')');
-            regex
+            fragment = regex;
         }
     }
+
+    memo.insert(r, fragment);
+    memo.get(&r).unwrap().to_string()
 }
 
 fn part_one(messages: &Messages) -> i64 {
     let mut raw_regex = String::from("^");
-    raw_regex += &build_regex(0, &messages.rules);
+    let mut memo = HashMap::new();
+    raw_regex += &build_regex(0, &messages.rules, &mut memo);
     raw_regex += "$";
     let re = Regex::from_str(&raw_regex).unwrap();
 
     messages.messages.iter().filter(|m| re.is_match(m)).count() as i64
 }
 
-fn part_two() -> i64 {
-    0
-}
-
 pub fn solve() -> String {
-    let messages = Messages::load("input/day_nineteen.txt");
+    let mut messages = Messages::load("input/day_nineteen.txt");
+    let part_one_answer = part_one(&messages);
+    messages
+        .rules
+        .insert(8, Rule::Referential(vec![vec![42], vec![42, 8]]));
+    messages
+        .rules
+        .insert(11, Rule::Referential(vec![vec![42, 31], vec![42, 11, 31]]));
+
     format!(
         "part one: {}, part two: {}",
-        part_one(&messages),
-        part_two()
+        part_one_answer,
+        0 // TODO: fix stack overflow: part_one(&messages)
     )
 }
 
