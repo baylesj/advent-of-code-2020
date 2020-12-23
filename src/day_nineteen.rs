@@ -1,15 +1,14 @@
 use crate::loadable::LoadableFromFile;
-use std::str::FromStr;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::BufReader;
+use std::str::FromStr;
 
 #[derive(Debug, PartialEq)]
 enum Rule {
-    None,
     Single(char),
-    Referential(Vec<Vec<usize>>)
+    Referential(Vec<Vec<usize>>),
 }
 
 #[derive(Debug, PartialEq)]
@@ -21,7 +20,7 @@ struct RuleAndIndex {
 #[derive(Debug, Default)]
 struct Messages {
     rules: HashMap<usize, Rule>,
-    messages: Vec<String>
+    messages: Vec<String>,
 }
 
 impl FromStr for RuleAndIndex {
@@ -70,13 +69,58 @@ impl LoadableFromFile for Messages {
         }
         Messages {
             rules: rules,
-            messages: lines.map(|l| l.unwrap()).collect()
+            messages: lines.map(|l| l.unwrap()).collect(),
         }
     }
 }
 
-fn part_one() -> i64 {
-    0
+fn meets_rule(s: &str, r: usize, rules: &HashMap<usize, Rule>) -> bool {
+    match rules.get(&r).unwrap() {
+        // Base case, string should be of length 1.
+        Rule::Single(c) => {
+            if s.len() == 1 {
+                *s.as_bytes().first().unwrap() as char == *c
+            } else {
+                false
+            }
+        }
+
+        Rule::Referential(rs) => {
+            // string should always be an even length, e.g. 2, 4, 8.
+            // If string length is 8, want [0 .. 3], [4 .. 7]
+            for rules_list in rs {
+                if rules_list.len() == 1 {
+                    return meets_rule(s, rules_list[0], &rules);
+                }
+                assert!(rules_list.len() == 2);
+                // TODO: we should really have a smarter way of knowing where
+                // to split the string.
+                for i in 1..s.len() - 1 {
+                    let lr = s.split_at(i);
+                    if meets_rule(lr.0, rules_list[0], &rules)
+                        && meets_rule(lr.1, rules_list[1], &rules)
+                    {
+                        return true;
+                    }
+                }
+            }
+            false
+        }
+    }
+}
+
+// TODO: memoization?
+fn meets_the_rules(message: &str, rules: &HashMap<usize, Rule>) -> bool {
+    println!("testing \"{}\"", message);
+    meets_rule(message, 0, &rules)
+}
+
+fn part_one(messages: &Messages) -> i64 {
+    messages
+        .messages
+        .iter()
+        .filter(|m| meets_the_rules(&m, &messages.rules))
+        .count() as i64
 }
 
 fn part_two() -> i64 {
@@ -84,7 +128,12 @@ fn part_two() -> i64 {
 }
 
 pub fn solve() -> String {
-    format!("part one: {}, part two: {}", part_one(), part_two())
+    let messages = Messages::load("input/day_nineteen.txt");
+    format!(
+        "part one: {}, part two: {}",
+        part_one(&messages),
+        part_two()
+    )
 }
 
 #[cfg(test)]
@@ -119,12 +168,18 @@ mod tests {
     #[test]
     fn test_load() {
         let messages = Messages::load("input/day_nineteen_example.txt");
-        assert_eq!(Rule::Referential(vec![vec![4, 1, 5]]),
-        messages.rules[&0]);
-        assert_eq!(Rule::Single('a'),
-        messages.rules[&4]);
+        // NOTE: the example is modified since the actual file starts with a
+        // pair for rule 0, and there's really no reason to complicate things.
+        assert_eq!(Rule::Referential(vec![vec![1, 5]]), messages.rules[&0]);
+        assert_eq!(Rule::Single('a'), messages.rules[&4]);
 
-        assert_eq!("ababbb", messages.messages[0]);
+        assert_eq!("babbb", messages.messages[0]);
+    }
+
+    #[test]
+    fn test_example() {
+        let messages = Messages::load("input/day_nineteen_example.txt");
+        assert_eq!(2, part_one(&messages));
     }
 
     #[test]

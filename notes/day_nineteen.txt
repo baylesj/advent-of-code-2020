@@ -1,0 +1,21 @@
+Started out by trying the easy, obvious approach: dynamic programming. Each
+rule is met if a set of its subrules are met, so just divide naturally by
+subrules. This approach is quick and easy, and works for the example!
+
+Bad news: the rules do not split evenly, e.g. if a rule contains 2 other rules
+the first one may match 2 characters, and the other 6, or 1 and 7, so each
+possible combination of subrules may match different lengths. This pretty much
+kills this approach.
+
+Option 1: remediate by calculating all possible subrule lengths and try matching
+by splitting the expression string at every sub rule length.
+
+Option 2: This is NOT a binary tree, but it is a tree and it's pretty regex
+like, for example our example rules could be expressed as:
+
+0: "((aa|bb)(ab|ba))|((ab|ba)(aa|bb))b"
+1: "((aa|bb)(ab|ba))|((ab|ba)(aa|bb))"
+2: "(aa|bb)"
+3: "(ab|ba)"
+4: "a"
+5: "b"
