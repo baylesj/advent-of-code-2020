@@ -9,4 +9,23 @@ higher priority than addition, which leads to...
 Option 2: just use a stack, evaluate as we go. when we encounter
 a left paren, push the current state onto the stack, evaluate the contents
 of the parens, then when we encounter left paren, reduce, then evaluate what
-we put on the stack.
+we put on the stack. Let's do option 2.
+
+Part 2:
+
+Now addition has higher priority than multiplication, and subtraction and
+division never got added so can just be removed...
+
+Priority definitely implies tree to me.
+
+Option 1: Build a tree, reduce it. Haven't done a parse tree in a long time/in
+Rust at all so pretty interesting. All operations are binary, meaning that each
+operator must have a left and a right child. Numbers are leaf nodes.
+
+Option 2: Parse the expression and leave things that are multiply alone, then
+re-parse the string to do multiplication. This could get tricky/annoying to
+figure out how many times the string sill need to be reduced.
+
+Option 3: Use the same stack approach, but change from infix to postfix to
+figure out all the priorities, then resolve the postfix. This avoids the
+tree and traversal in favor of brushing up on some older math concepts to me.
