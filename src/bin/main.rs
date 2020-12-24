@@ -27,9 +27,9 @@ const DAYS: [&dyn Fn() -> String; 25] = [
     &advent_of_code::day_eighteen::solve,
     &advent_of_code::day_nineteen::solve,
     &advent_of_code::day_twenty::solve,
-    &advent_of_code::day_twentyone::solve,
-    &advent_of_code::day_twentytwo::solve,
-    &advent_of_code::day_twentythree::solve,
+    &advent_of_code::day_twenty_one::solve,
+    &advent_of_code::day_twenty_two::solve,
+    &advent_of_code::day_twenty_three::solve,
     &advent_of_code::christmas_eve::solve,
     &advent_of_code::christmas_day::solve,
 ];
