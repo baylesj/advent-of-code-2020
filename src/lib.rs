@@ -1,3 +1,5 @@
+pub mod christmas_day;
+pub mod christmas_eve;
 pub mod day_eight;
 pub mod day_eighteen;
 pub mod day_eleven;
@@ -18,6 +20,9 @@ pub mod day_thirteen;
 pub mod day_three;
 pub mod day_twelve;
 pub mod day_twenty;
+pub mod day_twentyone;
+pub mod day_twentythree;
+pub mod day_twentytwo;
 pub mod day_two;
 pub mod loadable;
 pub mod validity;

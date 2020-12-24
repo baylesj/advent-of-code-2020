@@ -6,7 +6,7 @@ use std::time::Instant;
 
 use advent_of_code;
 
-const DAYS: [&dyn Fn() -> String; 20] = [
+const DAYS: [&dyn Fn() -> String; 25] = [
     &advent_of_code::day_one::solve,
     &advent_of_code::day_two::solve,
     &advent_of_code::day_three::solve,
@@ -27,13 +27,25 @@ const DAYS: [&dyn Fn() -> String; 20] = [
     &advent_of_code::day_eighteen::solve,
     &advent_of_code::day_nineteen::solve,
     &advent_of_code::day_twenty::solve,
+    &advent_of_code::day_twentyone::solve,
+    &advent_of_code::day_twentytwo::solve,
+    &advent_of_code::day_twentythree::solve,
+    &advent_of_code::christmas_eve::solve,
+    &advent_of_code::christmas_day::solve,
 ];
 
 fn log_elapsed(last: &mut Instant, day: usize) {
     let now = Instant::now();
     let time_elapsed = now.duration_since(*last).as_millis();
 
-    let log_message = format!("\ttime elapsed for day {}:", day);
+    let log_message;
+    if day == 24 {
+        log_message = "\ttime elapsed for christmas eve:".to_owned();
+    } else if day == 25 {
+        log_message = "\ttime elapsed for christmas day:".to_owned();
+    } else {
+        log_message = format!("\ttime elapsed for day {}:", day);
+    }
     let log_time = format!("{}ms", time_elapsed);
 
     let color: Color;
@@ -51,7 +63,16 @@ fn log_elapsed(last: &mut Instant, day: usize) {
 
 fn run_day(i: usize, now: &mut Instant) {
     let style = Style::new().bold();
-    let day_fragment = style.paint(format!("Day {}", i));
+
+    let day_name;
+    if i == 24 {
+        day_name = "Christmas Eve".to_owned();
+    } else if i == 25 {
+        day_name = "Christmas Day".to_owned();
+    } else {
+        day_name = format!("Day {}", i);
+    }
+    let day_fragment = style.paint(day_name);
     println!("{}: {}", day_fragment, DAYS[i - 1]());
     log_elapsed(now, i);
 }
