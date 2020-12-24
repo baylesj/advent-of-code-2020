@@ -65,12 +65,11 @@ impl From<&str> for Instruction {
                     }
                     _ => panic!("unknown char"),
                 }
-                positives <<= 1;
-                negatives <<= 1;
+                if b.0 < mask_string.len() - 1 {
+                    positives <<= 1;
+                    negatives <<= 1;
+                }
             }
-            // TODO: hate this.
-            positives >>= 1;
-            negatives >>= 1;
             Instruction::SetMask(Mask {
                 positive_mask: positives,
                 negative_mask: negatives,
@@ -139,14 +138,7 @@ fn get_addresses(value: usize, mask: &Mask) -> Vec<usize> {
     addresses
 }
 
-// TODO: can definitely clean up uses of traits.
-trait Advanceable {
-    fn advance(&mut self);
-    fn advance_with_address_mask(&mut self);
-}
-
-// TODO: turn into trait
-impl Advanceable for Program {
+impl Program {
     fn advance(&mut self) {
         match &self.instructions[self.index] {
             Instruction::SetMask(mask) => {

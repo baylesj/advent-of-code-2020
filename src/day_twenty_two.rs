@@ -147,7 +147,6 @@ impl Game {
                 // winner takes the cards, with theirs first.
                 self.player_one_deck.push_back(one_played);
                 self.player_one_deck.push_back(two_played);
-            // TODO: need to deal with ties??
             } else {
                 self.player_two_deck.push_back(two_played);
                 self.player_two_deck.push_back(one_played);
