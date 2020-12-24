@@ -189,6 +189,8 @@ pub fn solve() -> String {
 
     format!(
         "part one: {}, part two: {}",
+        // TODO: should be able to refactor part one in terms of part two,
+        // just using the same priority.
         part_one(&expressions),
         part_two(&expressions)
     )

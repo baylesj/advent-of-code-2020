@@ -177,7 +177,7 @@ fn run_iteration(
 // Part two is basically Conways' Game of Life again.
 fn part_two(flipped_day_one: &HashSet<Point3D>) -> i64 {
     let mut flipped: HashSet<Point3D> = flipped_day_one.clone();
-    for i in 1..101 {
+    for _ in 1..101 {
         flipped = run_iteration(&flipped, &NEIGHBOR_OFFSETS_HEX);
     }
     flipped.len() as i64
