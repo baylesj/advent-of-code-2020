@@ -56,3 +56,10 @@ impl LoadableFromFile for Matrix2D<char> {
         }
     }
 }
+
+impl LoadableFromFile for i64 {
+    fn load(filename: &str) -> Self {
+        let data = fs::read_to_string(filename).expect("Unable to read file");
+        data.trim().parse().unwrap()
+    }
+}
