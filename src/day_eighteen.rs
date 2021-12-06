@@ -61,6 +61,9 @@ impl Token {
 #[derive(Default, Debug)]
 struct Node {
     value: Token,
+
+    // TODO: field is never read?? what??
+    #[allow(dead_code)]
     children: Vec<Node>,
 }
 

@@ -5,6 +5,8 @@ use std::io::prelude::*;
 use std::io::BufReader;
 
 // Note: tiles are 10x10
+// TODO: field is never read?? what??
+#[allow(dead_code)]
 #[derive(Debug)]
 struct Tile {
     id: i32,

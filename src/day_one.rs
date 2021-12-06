@@ -51,7 +51,7 @@ fn load_data() -> Vec<i32> {
         .lines()
         .map(|r| match r {
             Ok(n) => n.parse::<i32>().unwrap(),
-            Err(e) => panic!(e),
+            Err(e) => panic!("{}", e),
         })
         .collect();
     data.sort();

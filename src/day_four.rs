@@ -241,7 +241,7 @@ impl LoadableFromFile for Vec<Passport> {
                     }
                 }
                 Err(err) => {
-                    panic!(err);
+                    panic!("{}", err);
                 }
             }
             line.clear();

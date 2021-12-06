@@ -37,7 +37,7 @@ impl LoadableFromFile for Vec<Group> {
                     group.push(current);
                 }
                 Err(err) => {
-                    panic!(err);
+                    panic!("{}", err);
                 }
             }
             line.clear();

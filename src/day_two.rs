@@ -65,7 +65,7 @@ impl LoadableFromFile for Vec<PasswordAndPolicy> {
             .lines()
             .map(|r| match r {
                 Ok(n) => PasswordAndPolicy::from_str(&n).unwrap(),
-                Err(e) => panic!(e),
+                Err(e) => panic!("{}", e),
             })
             .collect()
     }
